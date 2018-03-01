@@ -1,0 +1,13 @@
+The adaptive test infrastructure uses the GIT revision control system.
+Files are being uploaded to TI's official, IT supported Bitbucket. You could
+also configure your windows system to pull/push from the repo, so could
+conceivably work from that at all times.
+
+Basic Tutorials :
+	https://git-scm.com/docs/gittutorial
+	https://confluence.itg.ti.com/display/BBUCKKB/Introduction+to+GIT
+
+TI's bitbucket :
+	https://bitbucket.itg.ti.com/repos?visibility=public
+
+
