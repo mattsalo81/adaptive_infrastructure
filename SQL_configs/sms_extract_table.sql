@@ -6,12 +6,12 @@ create table etest_daily_sms_extract(
 	routing			varchar2	(32)	not null,
 	effective_routing	varchar2	(32)	not null,
 	test_lpt		number		(4,0)	not null,
-	COT			varchar2	(1)	in ('Y', 'N'),
+	COT			varchar2	(1)     check (COT in ('Y', 'N')),
 	program			varchar2	(32)	not null,
 	prober_file		varchar2	(32)	not null,
 	recipe			varchar2	(128)	not null,
 
 	constraint sms_pk PRIMARY KEY (device, test_lpt)
-);
+)
 
 
