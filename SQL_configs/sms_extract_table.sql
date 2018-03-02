@@ -10,6 +10,7 @@ create table etest_daily_sms_extract(
 	program			varchar2	(32)	not null,
 	prober_file		varchar2	(32)	not null,
 	recipe			varchar2	(128)	not null,
+	test_area		varchar2	(32)	not null,
 
 	constraint sms_pk PRIMARY KEY (device, test_lpt)
 )
