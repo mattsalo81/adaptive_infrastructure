@@ -2,12 +2,14 @@ package extract;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
+use SMS::effective_routing;
 use DBI;
 use DATABASE::connect;
 use Carp;
 use Data::Dumper;
 
 my %family2tech;
+my %lpt_opn2area;
 
 sub update_sms_table{
 	my $table = 'etest_daily_sms_extract';
@@ -37,7 +39,8 @@ sub update_sms_table{
 			# set bound variables
 			$device = $rec->{"DEVICE"};
 			$family = $rec->{"FAMILY"};
-			$technology = get_technology_from_family($family);
+			$rec->{"TECH"} = get_technology_from_family($family);
+			$technology = $rec->{"TECH"};
 			$coordref = $rec->{"COORDREF"};
 			$routing = $rec->{"ROUTING"};
 			$lpt = $rec->{"LPT"};
@@ -45,12 +48,13 @@ sub update_sms_table{
 			$prober_file = $rec->{"PROBER_FILE"};
 			$opn = $rec->{"OPN"};
 			$card_family = $rec->{"CARD_FAMILY"};
-			$cot = get_COT($rec);
-
-			# TODO:
-			$effective_routing = "WHATEVER";
-			$recipe = "WHATEVER";
-			$area = "WHATEVER";
+			$cot = get_COT_from_record($rec);
+			$recipe = make_recipe_from_record($rec);
+			$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
+			$area = $rec->{"AREA"};
+			next if $area eq "UNDEF";
+			
+			$effective_routing = effective_routing::get_effective_routing($rec);
 			
 			# error checking on KPARMS
 			next unless defined $coordref;
@@ -71,7 +75,7 @@ sub update_sms_table{
 	}
 }
 
-sub get_COT{
+sub get_COT_from_record{
 	my ($hash_rec) = @_;
 	my $prod_grp = $hash_rec->{"PROD_GRP"};
 	unless (defined $prod_grp){
@@ -85,12 +89,17 @@ sub get_COT{
 	return undef;
 }
 
+sub make_recipe_from_record{
+	my $rec = (@_);
+	return make_recipe($rec->{"FAMILY"}, $rec->{"ROUTING"}, $rec->{"PROGRAM"});
+}
+
 sub make_recipe{
 	my ($family, $routing, $program) = @_;
-	unless (defined $family && defined $routing && defined $program){
-		$family = "" unless defined $family;
-		$routing = "" unless defined $routing;
-		$program = "" unless defined $program;
+	$family = "" unless defined $family;
+	$routing = "" unless defined $routing;
+	$program = "" unless defined $program;
+	unless ($family ne "" && $routing ne "" && $program ne ""){
 		confess("Could not make recipe with <$family> <$routing> and <$program>\n");
 	}
 	$routing = clean_text($routing);
@@ -102,7 +111,7 @@ sub clean_text{
 	my $orig_text = $text;
 	$text =~ tr{-\./\+}{desp};
 	$text =~ s/\s//g;
-	unless ($text =~ m/^[a-zA-Z0-9]$/){
+	unless ($text =~ m/^[a-zA-Z0-9]*$/){
 		confess "Could not clean <$orig_text>! Best try : <$text>.  Probably need to update the naming conventions\n";
 	}
 	return $text;
@@ -124,6 +133,21 @@ sub get_technology_from_family{
 	}
 	return $family2tech{$family};
 } 
+
+sub get_area_from_lpt_and_opn{
+	my ($lpt, $opn) = @_;
+	my $key = "$lpt" . "x" . "$opn";
+	unless (defined $lpt_opn2area{$key}){
+		my $sql = "select test_area from etest_logpoints where logpoint = ? and operation = ?";
+		my $conn = connect::read_only_connection("sd_limits");
+		my $sth = $conn->prepare($sql);
+		$sth->execute($lpt, $opn);
+		my ($area) = $sth->fetchrow_array();
+		$area = "UNDEF" unless defined $area;
+		$lpt_opn2area{$key} = $area;		
+	}
+	return $lpt_opn2area{$key};
+}
 
 sub get_device_extract_handle{
 	my $conn = connect::read_only_connection("sms");
