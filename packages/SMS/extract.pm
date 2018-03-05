@@ -7,6 +7,7 @@ use DBI;
 use DATABASE::connect;
 use Carp;
 use Data::Dumper;
+use LOGGING;
 
 my %family2tech;
 my %lpt_opn2area;
@@ -16,10 +17,12 @@ sub update_sms_table{
 	my $trans = connect::new_transaction("sd_limits");
 	eval{
 		# empty table in transaction
+		LOGGING::event("Clearing old sms extract table");
 		my $e_sth = $trans->prepare("delete from $table where 1 = 1");
 		$e_sth->execute();
 
 		# get SMS data
+		LOGGING::event("Downloading info from SMS and putting it into etest db");
 		my $d_sth = get_device_extract_handle();		
 		$d_sth->execute();
 
@@ -33,9 +36,17 @@ sub update_sms_table{
 		my $u_sth = $trans->prepare($u_sql);
 		my ($device, $technology, $family, $coordref, $routing, $effective_routing, $lpt, 
 		    $cot, $program, $prober_file, $recipe, $area, $opn, $card_family);
-
+		
+		my $num = 0;
 		# enter the download/scrub/upload loop
 		while (my $rec = $d_sth->fetchrow_hashref("NAME_uc")){
+			
+			$device = $rec->{"DEVICE"};
+			LOGGING::diag("Processing device $device");
+			$num++;
+			if ($num % 100 == 0){
+				LOGGING::DEBUG("Processed $num devices");
+			}
 
                         # error checking on KPARMS
                         next unless defined $coordref;
@@ -48,7 +59,6 @@ sub update_sms_table{
 
 
 			# set bound variables
-			$device = $rec->{"DEVICE"};
 			$family = $rec->{"FAMILY"};
 			$rec->{"TECH"} = get_technology_from_family($family);
 			$technology = $rec->{"TECH"};
@@ -90,6 +100,7 @@ sub get_COT_from_record{
 		confess("Unable find <PROD_GRP> in this record : " .  Dumper($hash_rec) . "\n");
 	}
 	if ($prod_grp =~ m/COT/i){
+		LOGGING::debug("It's a COT device");
 		return 'Y';
 	}else{
 		return 'N';
@@ -129,6 +140,7 @@ sub get_technology_from_family{
 	my ($family) = @_;
 	$family =~ tr/[a-z]/[A-Z]/;
 	unless (defined $family2tech{$family}){
+		LOGGING::debug("Looking for technology for $family in etest db");
 		my $conn = connect::read_only_connection("sd_limits");
 		my $sql = "select technology from etest_family_to_technology where UPPER(family) = ?";
 		my $sth = $conn->prepare($sql);
@@ -146,6 +158,7 @@ sub get_area_from_lpt_and_opn{
 	my ($lpt, $opn) = @_;
 	my $key = "$lpt" . "x" . "$opn";
 	unless (defined $lpt_opn2area{$key}){
+		LOGGING::debug("Looking for test area for lpt:opn $lpt:$opn in etest db");
 		my $sql = "select test_area from etest_logpoints where logpoint = ? and operation = ?";
 		my $conn = connect::read_only_connection("sd_limits");
 		my $sth = $conn->prepare($sql);
