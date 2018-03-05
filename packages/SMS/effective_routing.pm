@@ -14,7 +14,14 @@ sub get_effective_routing{
 	my $tech = $rec->{"TECH"};
 	if ($tech eq "LBC8"){
 		return get_effective_routing_LBC8($rec);
+	}elsif($tech eq "LBC7"){
+		return get_effective_routing_LBC7($rec);
+	}elsif($tech eq "F05"){
+		return get_effective_routing_F05($rec);
 	}	
+	# Nothing special LBC5
+	# Nothing special HPA07
+	# Nothing special LBC8LV
 	
 	my $routing = $rec->{"ROUTING"};
 	unless (defined $routing){
@@ -23,18 +30,29 @@ sub get_effective_routing{
 	return $routing
 }
 
+sub get_effective_routing_LBC7{
+	my ($rec) = @_;
+	return get_effective_routing_DCU_prod_grp($rec, "LBC7");
+}
+
 sub get_effective_routing_LBC8{
 	my ($rec) = @_;
+	return get_effective_routing_DCU_prod_grp($rec, "LBC8");
+}
+
+sub get_effective_routing_DCU_prod_grp{
+	my ($rec, $prefix) = @_;
 	my $device = $rec->{"DEVICE"};
 	my $prod_grp = $rec->{"PROD_GRP"};   
 	my $routing = $rec->{"ROUTING"};
 	unless(defined $routing && defined $prod_grp && defined $device){
-		confess("Missing crucial information to generate LBC8 effective routing. Probably programmer's fault\n");
+		confess("Missing crucial information to generate $prefix effective routing. Probably programmer's fault\n");
 	}
 	my $eff_routing = $routing;
 	if ($routing =~ m/DCU/){
 		$eff_routing .= "-".substr($device,4,2);
-		if ($prod_grp =~ m/LBC8\-([SDT]LM)/){
+		print("$prefix\n");
+		if ($prod_grp =~ m/$prefix\-([SDT]LM)/){
 			my $xlm = $1;
 			my $num_metal = 1;
 			$num_metal = 2 if ($xlm =~ /DLM/);
@@ -43,6 +61,22 @@ sub get_effective_routing_LBC8{
 		}else{
 			confess("Unable to get number of metal levels for effective routing from " . Dumper($rec) . "\n");
 		}
+	}
+	return $eff_routing;
+}
+
+sub get_effective_routing_F05{
+	my ($rec) = @_;
+	my $strategy = $rec->{"FE_STRATEGY"};	
+	my $routing = $rec->{"ROUTING"};
+	unless (defined $strategy && defined $routing){
+		confess("Missing crucial information to generate F05 effective routing.  Probably programmer's fault\n");
+	}
+	my $eff_routing = $routing;
+	if ($strategy =~ m/X(\d)L/){
+		$eff_routing .= "-$1";
+	}else{
+		confess("Unable to get number of metal levels for effective routing from " . Dumper($rec) . "\n");
 	}
 	return $eff_routing;
 }

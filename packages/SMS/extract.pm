@@ -36,6 +36,17 @@ sub update_sms_table{
 
 		# enter the download/scrub/upload loop
 		while (my $rec = $d_sth->fetchrow_hashref("NAME_uc")){
+
+                        # error checking on KPARMS
+                        next unless defined $coordref;
+                        next unless defined $program;
+                        next unless defined $prober_file;
+                        next unless defined $card_family;
+			$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
+			$area = $rec->{"AREA"};
+			next if $area eq "UNDEF";
+
+
 			# set bound variables
 			$device = $rec->{"DEVICE"};
 			$family = $rec->{"FAMILY"};
@@ -50,9 +61,6 @@ sub update_sms_table{
 			$card_family = $rec->{"CARD_FAMILY"};
 			$cot = get_COT_from_record($rec);
 			$recipe = make_recipe_from_record($rec);
-			$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
-			$area = $rec->{"AREA"};
-			next if $area eq "UNDEF";
 			
 			$effective_routing = effective_routing::get_effective_routing($rec);
 			
@@ -90,7 +98,7 @@ sub get_COT_from_record{
 }
 
 sub make_recipe_from_record{
-	my $rec = (@_);
+	my ($rec) = (@_);
 	return make_recipe($rec->{"FAMILY"}, $rec->{"ROUTING"}, $rec->{"PROGRAM"});
 }
 
