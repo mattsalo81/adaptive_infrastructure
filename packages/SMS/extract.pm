@@ -45,10 +45,10 @@ sub update_sms_table{
 			$prober_file = $rec->{"PROBER_FILE"};
 			$opn = $rec->{"OPN"};
 			$card_family = $rec->{"CARD_FAMILY"};
+			$cot = get_COT($rec);
 
 			# TODO:
 			$effective_routing = "WHATEVER";
-			$cot = "N";
 			$recipe = "WHATEVER";
 			$area = "WHATEVER";
 			
@@ -71,7 +71,41 @@ sub update_sms_table{
 	}
 }
 
-sub is_COT{
+sub get_COT{
+	my ($hash_rec) = @_;
+	my $prod_grp = $hash_rec->{"PROD_GRP"};
+	unless (defined $prod_grp){
+		confess("Unable find <PROD_GRP> in this record : " .  Dumper($hash_rec) . "\n");
+	}
+	if ($prod_grp =~ m/COT/i){
+		return 'Y';
+	}else{
+		return 'N';
+	}
+	return undef;
+}
+
+sub make_recipe{
+	my ($family, $routing, $program) = @_;
+	unless (defined $family && defined $routing && defined $program){
+		$family = "" unless defined $family;
+		$routing = "" unless defined $routing;
+		$program = "" unless defined $program;
+		confess("Could not make recipe with <$family> <$routing> and <$program>\n");
+	}
+	$routing = clean_text($routing);
+	return "${family}__${routing}__${program}";
+}
+
+sub clean_text{
+	my ($text) = @_;
+	my $orig_text = $text;
+	$text =~ tr{-\./\+}{desp};
+	$text =~ s/\s//g;
+	unless ($text =~ m/^[a-zA-Z0-9]$/){
+		confess "Could not clean <$orig_text>! Best try : <$text>.  Probably need to update the naming conventions\n";
+	}
+	return $text;
 }
 
 sub get_technology_from_family{
