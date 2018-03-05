@@ -21,7 +21,7 @@ sub set_level{
 	$value =~ tr/a-z/A-Z/;
 	if (defined $log_levels{$value}){
 		$level = $log_levels{$value};
-	}elsif ($level == 0 || $level == 1 || $level += 2 || $level +=3){
+	}elsif ($level == 0 || $level == 1 || $level == 2 || $level == 3){
 		$level = $value;
 	}else{
 		confess("Could not set log_level to <$value>\n");
@@ -52,7 +52,7 @@ sub diag{
 sub print_log{
 	my ($text) = @_;
 	$text .= "\n" unless $text =~ m/\n$/;
-	print $log $text;
+	print $log ($text);
 }
 
 
