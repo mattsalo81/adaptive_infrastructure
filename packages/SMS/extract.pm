@@ -43,42 +43,41 @@ sub update_sms_table{
 			
 			$device = $rec->{"DEVICE"};
 			LOGGING::diag("Processing device $device");
+			LOGGING::diag(Dumper($rec));
 			$num++;
 			if ($num % 100 == 0){
-				LOGGING::DEBUG("Processed $num devices");
+				LOGGING::event("Processed $num devices");
 			}
 
                         # error checking on KPARMS
-                        next unless defined $coordref;
-                        next unless defined $program;
-                        next unless defined $prober_file;
-                        next unless defined $card_family;
-			$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
-			$area = $rec->{"AREA"};
-			next if $area eq "UNDEF";
-
+                        $rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
+                        $area = $rec->{"AREA"};
+                        next if $area eq "UNDEF";
 
 			# set bound variables
 			$family = $rec->{"FAMILY"};
 			$rec->{"TECH"} = get_technology_from_family($family);
 			$technology = $rec->{"TECH"};
 			$coordref = $rec->{"COORDREF"};
+			next unless defined $coordref;
 			$routing = $rec->{"ROUTING"};
 			$lpt = $rec->{"LPT"};
 			$program = $rec->{"PROGRAM"};
+                        next unless defined $program;
 			$prober_file = $rec->{"PROBER_FILE"};
+                        next unless defined $prober_file;
 			$opn = $rec->{"OPN"};
 			$card_family = $rec->{"CARD_FAMILY"};
+                        next unless defined $card_family;
 			$cot = get_COT_from_record($rec);
 			$recipe = make_recipe_from_record($rec);
 			
 			$effective_routing = effective_routing::get_effective_routing($rec);
-			
+			$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
+			$area = $rec->{"AREA"};
 			# error checking on KPARMS
-			next unless defined $coordref;
-			next unless defined $program;
-			next unless defined $prober_file;
-			next unless defined $card_family;
+			next if $area eq "UNDEF";
+
 			# upload
 			$u_sth->execute($device, $technology, $family, $coordref, $routing, $effective_routing, $lpt, 
 		    			$cot, $program, $prober_file, $recipe, $area, $opn, $card_family);
@@ -156,6 +155,10 @@ sub get_technology_from_family{
 
 sub get_area_from_lpt_and_opn{
 	my ($lpt, $opn) = @_;
+	unless(defined $lpt and defined $opn){
+		confess "Critical info not provided to find test area";
+	}
+
 	my $key = "$lpt" . "x" . "$opn";
 	unless (defined $lpt_opn2area{$key}){
 		LOGGING::debug("Looking for test area for lpt:opn $lpt:$opn in etest db");
