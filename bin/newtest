@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "use warnings;"
+echo "use strict;"
+echo "use Test::More 'no_plan';"
+echo "use lib '/dm5/ki/adaptive_infrastructure/packages';"
+echo "require Test::Homebrew_Exception;"
+echo "use DBI;"
+echo ""

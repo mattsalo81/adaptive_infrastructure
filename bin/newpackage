@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "package ;"
+echo "use warnings;"
+echo "use strict;"
+echo "use lib '/dm5/ki/adaptive_infrastructure/packages';"
+echo "use Carp;"
+echo "use Data::Dumper;"
+echo "use LOGGING;"
+echo ""
+echo ""
+echo "1;"
