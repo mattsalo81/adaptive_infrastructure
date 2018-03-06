@@ -6,6 +6,7 @@ use Carp;
 use Data::Dumper;
 
 my $log = *STDOUT;
+my $err = *STDERR;
 
 # logging level...
 my $level = 1;
@@ -30,8 +31,7 @@ sub set_level{
 }
 
 sub set_log{
-	my ($fh) = @_;
-	$log = $fh;
+	($log) = @_;
 }
 
 sub event{
@@ -55,6 +55,14 @@ sub print_log{
 	print $log ($text);
 }
 
+sub set_err{
+	($err) = @_;
+}
 
+sub error{
+	my ($text) = @_;
+	$text .= "\n" unless $text =~ m/\n/;
+	print $err ($text);
+}
 
 

@@ -10,6 +10,7 @@ use DBI;
 
 # associates all coordrefs to their waferconfigs. 
 my $get_wcf_sth;
+our $could_not_find_wcf_error = "Could not find a wcf for";
 
 sub get_wcf_for_coordref{
 	my ($coordref) = @_;
@@ -25,7 +26,7 @@ sub get_wcf_for_coordref{
 	$get_wcf_sth->execute($search);
 	my $matches = $get_wcf_sth->fetchall_arrayref();
 	if(scalar @{$matches} == 0){
-		confess "Could not find a wcf for <$coordref>\n";
+		confess "$could_not_find_wcf_error <$coordref>\n";
 	}else{
 		if (scalar @{$matches} == 1){
 			return $matches->[0]->[0];
@@ -44,6 +45,7 @@ sub choose_latest_wcf{
 	if (scalar @wcf == 0){
 		confess "No waferconfigs provided, probably programmer's fault";
 	}
+	LOGGING::diag("Looking for latest version in <" . join(", ", @wcf) . ">\n");
 	# extract the date, skipping any unkown formats
 	foreach my $wcf (@wcf){
 		# DMOS5_18F05.24L_BF741698_20140407190107_wfcfg.xml
@@ -85,14 +87,18 @@ sub update_lookup_table{
 		my $coordrefs = $download_sth->fetchall_arrayref();
 		foreach my $rec(@{$coordrefs}){
 			LOGGING::diag("Processing coordref " . $rec->[0]);
-#			eval{
+			eval{
 				my $wcf = get_wcf_for_coordref($rec->[0]);
 				$up_sth->execute($rec->[0], $wcf);	
 				1;
-#			} or do{
-#				my $e = $@;
-#				warn "Could not find wcf for <" . $rec->[0] . "> because\n";
-#			};
+			} or do{
+				my $e = $@;
+				if ($e =~ m/$could_not_find_wcf_error/){
+					LOGGING::error("no wcf found for <" . $rec->[0] . ">\n");
+				}else{
+					confess "Could not find a wcf for <" . $rec->[0] . "> because : $e";
+				}
+			};
 		}
 		$trans->commit();
 		1;

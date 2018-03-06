@@ -7,7 +7,7 @@ use DBI;
 use WCR::associate;
 
 # can pull a wcf
-throws_ok(sub{associate::get_wcf_for_coordref("I DO NOT EXIST")}, "Could not find", "nonexistant coordref");
+throws_ok(sub{associate::get_wcf_for_coordref("I DO NOT EXIST")}, $associate::could_not_find_wcf_error, "nonexistant coordref");
 is(associate::get_wcf_for_coordref("0301044b"), "DMOS5_3310LBC5.02LN_SN0301044B_20140407182905_wfcfg.xml", "existing coordref");
 is(associate::get_wcf_for_coordref("0301044B"), "DMOS5_3310LBC5.02LN_SN0301044B_20140407182905_wfcfg.xml", "Case insensitivity");
 

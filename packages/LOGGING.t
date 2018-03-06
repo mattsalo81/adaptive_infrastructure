@@ -15,6 +15,9 @@ LOGGING::event("This should be here");
 LOGGING::debug("This should be here");
 LOGGING::diag("This should not be here");
 
+LOGGING::set_err($temp);
+LOGGING::error("ERROR");
+
 open my $null, ("/dev/null") or die "Could not open /dev/null";
 LOGGING::set_log($null);
 
@@ -22,4 +25,4 @@ open $temp, $tempfile or die "Could not open tmp file for reading";
 my @text = <$temp>;
 my $text = join "", @text;
 close $temp;
-ok($text =~ m/This should be here\nThis should be here\n$/, "basic logging");
+ok($text =~ m/This should be here\nThis should be here\nERROR\n$/, "basic logging");
