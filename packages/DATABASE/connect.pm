@@ -21,6 +21,7 @@ sub read_only_connection{
 		unless (defined $connections{$name}){
 			confess "Could not connect to <$name>";
 		}
+		$connections{$name}->{"ReadOnly"} = 1;
 	}
 	return $connections{$name};
 }
