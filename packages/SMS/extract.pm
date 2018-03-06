@@ -14,7 +14,7 @@ my %lpt_opn2area;
 
 sub update_sms_table{
 	my $table = 'etest_daily_sms_extract';
-	my $trans = connect::new_transaction("sd_limits");
+	my $trans = connect::new_transaction("etest");
 	eval{
 		# empty table in transaction
 		LOGGING::event("Clearing old sms extract table");
@@ -140,7 +140,7 @@ sub get_technology_from_family{
 	$family =~ tr/[a-z]/[A-Z]/;
 	unless (defined $family2tech{$family}){
 		LOGGING::debug("Looking for technology for $family in etest db");
-		my $conn = connect::read_only_connection("sd_limits");
+		my $conn = connect::read_only_connection("etest");
 		my $sql = "select technology from etest_family_to_technology where UPPER(family) = ?";
 		my $sth = $conn->prepare($sql);
 		$sth->execute($family);
@@ -163,7 +163,7 @@ sub get_area_from_lpt_and_opn{
 	unless (defined $lpt_opn2area{$key}){
 		LOGGING::debug("Looking for test area for lpt:opn $lpt:$opn in etest db");
 		my $sql = "select test_area from etest_logpoints where logpoint = ? and operation = ?";
-		my $conn = connect::read_only_connection("sd_limits");
+		my $conn = connect::read_only_connection("etest");
 		my $sth = $conn->prepare($sql);
 		$sth->execute($lpt, $opn);
 		my ($area) = $sth->fetchrow_array();

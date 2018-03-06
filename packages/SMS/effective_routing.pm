@@ -54,7 +54,6 @@ sub get_effective_routing_DCU_prod_grp{
 	my $eff_routing = $routing;
 	if ($routing =~ m/DCU/){
 		$eff_routing .= "-".substr($device,4,2);
-		print("$prefix\n");
 		if ($prod_grp =~ m/$prefix\-([SDT]LM)/){
 			my $xlm = $1;
 			my $num_metal = 1;
