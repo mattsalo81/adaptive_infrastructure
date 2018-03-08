@@ -21,4 +21,5 @@ is(join(",", @options), "SHAZAM,WOW", "Correct results");
 @options = @{ProcessDecoder::get_options_for_code("TEST", 1, "MATT")};
 is(join(",", @options), "HEYO", "Correct results");
 
-
+throws_ok(sub{ProcessDecoder::get_options_for_code("I DO NOT EXIST", 0, "ASKJfaso")}, 'No options found', "dies if cannot find any options");
+throws_ok(sub{ProcessDecoder::get_options_for_code("TEST", undef, undef)}, 'No options found', "dies if cannot find any options");

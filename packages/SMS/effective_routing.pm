@@ -54,11 +54,15 @@ sub get_effective_routing_DCU_prod_grp{
 	my $eff_routing = $routing;
 	if ($routing =~ m/DCU/){
 		$eff_routing .= "-".substr($device,4,2);
-		if ($prod_grp =~ m/$prefix\-([SDT]LM)/){
+		if ($prod_grp =~ m/\-([SDTQP67]LM)/){
 			my $xlm = $1;
 			my $num_metal = 1;
 			$num_metal = 2 if ($xlm =~ /DLM/);
 			$num_metal = 3 if ($xlm =~ /TLM/);
+			$num_metal = 4 if ($xlm =~ /QLM/);
+			$num_metal = 5 if ($xlm =~ /PLM/);
+			$num_metal = 6 if ($xlm =~ /6LM/);
+			$num_metal = 7 if ($xlm =~ /7LM/);
 			$eff_routing .= $num_metal;
 		}else{
 			confess("Unable to get number of metal levels for effective routing from " . Dumper($rec) . "\n");

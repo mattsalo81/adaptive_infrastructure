@@ -21,8 +21,11 @@ sub execute_sql_transaction{
 	my $trans;
 	eval{
 		$trans = connect::new_transaction($database);
-		my $sth = $trans->prepare($sql);
-		$sth->execute();
+		foreach my $statement (split(';', $sql)){
+			next if $statement =~ m/^\s*$/;
+			my $sth = $trans->prepare($statement);
+			$sth->execute();
+		}
 		$trans->commit();
 		1;
 	} or do {

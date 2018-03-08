@@ -181,7 +181,7 @@ sub get_device_extract_handle{
 	  dm.class,
 	  dm.family,
 	  dm.prod_grp,
-	  dm.fe_stratgy,
+	  dm.fe_stratgy as fe_strategy,
 	  dm.routing,
 	  rfd.lpt,
 	  rfd.opnset,
@@ -217,6 +217,7 @@ sub get_device_extract_handle{
 	  and (dm.prod_grp in ('PRIME', 'DEV') or dm.dev_group in ('PRIME', 'DEV'))
 	  and dm.device not like '%DMD%'
 	  and dm.device not like '%MX'
+	  and dm.device not like 'M/%'
 	};
 	my $sth = $conn->prepare($extract_sql);
 	return $sth;

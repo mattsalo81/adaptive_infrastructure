@@ -35,10 +35,17 @@ sub get_options_for_code{
 	my ($technology, $code_num, $code) = @_;
 	my $sth = get_options_for_code_sth();
 	$sth->execute($technology, $code_num, $code);
-	my $options = $sth->fetchall_arrayref();
+	my @options = @{$sth->fetchall_arrayref()};
+	if (scalar @options == 0){
+		confess "No options found for code <$technology, $code_num, $code> in database!";
+	}
 	# flatten deep array
-	my @options = sort map {$_->[0]} @{$options};
-	return \@options;
+	@options = sort map {$_->[0] =~ s/\s//g; $_->[0]} @options;
+	my @def_options;
+	foreach my $opt (@options){
+		push(@def_options, $opt) if defined $opt;
+	}
+	return \@def_options;
 }
 
 1;
