@@ -17,12 +17,22 @@ sub get_wcf_for_coordref{
 	unless (defined $get_wcf_sth){
 		LOGGING::diag("preparing statement handle to find attachments of wcrepo\n");
 		my $wcrepo = connect::read_only_connection("wcrepo");
-		my $sql = q{select distinct WAFERCONFIGFILE from wcrepo.zonal_summary where UPPER(WAFERCONFIGFILE) like ?};
+		my $sql = q{
+			select
+			    distinct WCF 
+			from 
+			    wcrepo.WCF_ATTACHMENT wa
+			where 
+			    WCF like 'DMOS5%'
+			    and regexp_like(UPPER(attachment_name), ?)
+			    and UPPER(Attachment_sourcetype) in ('CHIPOPT','CHIPOPT2003')
+			};
 		$get_wcf_sth = $wcrepo->prepare($sql);
 	}
 	LOGGING::diag("Looking for <$coordref> in attachments of wcrepo\n");
-	my $search = "\%_${coordref}_\%";
+	my $search = $coordref;
 	$search =~ tr/a-z/A-Z/;	
+	$search = "^${search}(\$|[^[:alnum:]])";
 	$get_wcf_sth->execute($search);
 	my $matches = $get_wcf_sth->fetchall_arrayref();
 	if(scalar @{$matches} == 0){
