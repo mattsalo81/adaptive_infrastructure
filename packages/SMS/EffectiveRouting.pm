@@ -1,4 +1,4 @@
-package effective_routing;
+package EffectiveRouting;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
@@ -10,16 +10,16 @@ use LOGGING;
 
 #records are from SMS, reference extract.pm for format.
 
-sub get_effective_routing{
+sub make_effective_routing{
 	my ($rec) = @_;
 	LOGGING::diag("Getting effective routing for device " . $rec->{"DEVICE"});
 	my $tech = $rec->{"TECH"};
 	if ($tech eq "LBC8"){
-		return get_effective_routing_LBC8($rec);
+		return make_effective_routing_LBC8($rec);
 	}elsif($tech eq "LBC7"){
-		return get_effective_routing_LBC7($rec);
+		return make_effective_routing_LBC7($rec);
 	}elsif($tech eq "F05"){
-		return get_effective_routing_F05($rec);
+		return make_effective_routing_F05($rec);
 	}	
 	# Nothing special LBC5
 	# Nothing special HPA07
@@ -32,17 +32,17 @@ sub get_effective_routing{
 	return $routing
 }
 
-sub get_effective_routing_LBC7{
+sub make_effective_routing_LBC7{
 	my ($rec) = @_;
-	return get_effective_routing_DCU_prod_grp($rec, "LBC7");
+	return make_effective_routing_DCU_prod_grp($rec, "LBC7");
 }
 
-sub get_effective_routing_LBC8{
+sub make_effective_routing_LBC8{
 	my ($rec) = @_;
-	return get_effective_routing_DCU_prod_grp($rec, "LBC8");
+	return make_effective_routing_DCU_prod_grp($rec, "LBC8");
 }
 
-sub get_effective_routing_DCU_prod_grp{
+sub make_effective_routing_DCU_prod_grp{
 	my ($rec, $prefix) = @_;
 	my $device = $rec->{"DEVICE"};
 	my $prod_grp = $rec->{"PROD_GRP"};   
@@ -71,7 +71,7 @@ sub get_effective_routing_DCU_prod_grp{
 	return $eff_routing;
 }
 
-sub get_effective_routing_F05{
+sub make_effective_routing_F05{
 	my ($rec) = @_;
 	my $strategy = $rec->{"FE_STRATEGY"};	
 	my $routing = $rec->{"ROUTING"};

@@ -1,8 +1,8 @@
-package extract;
+package Extract;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
-use SMS::effective_routing;
+use SMS::EffectiveRouting;
 use DBI;
 use DATABASE::connect;
 use Carp;
