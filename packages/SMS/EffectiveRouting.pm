@@ -3,16 +3,15 @@ use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
 use DBI;
-use DATABASE::connect;
 use Carp;
 use Data::Dumper;
-use LOGGING;
+use Logging;
 
 #records are from SMS, reference extract.pm for format.
 
 sub make_effective_routing{
 	my ($rec) = @_;
-	LOGGING::diag("Getting effective routing for device " . $rec->{"DEVICE"});
+	Logging::diag("Getting effective routing for device " . $rec->{"DEVICE"});
 	my $tech = $rec->{"TECH"};
 	if ($tech eq "LBC8"){
 		return make_effective_routing_LBC8($rec);
@@ -50,7 +49,7 @@ sub make_effective_routing_DCU_prod_grp{
 	unless(defined $routing && defined $prod_grp && defined $device){
 		confess("Missing crucial information to generate $prefix effective routing. Probably programmer's fault\n");
 	}
-	LOGGING::diag("Looking for effective routing in prod_grp for tech $prefix on device $device");
+	Logging::diag("Looking for effective routing in prod_grp for tech $prefix on device $device");
 	my $eff_routing = $routing;
 	if ($routing =~ m/DCU/){
 		$eff_routing .= "-".substr($device,4,2);
@@ -78,7 +77,7 @@ sub make_effective_routing_F05{
 	unless (defined $strategy && defined $routing){
 		confess("Missing crucial information to generate F05 effective routing.  Probably programmer's fault\n");
 	}
-	LOGGING::diag("looking for metal levels in fe_strategy for F05 device" . $rec->{"DEVICE"});
+	Logging::diag("looking for metal levels in fe_strategy for F05 device" . $rec->{"DEVICE"});
 	my $eff_routing = $routing;
 	if ($strategy =~ m/X(\d)L/){
 		$eff_routing .= "-$1";

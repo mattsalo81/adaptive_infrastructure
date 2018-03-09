@@ -4,25 +4,25 @@ use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
 use SMS::EffectiveRouting;
 use DBI;
-use DATABASE::connect;
+use Database::Connect;
 use Carp;
 use Data::Dumper;
-use LOGGING;
+use Logging;
 
 my %family2tech;
 my %lpt_opn2area;
 
 sub update_sms_table{
 	my $table = 'etest_daily_sms_extract';
-	my $trans = connect::new_transaction("etest");
+	my $trans = Connect::new_transaction("etest");
 	eval{
 		# empty table in transaction
-		LOGGING::event("Clearing old sms extract table");
+		Logging::event("Clearing old sms extract table");
 		my $e_sth = $trans->prepare("delete from $table where 1 = 1");
 		$e_sth->execute();
 
 		# get SMS data
-		LOGGING::event("Downloading info from SMS and putting it into etest db");
+		Logging::event("Downloading info from SMS and putting it into etest db");
 		my $d_sth = get_device_extract_handle();		
 		$d_sth->execute();
 
@@ -42,11 +42,11 @@ sub update_sms_table{
 		while (my $rec = $d_sth->fetchrow_hashref("NAME_uc")){
 			
 			$device = $rec->{"DEVICE"};
-			LOGGING::diag("Processing device $device");
-			LOGGING::diag(Dumper($rec));
+			Logging::diag("Processing device $device");
+			Logging::diag(Dumper($rec));
 			$num++;
 			if ($num % 100 == 0){
-				LOGGING::event("Processed $num devices");
+				Logging::event("Processed $num devices");
 			}
 
                         # error checking on KPARMS
@@ -99,7 +99,7 @@ sub get_COT_from_record{
 		confess("Unable find <PROD_GRP> in this record : " .  Dumper($hash_rec) . "\n");
 	}
 	if ($prod_grp =~ m/COT/i){
-		LOGGING::debug("It's a COT device");
+		Logging::debug("It's a COT device");
 		return 'Y';
 	}else{
 		return 'N';
@@ -139,8 +139,8 @@ sub get_technology_from_family{
 	my ($family) = @_;
 	$family =~ tr/[a-z]/[A-Z]/;
 	unless (defined $family2tech{$family}){
-		LOGGING::debug("Looking for technology for $family in etest db");
-		my $conn = connect::read_only_connection("etest");
+		Logging::debug("Looking for technology for $family in etest db");
+		my $conn = Connect::read_only_connection("etest");
 		my $sql = "select technology from etest_family_to_technology where UPPER(family) = ?";
 		my $sth = $conn->prepare($sql);
 		$sth->execute($family);
@@ -161,9 +161,9 @@ sub get_area_from_lpt_and_opn{
 
 	my $key = "$lpt" . "x" . "$opn";
 	unless (defined $lpt_opn2area{$key}){
-		LOGGING::debug("Looking for test area for lpt:opn $lpt:$opn in etest db");
+		Logging::debug("Looking for test area for lpt:opn $lpt:$opn in etest db");
 		my $sql = "select test_area from etest_logpoints where logpoint = ? and operation = ?";
-		my $conn = connect::read_only_connection("etest");
+		my $conn = Connect::read_only_connection("etest");
 		my $sth = $conn->prepare($sql);
 		$sth->execute($lpt, $opn);
 		my ($area) = $sth->fetchrow_array();
@@ -174,7 +174,7 @@ sub get_area_from_lpt_and_opn{
 }
 
 sub get_device_extract_handle{
-	my $conn = connect::read_only_connection("sms");
+	my $conn = Connect::read_only_connection("sms");
 	my $extract_sql = q{
 	select 
 	  dm.device, 

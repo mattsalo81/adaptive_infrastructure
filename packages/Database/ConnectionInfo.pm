@@ -1,4 +1,4 @@
-package connection_info;
+package ConnectionInfo;
 use warnings;
 use strict;
 use Carp;

@@ -1,11 +1,11 @@
-package associate;
+package Associate;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
-use LOGGING;
-use DATABASE::connect;
+use Logging;
+use Database::Connect;
 use DBI;
 
 # associates all coordrefs to their waferconfigs. 
@@ -15,8 +15,8 @@ our $could_not_find_wcf_error = "Could not find a wcf for";
 sub get_wcf_for_coordref{
 	my ($coordref) = @_;
 	unless (defined $get_wcf_sth){
-		LOGGING::diag("preparing statement handle to find attachments of wcrepo\n");
-		my $wcrepo = connect::read_only_connection("wcrepo");
+		Logging::diag("preparing statement handle to find attachments of wcrepo\n");
+		my $wcrepo = Connect::read_only_connection("wcrepo");
 		my $sql = q{
 			select
 			    distinct WCF 
@@ -29,7 +29,7 @@ sub get_wcf_for_coordref{
 			};
 		$get_wcf_sth = $wcrepo->prepare($sql);
 	}
-	LOGGING::diag("Looking for <$coordref> in attachments of wcrepo\n");
+	Logging::diag("Looking for <$coordref> in attachments of wcrepo\n");
 	my $search = $coordref;
 	$search =~ tr/a-z/A-Z/;	
 	$search = "^${search}(\$|[^[:alnum:]])";
@@ -55,7 +55,7 @@ sub choose_latest_wcf{
 	if (scalar @wcf == 0){
 		confess "No waferconfigs provided, probably programmer's fault";
 	}
-	LOGGING::diag("Looking for latest version in <" . join(", ", @wcf) . ">\n");
+	Logging::diag("Looking for latest version in <" . join(", ", @wcf) . ">\n");
 	# extract the date, skipping any unkown formats
 	foreach my $wcf (@wcf){
 		# DMOS5_18F05.24L_BF741698_20140407190107_wfcfg.xml
@@ -76,13 +76,13 @@ sub choose_latest_wcf{
 
 sub update_lookup_table{
 	# prepare download handle to get coordrefs
-	LOGGING::event("Updating coordref -> wcr lookup table");
-	my $etest = connect::read_only_connection("etest");
+	Logging::event("Updating coordref -> wcr lookup table");
+	my $etest = Connect::read_only_connection("etest");
 	my $download_sql = q{select distinct coordref from etest_daily_sms_extract};
 	my $download_sth = $etest->prepare($download_sql);
 	
 	# start upload transaction
-	my $trans = connect::new_transaction("etest");
+	my $trans = Connect::new_transaction("etest");
 	eval{
 		# clear old table
 		my $delete_sql = q{delete from etest_coordref2wcrepo where 1=1};
@@ -96,7 +96,7 @@ sub update_lookup_table{
 		# start populating the lookup
 		my $coordrefs = $download_sth->fetchall_arrayref();
 		foreach my $rec(@{$coordrefs}){
-			LOGGING::diag("Processing coordref " . $rec->[0]);
+			Logging::diag("Processing coordref " . $rec->[0]);
 			eval{
 				my $wcf = get_wcf_for_coordref($rec->[0]);
 				$up_sth->execute($rec->[0], $wcf);	
@@ -104,7 +104,7 @@ sub update_lookup_table{
 			} or do{
 				my $e = $@;
 				if ($e =~ m/$could_not_find_wcf_error/){
-					LOGGING::error("no wcf found for <" . $rec->[0] . ">\n");
+					Logging::error("no wcf found for <" . $rec->[0] . ">\n");
 				}else{
 					confess "Could not find a wcf for <" . $rec->[0] . "> because : $e";
 				}

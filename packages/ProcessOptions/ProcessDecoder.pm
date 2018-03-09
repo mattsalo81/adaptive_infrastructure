@@ -4,15 +4,15 @@ use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
-use LOGGING;
-use DATABASE::connect;
+use Logging;
+use Database::Connect;
 
 my $options_for_code_sth;
 
 sub get_options_for_code_sth{
 	unless (defined $options_for_code_sth){
-		LOGGING::debug("Creating new statement handle for getting process codes from process options");
-		my $conn = connect::read_only_connection("etest");
+		Logging::debug("Creating new statement handle for getting process codes from process options");
+		my $conn = Connect::read_only_connection("etest");
 		my $sql = q{
 			select distinct
 				process_option
