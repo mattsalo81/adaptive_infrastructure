@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
-use DATABASE::connect;
+use Database::Connect;
 use DBI;
 
 main();
@@ -20,11 +20,14 @@ sub execute_sql_transaction{
 	my ($sql, $database) = @_;
 	my $trans;
 	eval{
-		$trans = connect::new_transaction($database);
+		$trans = Connect::new_transaction($database);
 		foreach my $statement (split(';', $sql)){
 			next if $statement =~ m/^\s*$/;
-			my $sth = $trans->prepare($statement);
-			$sth->execute();
+			$statement =~ s/^\n*//;
+			$statement =~ s/\n*$//;
+			next if $statement =~ m/^--/;
+			my $sth = $trans->prepare($statement) or die "Could not prepare <$statement>";
+			$sth->execute() or die "Could not execure <$statement>";
 		}
 		$trans->commit();
 		1;

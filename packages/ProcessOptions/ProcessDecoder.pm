@@ -8,6 +8,7 @@ use Logging;
 use Database::Connect;
 
 my $options_for_code_sth;
+my $placeholder_option = "PLACEHOLDER";
 
 sub get_options_for_code_sth{
 	unless (defined $options_for_code_sth){
@@ -46,7 +47,7 @@ sub get_options_for_code{
 	@options = sort map {$_->[0] =~ s/\s//g; $_->[0]} @options;
 	my @def_options;
 	foreach my $opt (@options){
-		push(@def_options, $opt) if defined $opt;
+		push(@def_options, $opt) if defined $opt and $opt ne $placeholder_option;
 	}
 	return \@def_options;
 }

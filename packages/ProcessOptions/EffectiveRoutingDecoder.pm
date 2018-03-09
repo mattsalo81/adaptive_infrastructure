@@ -42,11 +42,12 @@ sub get_codes_from_routing{
 	my ($technology, $routing) = @_;
 	my $codes = [];
 	switch($technology){
-		case 'TEST' {$codes->[0] = substr($routing, 4, 6)}
-		case 'LBC5' {$codes = LBC5_get_codes_from_routing($routing)}
+		case 'TEST' {$codes->[0] = substr($routing, 4, 6)} # used for testing get_codes_from_routing
+		case 'F05' {$codes = F05_get_codes_from_routing($routing)}
 		case 'HPA07' {$codes = HPA07_get_codes_from_routing($routing)}
-		case 'LBC8' {$codes = LBC8_get_codes_from_routing($routing)}
+		case 'LBC5' {$codes = LBC5_get_codes_from_routing($routing)}
 		case 'LBC7' {$codes = LBC7_get_codes_from_routing($routing)}
+		case 'LBC8' {$codes = LBC8_get_codes_from_routing($routing)}
 		case 'LBC8LV' {$codes = LBC8LV_get_codes_from_routing($routing)}
 		else {confess "No defined way to parse routings for technology <$technology>, need to edit <get_codes_from_routing>\n";}
 	}
