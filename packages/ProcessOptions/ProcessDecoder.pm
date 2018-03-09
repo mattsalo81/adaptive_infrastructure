@@ -33,6 +33,9 @@ sub get_options_for_code_sth{
 
 sub get_options_for_code{
 	my ($technology, $code_num, $code) = @_;
+	unless(defined $code && defined $code_num && defined $technology){
+		confess "Something is not defined correctly, probably programmer's fault";
+	}
 	my $sth = get_options_for_code_sth();
 	$sth->execute($technology, $code_num, $code);
 	my @options = @{$sth->fetchall_arrayref()};
