@@ -41,7 +41,7 @@ sub make_effective_routing_LBC7{
         }
         Logging::diag("Looking for effective routing in prod_grp for tech LBC7 on device $device");
         my $eff_routing = $routing;
-        if ($routing =~ m/DCU/){
+        if ($routing =~ m/(DCU|FVDCA)/){
                 $eff_routing .= "-".substr($device,4,2);
                 if ($prod_grp =~ m/\-([SDTQP67]LM)/){
                         my $xlm = $1;
@@ -52,7 +52,7 @@ sub make_effective_routing_LBC7{
                         $num_metal = 5 if ($xlm =~ /PLM/);
                         $num_metal = 6 if ($xlm =~ /6LM/);
                         $num_metal = 7 if ($xlm =~ /7LM/);
-                        $eff_routing .= $num_metal;
+                        $eff_routing .= "-" . $num_metal;
                 }else{
                         confess("Unable to get number of metal levels for effective routing from " . Dumper($rec) . "\n");
                 }

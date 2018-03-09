@@ -27,7 +27,7 @@ my $record = {
 };
 is(EffectiveRouting::make_effective_routing_LBC7($record), "WHATEVER", "LBC7 basic routing");
 $record->{"ROUTING"} = "DCU";
-is(EffectiveRouting::make_effective_routing_LBC7($record), "DCU-MS2", "LBC7 effective routing tests");
+is(EffectiveRouting::make_effective_routing_LBC7($record), "DCU-MS-2", "LBC7 effective routing tests");
 $record->{"PROD_GRP"} = "Doesn't work";
 dies_ok(sub {EffectiveRouting::make_effective_routing_LBC7($record)}, "LBC7 effective routing tests - no metal level in prod grp");
 

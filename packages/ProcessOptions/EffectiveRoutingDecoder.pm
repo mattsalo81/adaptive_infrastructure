@@ -15,7 +15,7 @@ sub get_options_for_routing{
 }
 
 # takes an array of codes
-# each index is the code_num (so we can have multiple decoders per each bit/code in a routing)
+# each index is the code_num (so we can have multiple decoders per each char/code in a routing)
 # each value is the process code
 # undef is okay
 sub get_options_for_code_array{
@@ -46,13 +46,15 @@ sub get_codes_from_routing{
 		case 'LBC5' {$codes = LBC5_get_codes_from_routing($routing)}
 		case 'HPA07' {$codes = HPA07_get_codes_from_routing($routing)}
 		case 'LBC8' {$codes = LBC8_get_codes_from_routing($routing)}
+		case 'LBC7' {$codes = LBC7_get_codes_from_routing($routing)}
+		case 'LBC8LV' {$codes = LBC8LV_get_codes_from_routing($routing)}
 		else {confess "No defined way to parse routings for technology <$technology>, need to edit <get_codes_from_routing>\n";}
 	}
 	return $codes;
 }
 
-# code 0 -> defined by nameing convention
-# code 1 -> # of ML
+# code 0 -> # of ML
+# code 1 -> defined by nameing convention
 sub LBC5_get_codes_from_routing{
 	my ($routing) = @_;
 	my $main_code = substr($routing, 6, 2);
@@ -60,11 +62,11 @@ sub LBC5_get_codes_from_routing{
 	if ($num_ml !~ m/^[0-4]$/ || $main_code eq ""){
 		confess "Unexpected LBC5 routing format <$routing>";
 	}
-	return [$main_code, $num_ml];
+	return [$num_ml, $main_code];
 }
 
-# code 0 -> main naming convention
-# code 1 -> # of ML
+# code 0 -> # of ML
+# code 1 -> main naming convention
 # code 2 -> flavor of hpa07
 sub HPA07_get_codes_from_routing{
 	# can't get iso from flavor code.  Could get it from the num ml
@@ -75,27 +77,72 @@ sub HPA07_get_codes_from_routing{
 	if ($num_ml !~ m/^[0-4]$/ || $main_code eq "" || $flavor_code !~ m/^10[0237]$/){
 		confess "Unexpected HPA07 routing format <$routing>";
 	}
-	return [$main_code, $num_ml, $flavor_code];
+	return [$num_ml, $main_code, $flavor_code];
 }
 
-# code 0 -> bit 1
-# code 1 -> bit 2
-# code 2 -> bit 3
-# code 3 -> optional bit 4
-# code 4 -> # of ML
+# code 0 -> # of ML
+# code 1 -> char 1
+# code 2 -> char 2
+# code 3 -> char 3
+# code 4 -> optional char 4
 sub LBC8_get_codes_from_routing{
 	my ($routing) = @_;
-	my ($bit_1, $bit_2, $bit_3, $bit_4, $num_ml);
-	if ($routing =~ m/DCU-(.)(.)(.)(.?)-(.)$/){
+	my ($char_1, $char_2, $char_3, $char_4, $num_ml);
+	if ($routing =~ m/DCU-(.)(.)(.)(.?)-([0-9])$/){
 		# DCU routing
-		($bit_1, $bit_2, $bit_3, $bit_4, $num_ml) = ($1, $2, $3, $4, $5);
-	}elsif($routing =~ m/^.....(.)(.)(.)(.)(.?)$/){
+		($char_1, $char_2, $char_3, $char_4, $num_ml) = ($1, $2, $3, $4, $5);
+	}elsif($routing =~ m/^.....([0-9])(.)(.)(.)(.?)$/){
 		# 9/10 character routings
-		($num_ml, $bit_1, $bit_2, $bit_3, $bit_4) = ($1, $2, $3, $4, $5);
+		($num_ml, $char_1, $char_2, $char_3, $char_4) = ($1, $2, $3, $4, $5);
 	}else{
 		confess "Unexpected LBC8 Routing format <$routing>";
 	}
-	return [$bit_1, $bit_2, $bit_3, $bit_4, $num_ml];
+	return [$num_ml, $char_1, $char_2, $char_3, $char_4];
+}
+
+# code 0 -> # of ML
+# code 1 -> 2 char options
+sub LBC7_get_codes_from_routing{
+        my ($routing) = @_;
+        my ($main_code, $num_ml);
+	if ($routing =~ m/(DCU|FVDCA)-(..)-(.)$/){
+                # DCU routing
+		($main_code, $num_ml) = ($2, $3);
+        }elsif($routing =~ m/^.....([0-9])(..)/){
+		# std routing format        
+		($main_code, $num_ml) = ($2, $1);
+	}else{
+                confess "Unexpected LBC7 Routing format <$routing>";
+        }
+        return [$num_ml, $main_code];
+}
+
+# code 0 -> # of ML
+sub F05_get_codes_from_routing{
+	my ($routing) = @_;
+	my $num_ml;
+	if ($routing =~ m/-([0-9])$/){
+		$num_ml = $1;
+	}else{
+		confess "Unexpected F05 Routing format <$routing>";
+	}
+	return [$num_ml];
+}
+
+# code 0 -> # of ML
+# code 1 -> char 1
+# code 2 -> char 2
+# code 3 -> char 3
+# code 4 -> char 4
+sub LBC8LV_get_codes_from_routing{
+	my ($routing) = @_;
+	my ($num_ml, $char_1, $char_2, $char_3, $char_4);
+	if ($routing =~ m/^.....([0-9])(.)(.)(.)(.)$/){
+		($num_ml, $char_1, $char_2, $char_3, $char_4) = ($1, $2, $3, $4, $5);
+	}else{
+		confess "Unexpected LBC8LV Routing format <$routing>";
+	}
+	return [$num_ml, $char_1, $char_2, $char_3, $char_4];
 }
 
 1;
