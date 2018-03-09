@@ -45,6 +45,7 @@ sub get_codes_from_routing{
 		case 'TEST' {$codes->[0] = substr($routing, 4, 6)}
 		case 'LBC5' {$codes = LBC5_get_codes_from_routing($routing)}
 		case 'HPA07' {$codes = HPA07_get_codes_from_routing($routing)}
+		case 'LBC8' {$codes = LBC8_get_codes_from_routing($routing)}
 		else {confess "No defined way to parse routings for technology <$technology>, need to edit <get_codes_from_routing>\n";}
 	}
 	return $codes;
@@ -77,9 +78,24 @@ sub HPA07_get_codes_from_routing{
 	return [$main_code, $num_ml, $flavor_code];
 }
 
+# code 0 -> bit 1
+# code 1 -> bit 2
+# code 2 -> bit 3
+# code 3 -> optional bit 4
+# code 4 -> # of ML
 sub LBC8_get_codes_from_routing{
 	my ($routing) = @_;
-	
+	my ($bit_1, $bit_2, $bit_3, $bit_4, $num_ml);
+	if ($routing =~ m/DCU-(.)(.)(.)(.?)-(.)$/){
+		# DCU routing
+		($bit_1, $bit_2, $bit_3, $bit_4, $num_ml) = ($1, $2, $3, $4, $5);
+	}elsif($routing =~ m/^.....(.)(.)(.)(.)(.?)$/){
+		# 9/10 character routings
+		($num_ml, $bit_1, $bit_2, $bit_3, $bit_4) = ($1, $2, $3, $4, $5);
+	}else{
+		confess "Unexpected LBC8 Routing format <$routing>";
+	}
+	return [$bit_1, $bit_2, $bit_3, $bit_4, $num_ml];
 }
 
 1;

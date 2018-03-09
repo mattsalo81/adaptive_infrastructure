@@ -8,13 +8,13 @@ use SMS::EffectiveRouting;
 # LBC8
 my $record = {
 	TECH		=>	'LBC8',
-	DEVICE		=>	'M08_MSSOMESTUFF',
+	DEVICE		=>	'M08_MJS1_SOMESTUFF',
 	ROUTING		=>	'WHATEVER',
 	PROD_GRP	=>	'LBC8-DLM',
 };
 is(EffectiveRouting::make_effective_routing_LBC8($record), "WHATEVER", "LBC8 basic routing");
 $record->{"ROUTING"} = "DCU";
-is(EffectiveRouting::make_effective_routing_LBC8($record), "DCU-MS2", "LBC8 effective routing tests");
+is(EffectiveRouting::make_effective_routing_LBC8($record), "DCU-MJS1-2", "LBC8 effective routing tests");
 $record->{"PROD_GRP"} = "Doesn't work";
 dies_ok(sub {EffectiveRouting::make_effective_routing_LBC8($record)}, "LBC8 effective routing tests - no metal level in prod grp");
 
