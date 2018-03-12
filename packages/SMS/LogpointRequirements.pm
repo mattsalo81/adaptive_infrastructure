@@ -72,6 +72,13 @@ sub does_routing_match_lpt_lists{
 	return 1;	
 }
 
+# used for the recursive Descent parser
+# returns true if routing goes through LPT
+sub does_routing_use_lpt{
+	my ($routing, $lpt) = @_;
+	return does_routing_match_lpt_lists($routing, [$lpt], []);
+}
+
 # takes a single routing and a logpoint string.
 # returns true/false if that routing satisfies the string
 sub does_routing_match_lpt_string{

@@ -6,6 +6,7 @@ use DBI;
 use Carp;
 use Data::Dumper;
 use Logging;
+use Switch;
 
 #records are from SMS, reference extract.pm for format.
 
@@ -13,22 +14,28 @@ sub make_effective_routing{
 	my ($rec) = @_;
 	Logging::diag("Getting effective routing for device " . $rec->{"DEVICE"});
 	my $tech = $rec->{"TECH"};
-	if ($tech eq "LBC8"){
-		return make_effective_routing_LBC8($rec);
-	}elsif($tech eq "LBC7"){
-		return make_effective_routing_LBC7($rec);
-	}elsif($tech eq "F05"){
-		return make_effective_routing_F05($rec);
+	my $eff = undef;
+	switch ($tech){
+		case "LBC8" {$eff = make_effective_routing_LBC8($rec)}
+		case "LBC7" {$eff = make_effective_routing_LBC7($rec)}
+		case "F05"  {$eff = make_effective_routing_F05($rec)}
 	}	
 	# Nothing special LBC5
 	# Nothing special HPA07
 	# Nothing special LBC8LV
-	
-	my $routing = $rec->{"ROUTING"};
-	unless (defined $routing){
-		confess("no routing to generate effective routing.  Probably programmer's fault\n");
+
+	unless (defined $eff){
+		my $eff = $rec->{"ROUTING"};
 	}
-	return $routing
+	unless (defined $eff){
+		confess("no routing/tech specific eff_routing to generate effective routing.  Probably programmer's fault");
+	}
+	my $area = $rec->{"AREA"};
+	unless (defined $area){
+		confess("No test area defined to generate effective routing. Probably programmer's fault");
+	}
+	$eff = "$area" . "__" . $eff;
+	return $eff;
 }
 
 sub make_effective_routing_LBC7{

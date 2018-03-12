@@ -11,12 +11,14 @@ my $record = {
 	DEVICE		=>	'M08_MJS1_SOMESTUFF',
 	ROUTING		=>	'WHATEVER',
 	PROD_GRP	=>	'LBC8-DLM',
+	AREA		=>	'PARAMETRIC',
 };
-is(EffectiveRouting::make_effective_routing_LBC8($record), "WHATEVER", "LBC8 basic routing");
+is(EffectiveRouting::make_effective_routing($record), "PARAMETRIC__WHATEVER", "LBC8 basic routing");
 $record->{"ROUTING"} = "DCU";
-is(EffectiveRouting::make_effective_routing_LBC8($record), "DCU-MJS1-2", "LBC8 effective routing tests");
+$record->{"AREA"} = "METAL1";
+is(EffectiveRouting::make_effective_routing($record), "METAL1__DCU-MJS1-2", "LBC8 effective routing tests");
 $record->{"PROD_GRP"} = "Doesn't work";
-dies_ok(sub {EffectiveRouting::make_effective_routing_LBC8($record)}, "LBC8 effective routing tests - no metal level in prod grp");
+dies_ok(sub {EffectiveRouting::make_effective_routing($record)}, "LBC8 effective routing tests - no metal level in prod grp");
 
 # LBC7
 my $record = {
