@@ -19,14 +19,12 @@ ok(!BooleanLogpoint::is_valid_lpt_string(")9300("), "or facing the wrong way");
 ok(BooleanLogpoint::is_valid_lpt_string("!9300"), "Can do nots");
 ok(BooleanLogpoint::is_valid_lpt_string("!!!!!!!!!9300"), "Can do nots - so many");
 
-ok(BooleanLogpoint::is_valid_lpt_string("9300.9455.1234.2345.3456"), "Can do and - .");
-ok(BooleanLogpoint::is_valid_lpt_string("9300+9455 and 1234 and 2345&3456"), "Can do and - \"and\", &, and +");
-ok(BooleanLogpoint::is_valid_lpt_string("9300and9455and1234and2345and3456"), "Can do and - .");
+ok(BooleanLogpoint::is_valid_lpt_string("9300.9455.1234.2345.3456"), "Can do and .");
 ok(!BooleanLogpoint::is_valid_lpt_string("9300also3456"), "Can not do also");
 
+ok(BooleanLogpoint::is_valid_lpt_string("9300.9455|1234.2345|3456"), "Can do |");
 
-ok(BooleanLogpoint::is_valid_lpt_string("9300"), "Interprets logpoints as valid");
-ok(BooleanLogpoint::is_valid_lpt_string("9300"), "Interprets logpoints as valid");
-ok(BooleanLogpoint::is_valid_lpt_string("9300"), "Interprets logpoints as valid");
-ok(BooleanLogpoint::is_valid_lpt_string("9300"), "Interprets logpoints as valid");
-ok(BooleanLogpoint::is_valid_lpt_string("9300"), "Interprets logpoints as valid");
+ok(BooleanLogpoint::is_valid_lpt_string("9300.9455^1234.2345|3456"), "Can do ^");
+
+ok(BooleanLogpoint::is_valid_lpt_string("!(1234)^(1234|1234)^(1234.((~1234).(1234|1234))|(1234.1234|1234.1234))"), "Can do it all");
+ok(!BooleanLogpoint::is_valid_lpt_string("!(1234)^(1234|1234)^(1234.((~1234).(1234|1234))|1234.1234|1234.1234))"), "misplaced paren");

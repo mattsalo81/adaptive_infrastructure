@@ -21,45 +21,50 @@ my $grammar = q{
 #
 
 LPT		: /[0-9]{4}/		# logpoints
-AND		: /([&\.\+]|\band\b)/i
-OR		: /(\|\bor\b)/i
-XOR		: /(\^|\bxor\b)/
+AND		: /([&\.\+])/i
+OR		: /(\|)/i
+XOR		: /(\^)/
 NOT		: /[-!~]/
 LEFT_PAREN	: /\(/
 RIGHT_PAREN	: /\)/
 
 # Binary operators 
 
-STD_BIN_OP	: AND
-		{ $return = "&&"}
-		| OR
+STD_BIN_OR	: OR
 		{ $return = "||"}
 		| XOR
 		{ $return = "xor"}
+
+STD_BIN_AND	: AND
+		{ $return = "&&"}
 
 # Unary Operators
 STD_UN_OP	: NOT
 		{ $return = "!" }
 
 # Expressions
-EXPRESSION	: CHUNK ADDENDUM
+EXPRESSION	: TERM EXPRESSION_E
 		{ $return = eval {"$item[1] $item[2]"}}
-		| CHUNK 
-		{ $return = eval {"$item[1]"}}
 
-ADDENDUM	: STD_BIN_OP CHUNK
+EXPRESSION_E	: STD_BIN_OR TERM EXPRESSION_E(s)
+		{ $return = "join(' ', @item[1..$#item])"}
+		| 
+		{ $return = ""}
+
+TERM		: FACTOR TERM_E
 		{ $return = "$item[1] $item[2]"}
-		| STD_BIN_OP CHUNK ADDENDUM
-		{ $return = "$item[1] $item[2] $item[3]"}
 
-CHUNK		: LPT
+TERM_E		: STD_BIN_AND FACTOR TERM_E(s)
+		{ $return = "join(' ', @item[1..$#item])"}
+		|
+		{ $return = ""}
+
+FACTOR		: LPT
 		{ $return = LogpointRequirements::does_routing_use_lpt($BooleanLogpoint::current_routing, $item{"LPT"})}
-		| LEFT_PAREN CHUNK RIGHT_PAREN
-		{ $return = eval {"$item[2]"}}
 		| LEFT_PAREN EXPRESSION RIGHT_PAREN
-		{ $return = eval {"$item[2]"}}
+		{ $return = "$item[2]"}
 		| STD_UN_OP EXPRESSION
-		{ $return = eval {"$item[1] $item[2]"}}
+		{ $return = "$item[1] $item[2]"}
 		
 
 startrule	: EXPRESSION
@@ -81,7 +86,7 @@ sub does_routing_match_lpt_string{
 	set_routing($routing);
 	my $copy = $lpt_string;
 	my $result = $parser->startrule(\$copy);
-	unless (defined $result){
+	unless (defined $result && $copy =~ m/^\s*$/){
                 confess "Parser failed to interpret <$lpt_string>";
         };
 	return $result;
@@ -98,7 +103,7 @@ sub is_valid_lpt_string{
 	my $result = $parser->startrule(\$copy);
 	print ($copy . "\n");
 	($::RD_ERRORS, $::RD_WARN, $::RD_HINT) = @old;
-	return defined $result;
+	return defined $result && $copy =~ m/^\s*$/;
 }
 
 1;
