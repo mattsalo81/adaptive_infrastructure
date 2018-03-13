@@ -1,6 +1,6 @@
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
-use WCR::associate;
+use WCR::Associate;
 
-associate::update_lookup_table();
+Associate::update_lookup_table();

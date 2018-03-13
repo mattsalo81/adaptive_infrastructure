@@ -54,3 +54,7 @@ dies_ok(sub{Extract::make_recipe("FAM", "ROUT.!@#\$\%^&*(){}||\\][+_=-i\":';<>?.
 is(Extract::get_area_from_lpt_and_opn("9300", "8820"), "PARAMETRIC", "ability to check test area from logpoints");
 is(Extract::get_area_from_lpt_and_opn("9999", "8820"), "UNDEF", "ability to check test area from logpoints");
 
+# get parametric lpts and opns
+my ($lpt, $opn) = Extract::get_parametric_logpoints_operations();
+ok(scalar @{$lpt} > 0, "able to pull list of parametric logpoints");
+ok(scalar @{$opn} > 0, "able to pull list of parametric operations");

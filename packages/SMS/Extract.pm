@@ -72,7 +72,7 @@ sub update_sms_table{
 			$cot = get_COT_from_record($rec);
 			$recipe = make_recipe_from_record($rec);
 			
-			$effective_routing = effective_routing::get_effective_routing($rec);
+			$effective_routing = EffectiveRouting::make_effective_routing($rec);
 			$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
 			$area = $rec->{"AREA"};
 			# error checking on KPARMS
@@ -173,9 +173,33 @@ sub get_area_from_lpt_and_opn{
 	return $lpt_opn2area{$key};
 }
 
+sub get_parametric_logpoints_operations{
+	my $conn = Connect::read_only_connection("etest");
+	my $sql = q{
+		select distinct LOGPOINT, OPERATION from etest_logpoints
+	};
+	my $sth = $conn->prepare($sql);
+	$sth->execute();
+	my %lpt;
+	my %opn;
+	while( my $rec = $sth->fetchrow_arrayref()){
+		$lpt{$rec->[0]} = "yep";
+		$opn{$rec->[1]} = "yep";
+	}
+	return ([keys %lpt], [keys %opn]);
+}
+
 sub get_device_extract_handle{
 	my $conn = Connect::read_only_connection("sms");
-	my $extract_sql = q{
+	my ($lpt, $opn) = get_parametric_logpoints_operations();
+	$lpt = [map {"'$_'"} @{$lpt}];
+	$opn = [map {"'$_'"} @{$opn}];
+	$lpt = join(", ", @{$lpt});
+	$opn = join(", ", @{$opn});
+	unless($lpt =~ m/^'[0-9]{4}'(, '[0-9]{4}')*$/ && $opn =~ m/^'[0-9]{4}'(, '[0-9]{4}')*$/){
+		confess "logpoint and operation strings are in unexpected format! : <$lpt> <$opn>";
+	}
+	my $extract_sql = qq{
 	select 
 	  dm.device, 
 	  dm.class,
@@ -201,7 +225,7 @@ sub get_device_extract_handle{
 		on  rfd.facility = rd.facility
 		and rfd.routing = rd.routing
 		and rfd.rev = rd.rev
-		and rfd.lpt in ('6152', '6652', '6279', '6778', '9300', '9455')
+		and rfd.lpt in ($lpt)
 	  inner join smsdw.opnset_def od
 		on  od.facility = rfd.facility
 		and od.opnset = rfd.opnset
@@ -210,7 +234,7 @@ sub get_device_extract_handle{
 		on  ofd.facility = od.facility
 		and ofd.opnset = od.opnset
 		and ofd.rev = od.rev
-		and ofd.opn in ('8820', '8822', '8823', '8827')
+		and ofd.opn in ($opn)
 	where 
 	  dm.facility = 'DP1DM5'
 	  and dm.status = 'A'

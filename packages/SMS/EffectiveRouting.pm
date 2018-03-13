@@ -25,7 +25,7 @@ sub make_effective_routing{
 	# Nothing special LBC8LV
 
 	unless (defined $eff){
-		my $eff = $rec->{"ROUTING"};
+		$eff = $rec->{"ROUTING"};
 	}
 	unless (defined $eff){
 		confess("no routing/tech specific eff_routing to generate effective routing.  Probably programmer's fault");
