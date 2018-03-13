@@ -63,4 +63,6 @@ my $results = LogpointRequirements::get_list_of_routings_matching_lpt_string($te
 is(scalar @{$results}, 1, "Identifies one routing correctly as 9300");
 is($results->[0], $routing_9300, "Identifies correct routing as 9300");
 
+$results = LogpointRequirements::get_list_of_routings_matching_lpt_string($testlist, "0050");
+is(scalar @{$results}, 2, "Identifies that both routings go through 0050");
 
