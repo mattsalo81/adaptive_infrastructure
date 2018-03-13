@@ -1,6 +1,6 @@
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
-use SMS::SpecExtract;
+use SMS::WipExtract;
 
-SpecExtract::update_sms_table();
+WipExtract::update_wip_extract();

@@ -54,41 +54,49 @@ sub get_codes_from_routing{
 	return $codes;
 }
 
-# code 0 -> # of ML
-# code 1 -> defined by nameing convention
+# code 0 -> Test Area
+# code 1 -> # of ML
+# code 2 -> defined by nameing convention
 sub LBC5_get_codes_from_routing{
 	my ($routing) = @_;
+	my $area;
+	($area, $routing) = strip_test_area($routing);
 	my $main_code = substr($routing, 6, 2);
 	my $num_ml = substr($routing, 5, 1);
 	if ($num_ml !~ m/^[0-4]$/ || $main_code eq ""){
 		confess "Unexpected LBC5 routing format <$routing>";
 	}
-	return [$num_ml, $main_code];
+	return [$area, $num_ml, $main_code];
 }
 
-# code 0 -> # of ML
-# code 1 -> main naming convention
-# code 2 -> flavor of hpa07
+# code 0 -> Test Area
+# code 1 -> # of ML
+# code 2 -> main naming convention
+# code 3 -> flavor of hpa07
 sub HPA07_get_codes_from_routing{
 	# can't get iso from flavor code.  Could get it from the num ml
 	my ($routing) = @_;
+	my $area;
+	($area, $routing) = strip_test_area($routing);
 	my $main_code = substr($routing, 6, 2);
 	my $num_ml = substr($routing, 5, 1);
 	my $flavor_code = substr($routing, 1, 3);
 	if ($num_ml !~ m/^[0-4]$/ || $main_code eq "" || $flavor_code !~ m/^10[0237]$/){
 		confess "Unexpected HPA07 routing format <$routing>";
 	}
-	return [$num_ml, $main_code, $flavor_code];
+	return [$area, $num_ml, $main_code, $flavor_code];
 }
 
-# code 0 -> # of ML
-# code 1 -> char 1
-# code 2 -> char 2
-# code 3 -> char 3
-# code 4 -> optional char 4
+# code 0 -> Test Area
+# code 1 -> # of ML
+# code 2 -> char 1
+# code 3 -> char 2
+# code 4 -> char 3
+# code 5 -> optional char 4
 sub LBC8_get_codes_from_routing{
 	my ($routing) = @_;
-	my ($char_1, $char_2, $char_3, $char_4, $num_ml);
+	my ($area, $char_1, $char_2, $char_3, $char_4, $num_ml);
+	($area, $routing) = strip_test_area($routing);
 	if ($routing =~ m/DCU-(.)(.)(.)(.?)-([0-9])$/){
 		# DCU routing
 		($char_1, $char_2, $char_3, $char_4, $num_ml) = ($1, $2, $3, $4, $5);
@@ -98,14 +106,16 @@ sub LBC8_get_codes_from_routing{
 	}else{
 		confess "Unexpected LBC8 Routing format <$routing>";
 	}
-	return [$num_ml, $char_1, $char_2, $char_3, $char_4];
+	return [$area, $num_ml, $char_1, $char_2, $char_3, $char_4];
 }
 
-# code 0 -> # of ML
-# code 1 -> 2 char options
+# code 0 -> Test Area
+# code 1 -> # of ML
+# code 2 -> 2 char options
 sub LBC7_get_codes_from_routing{
         my ($routing) = @_;
-        my ($main_code, $num_ml);
+        my ($area, $main_code, $num_ml);
+	($area, $routing) = strip_test_area($routing);
 	if ($routing =~ m/(DCU|FVDCA)-(..)-(.)$/){
                 # DCU routing
 		($main_code, $num_ml) = ($2, $3);
@@ -115,35 +125,53 @@ sub LBC7_get_codes_from_routing{
 	}else{
                 confess "Unexpected LBC7 Routing format <$routing>";
         }
-        return [$num_ml, $main_code];
+        return [$area, $num_ml, $main_code];
 }
 
-# code 0 -> # of ML
+# code 0 -> Test Area
+# code 1 -> # of ML
 sub F05_get_codes_from_routing{
 	my ($routing) = @_;
-	my $num_ml;
+	my ($area, $num_ml);
+	($area, $routing) = strip_test_area($routing);
 	if ($routing =~ m/-([0-9])$/){
 		$num_ml = $1;
 	}else{
 		confess "Unexpected F05 Routing format <$routing>";
 	}
-	return [$num_ml];
+	return [$area, $num_ml];
 }
 
-# code 0 -> # of ML
-# code 1 -> char 1
-# code 2 -> char 2
-# code 3 -> char 3
-# code 4 -> char 4
+# code 0 -> Test Area
+# code 1 -> # of ML
+# code 2 -> char 1
+# code 3 -> char 2
+# code 4 -> char 3
+# code 5 -> char 4
 sub LBC8LV_get_codes_from_routing{
 	my ($routing) = @_;
-	my ($num_ml, $char_1, $char_2, $char_3, $char_4);
+	my ($area, $num_ml, $char_1, $char_2, $char_3, $char_4);
+	($area, $routing) = strip_test_area($routing);
 	if ($routing =~ m/^.....([0-9])(.)(.)(.)(.)$/){
 		($num_ml, $char_1, $char_2, $char_3, $char_4) = ($1, $2, $3, $4, $5);
 	}else{
 		confess "Unexpected LBC8LV Routing format <$routing>";
 	}
-	return [$num_ml, $char_1, $char_2, $char_3, $char_4];
+	return [$area, $num_ml, $char_1, $char_2, $char_3, $char_4];
 }
 
+sub strip_test_area{
+	my ($routing) = @_;
+	my $area;
+	if ($routing =~ m/___/ || $routing =~ m/__.*__/){
+		confess "Unexpected Routing format <$routing>";
+	}
+	if($routing =~ m/^(.*)__(.*)$/){
+		$area = $1;
+		$routing = $2;
+	}else{
+		confess "Could not extract test area from routing <$routing>";
+	}
+	return ($area, $routing);
+}
 1;

@@ -1,4 +1,4 @@
-package Extract;
+package SpecExtract;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
@@ -40,47 +40,53 @@ sub update_sms_table{
 		my $num = 0;
 		# enter the download/scrub/upload loop
 		while (my $rec = $d_sth->fetchrow_hashref("NAME_uc")){
-			
-			$device = $rec->{"DEVICE"};
-			Logging::diag("Processing device $device");
-			Logging::diag(Dumper($rec));
-			$num++;
-			if ($num % 100 == 0){
-				Logging::event("Processed $num devices");
+			eval{	
+				no warnings q{exiting};
+				$device = $rec->{"DEVICE"};
+				Logging::diag("Processing device $device");
+				Logging::diag(Dumper($rec));
+				$num++;
+				if ($num % 100 == 0){
+					Logging::event("Processed $num devices");
+				}
+
+				# error checking on KPARMS
+				$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
+				$area = $rec->{"AREA"};
+				next if $area eq "UNDEF";
+
+				# set bound variables
+				$family = $rec->{"FAMILY"};
+				$rec->{"TECH"} = get_technology_from_family($family);
+				$technology = $rec->{"TECH"};
+				$coordref = $rec->{"COORDREF"};
+				next unless defined $coordref;
+				$routing = $rec->{"ROUTING"};
+				$lpt = $rec->{"LPT"};
+				$program = $rec->{"PROGRAM"};
+				next unless defined $program;
+				$prober_file = $rec->{"PROBER_FILE"};
+				next unless defined $prober_file;
+				$opn = $rec->{"OPN"};
+				$card_family = $rec->{"CARD_FAMILY"};
+				next unless defined $card_family;
+				$cot = get_COT_from_record($rec);
+				$recipe = make_recipe_from_record($rec);
+				
+				$effective_routing = EffectiveRouting::make_effective_routing($rec);
+				$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
+				$area = $rec->{"AREA"};
+				# error checking on KPARMS
+				next if $area eq "UNDEF";
+
+				# upload
+				$u_sth->execute($device, $technology, $family, $coordref, $routing, $effective_routing, $lpt, 
+						$cot, $program, $prober_file, $recipe, $area, $opn, $card_family);
+				1;
+			} or do {
+				my $e = $@;
+				Logging::error($e);
 			}
-
-                        # error checking on KPARMS
-                        $rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
-                        $area = $rec->{"AREA"};
-                        next if $area eq "UNDEF";
-
-			# set bound variables
-			$family = $rec->{"FAMILY"};
-			$rec->{"TECH"} = get_technology_from_family($family);
-			$technology = $rec->{"TECH"};
-			$coordref = $rec->{"COORDREF"};
-			next unless defined $coordref;
-			$routing = $rec->{"ROUTING"};
-			$lpt = $rec->{"LPT"};
-			$program = $rec->{"PROGRAM"};
-                        next unless defined $program;
-			$prober_file = $rec->{"PROBER_FILE"};
-                        next unless defined $prober_file;
-			$opn = $rec->{"OPN"};
-			$card_family = $rec->{"CARD_FAMILY"};
-                        next unless defined $card_family;
-			$cot = get_COT_from_record($rec);
-			$recipe = make_recipe_from_record($rec);
-			
-			$effective_routing = EffectiveRouting::make_effective_routing($rec);
-			$rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
-			$area = $rec->{"AREA"};
-			# error checking on KPARMS
-			next if $area eq "UNDEF";
-
-			# upload
-			$u_sth->execute($device, $technology, $family, $coordref, $routing, $effective_routing, $lpt, 
-		    			$cot, $program, $prober_file, $recipe, $area, $opn, $card_family);
 		}
 		
 		$trans->commit();

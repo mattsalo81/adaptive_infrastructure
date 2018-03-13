@@ -44,25 +44,29 @@ sub make_effective_routing_LBC7{
         my $prod_grp = $rec->{"PROD_GRP"};
         my $routing = $rec->{"ROUTING"};
         unless(defined $routing && defined $prod_grp && defined $device){
-                confess("Missing crucial information to generate LBC7 effective routing. Probably programmer's fault\n");
+                confess("Missing crucial information to generate LBC7 effective routing. Probably programmer's fault");
         }
         Logging::diag("Looking for effective routing in prod_grp for tech LBC7 on device $device");
         my $eff_routing = $routing;
         if ($routing =~ m/(DCU|FVDCA)/){
                 $eff_routing .= "-".substr($device,4,2);
+		my $num_metal = 0;
                 if ($prod_grp =~ m/\-([SDTQP67]LM)/){
                         my $xlm = $1;
-                        my $num_metal = 1;
-                        $num_metal = 2 if ($xlm =~ /DLM/);
-                        $num_metal = 3 if ($xlm =~ /TLM/);
-                        $num_metal = 4 if ($xlm =~ /QLM/);
-                        $num_metal = 5 if ($xlm =~ /PLM/);
-                        $num_metal = 6 if ($xlm =~ /6LM/);
-                        $num_metal = 7 if ($xlm =~ /7LM/);
-                        $eff_routing .= "-" . $num_metal;
-                }else{
-                        confess("Unable to get number of metal levels for effective routing from " . Dumper($rec) . "\n");
+			$num_metal = 1 if ($xlm =~ /SLM/);
+			$num_metal = 2 if ($xlm =~ /DLM/);
+			$num_metal = 3 if ($xlm =~ /TLM/);
+			$num_metal = 4 if ($xlm =~ /QLM/);
+			$num_metal = 5 if ($xlm =~ /PLM/);
+			$num_metal = 6 if ($xlm =~ /6LM/);
+			$num_metal = 7 if ($xlm =~ /7LM/);
+		}else{
+                        confess("Unable to get number of metal levels for effective routing from " . Dumper($rec));
                 }
+		if ($num_metal == 0){
+			confess("Unable to get number of metal levels (got 0) from " . Dumper($rec));
+		}
+                $eff_routing .= "-" . $num_metal;
         }
         return $eff_routing;
 
