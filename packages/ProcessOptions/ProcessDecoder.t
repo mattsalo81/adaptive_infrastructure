@@ -27,3 +27,9 @@ throws_ok(sub{ProcessDecoder::get_options_for_code("TEST", undef, undef)}, 'No o
 
 @options = @{ProcessDecoder::get_options_for_code("TEST", 0, "BLANK")};
 is(scalar @options, 0, "Successfully returns 0 options if \$ProcessDecoder::placeholder_option is the only option found.");
+
+@options = sort @{ProcessDecoder::get_all_possible_options_for_code("TEST", 0)};
+is(scalar @options, 3, "Finds three possibile process options for test/0 (ignores placeholder)");
+is($options[0], "NICE", "Finds four Correct process options for test/0");
+is($options[1], "SHAZAM", "Finds four Correct process options for test/0");
+is($options[2], "WOW", "Finds four Correct process options for test/0");

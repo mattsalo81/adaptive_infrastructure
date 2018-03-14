@@ -46,11 +46,7 @@ sub get_options_for_code{
 	}
 	# flatten deep array
 	@options = sort map {$_->[0] =~ s/\s//g; $_->[0]} @options;
-	my @def_options;
-	foreach my $opt (@options){
-		push(@def_options, $opt) if defined $opt and $opt ne $placeholder_option;
-	}
-	return \@def_options;
+	return remove_placeholder_arrayref(\@options);
 }
 
 # get every possibly option for every possible encoding scheme
@@ -67,7 +63,7 @@ sub get_all_possible_options_for_code{
 	$sth->execute($technology, $code_num);
 	my $codes = $sth->fetchall_arrayref();
 	my @codes = map {$_->[0]} @{$codes};
-	return \@codes;
+	return remove_placeholder_arrayref(\@codes);
 }
 
 sub get_all_possible_options_for_code_query{
@@ -88,6 +84,15 @@ sub get_all_possible_options_for_code_query{
 		confess "Could not get get_all_possible_options_for_code_sth, probably programmer's fault";
 	}
 	return $get_all_possible_options_for_code_sth;
+}
+
+sub remove_placeholder_arrayref{
+	my ($array) = @_;
+	my @array;
+	foreach my $item (@{$array}){
+		 push(@array, $item) if $item ne $placeholder_option;		
+	}
+	return \@array;
 }
 
 1;
