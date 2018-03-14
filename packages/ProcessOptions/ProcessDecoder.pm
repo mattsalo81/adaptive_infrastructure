@@ -9,6 +9,7 @@ use Database::Connect;
 
 my $options_for_code_sth;
 my $placeholder_option = "PLACEHOLDER";
+my $get_all_possible_options_for_code_sth;
 
 sub get_options_for_code_sth{
 	unless (defined $options_for_code_sth){
@@ -50,6 +51,43 @@ sub get_options_for_code{
 		push(@def_options, $opt) if defined $opt and $opt ne $placeholder_option;
 	}
 	return \@def_options;
+}
+
+# get every possibly option for every possible encoding scheme
+# note, this is NOT the possible codes, but the possible options
+# ie, if code_num 1 means metal levels, possible codes are 1,2,3,4,5, etc
+#	but possible options might be SLM,DLM,TLM,QLM,PLM, etc
+# 	this returns options
+sub get_all_possible_options_for_code{
+	my ($technology, $code_num) = @_;
+        unless(defined $code_num && defined $technology){
+                confess "Something is not defined correctly, probably programmer's fault";
+        }
+	my $sth = get_all_possible_options_for_code_query();
+	$sth->execute($technology, $code_num);
+	my $codes = $sth->fetchall_arrayref();
+	my @codes = map {$_->[0]} @{$codes};
+	return \@codes;
+}
+
+sub get_all_possible_options_for_code_query{
+	unless(defined $get_all_possible_options_for_code_sth){
+		my $conn = Connect::read_only_connection("etest");
+		my $sql = q{
+			select distinct 
+				process_option
+			from
+				process_code_to_option
+			where
+				technology = ?
+				and code_num = ?
+		};
+		$get_all_possible_options_for_code_sth = $conn->prepare($sql);
+	}
+	unless (defined $get_all_possible_options_for_code_sth){
+		confess "Could not get get_all_possible_options_for_code_sth, probably programmer's fault";
+	}
+	return $get_all_possible_options_for_code_sth;
 }
 
 1;
