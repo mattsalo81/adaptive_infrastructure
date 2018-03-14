@@ -13,7 +13,8 @@ my $lpt_sth;
 
 
 # splits a logpoint string into a list of required/forbidden logpoints.
-# supports ! (not) and . (and).  Could one day be upgraded for fully recursive parsing
+# supports ! (not) and . (and). 
+# REPLACED BY RECURSIVE DESCENT ALGO
 sub parse_lpt_string{
         my ($string) = @_;
 	my $forb_lpt = [];
@@ -35,6 +36,7 @@ sub parse_lpt_string{
 }
 
 # takes a list of routings and returns only those that meet the lpt string requirements
+# REPLACED BY RECURSIVE DESCENT ALGO
 sub get_list_of_routings_matching_lpt_string{
 	my ($input_routings, $string) = @_;
 	my @matching_routings;
@@ -51,23 +53,16 @@ sub get_list_of_routings_matching_lpt_string{
 
 # takes a single routing, a list of required logpoints, and a list of forbidden logpoints
 # returns true/false if that routing satisfies those requirements
+# REPLACED BY RECURSIVE DESCENT ALGO
 sub does_routing_match_lpt_lists{
 	my ($routing, $req_lpt, $forb_lpt) = @_;
 	REQ_LPT: foreach my $lpt (@{$req_lpt}){
                 Logging::diag("$routing must have $lpt");
-                my $hash_ref = get_routing_list_at_lpt($lpt);
-		unless (defined $hash_ref){
-                	confess "Sub did not return as expected, probably programmer's fault";
-		}
-		return 0 unless (defined $hash_ref->{$routing});
+		return 0 unless does_routing_use_lpt($routing, $lpt);
         }
 	FORB_LPT: foreach my $lpt (@{$forb_lpt}){
                	Logging::diag("cannot have $lpt");
-                my $hash_ref = get_routing_list_at_lpt($lpt);
-		unless (defined $hash_ref){
-			die "somebody broke the logpoint automation";
-		}
-                return 0 if (defined $hash_ref->{$routing});
+                return 0 if does_routing_use_lpt($routing, $lpt);
         }
 	return 1;	
 }
@@ -76,7 +71,11 @@ sub does_routing_match_lpt_lists{
 # returns true if routing goes through LPT
 sub does_routing_use_lpt{
 	my ($routing, $lpt) = @_;
-	return does_routing_match_lpt_lists($routing, [$lpt], []);
+	my $hash_ref = get_routing_list_at_lpt($lpt);
+	unless (defined $hash_ref){
+		confess "get_routing_list_at_lpt did not return as expected, probably programmer's fault";
+	}
+	return (defined $hash_ref->{$routing} ? 1 : 0);
 }
 
 # takes a single routing and a logpoint string.
