@@ -14,7 +14,6 @@ is($sth1, $sth2, "multiple calls do not create unique sth");
 
 # test cases, rely on DB vals
 my @options = @{ProcessDecoder::get_options_for_code("TEST", 0, "MATT")};
-
 is(@options, 2, "Correct number of results");
 is(join(",", @options), "SHAZAM,WOW", "Correct results");
 
@@ -33,3 +32,6 @@ is(scalar @options, 3, "Finds three possibile process options for test/0 (ignore
 is($options[0], "NICE", "Finds four Correct process options for test/0");
 is($options[1], "SHAZAM", "Finds four Correct process options for test/0");
 is($options[2], "WOW", "Finds four Correct process options for test/0");
+
+ok(ProcessDecoder::okay_to_ignore_code("TEST", 0), "okay to ignore missing code 0 on TEST, all options defined by LPT");
+ok(!ProcessDecoder::okay_to_ignore_code("TEST", 1), "not okay to ignore missing code 1 on TEST, not all options defined by LPT");

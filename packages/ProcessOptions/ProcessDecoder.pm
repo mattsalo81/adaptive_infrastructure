@@ -6,10 +6,36 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Database::Connect;
+use ProcessOptions::LogpointOptions;
 
 my $options_for_code_sth;
 my $placeholder_option = "PLACEHOLDER";
 my $get_all_possible_options_for_code_sth;
+my %okay_codes_to_ignore;
+
+sub okay_to_ignore_code{
+	my ($tech, $code_num) = @_;
+	my $key = "$tech - $code_num";
+	unless(defined $okay_codes_to_ignore{$key}){
+		# get all possible options from the process code
+		my $possible_options_from_code = get_all_possible_options_for_code($tech, $code_num);
+		# get all options defined using logpoints
+		my $possible_options_from_lpt  = LogpointOptions::get_all_options_for_tech($tech);
+		# determine if there are any options in the code not defined by a logpoint
+		my %lpt;
+		@lpt{@{$possible_options_from_lpt}} = @{$possible_options_from_lpt};
+		my $okay = 1;
+		foreach my $opt (@{$possible_options_from_code}){
+			# not okay if any process options do not have a logpoint backup
+			$okay = 0 unless defined $lpt{$opt};
+		}
+		$okay_codes_to_ignore{$key} = $okay;
+	}
+	unless(defined $okay_codes_to_ignore{$key}){
+		confess "Could not determine if it is okay to ignore code <$key>";
+	}
+	return $okay_codes_to_ignore{$key};
+}
 
 sub get_options_for_code_sth{
 	unless (defined $options_for_code_sth){
