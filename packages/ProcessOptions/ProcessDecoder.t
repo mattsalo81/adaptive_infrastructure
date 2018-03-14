@@ -33,5 +33,32 @@ is($options[0], "NICE", "Finds four Correct process options for test/0");
 is($options[1], "SHAZAM", "Finds four Correct process options for test/0");
 is($options[2], "WOW", "Finds four Correct process options for test/0");
 
+# ignore codes
 ok(ProcessDecoder::okay_to_ignore_code("TEST", 0), "okay to ignore missing code 0 on TEST, all options defined by LPT");
 ok(!ProcessDecoder::okay_to_ignore_code("TEST", 1), "not okay to ignore missing code 1 on TEST, not all options defined by LPT");
+
+@options = sort @{ProcessDecoder::get_options_for_code_array("TEST", ["MATT", "MATT"])};
+is(scalar @options, 3, "Returns correct number of options for code array");
+is($options[0], "HEYO", "returns correct options for code array");
+is($options[1], "SHAZAM", "returns correct options for code array");
+is($options[2], "WOW", "returns correct options for code array");
+
+@options = sort @{ProcessDecoder::get_options_for_code_array("TEST", ["MATT"])};
+is(scalar @options, 2, "Returns correct number of options for code array");
+is($options[0], "SHAZAM", "returns correct options for code array");
+is($options[1], "WOW", "returns correct options for code array");
+
+@options = sort @{ProcessDecoder::get_options_for_code_array("TEST", [undef, "MATT"])};
+is(scalar @options, 1, "Returns correct number of options for code array - and ignores code 0 which we can compensate for with logpoints");
+is($options[0], "HEYO", "returns correct options for code array");
+
+dies_ok(sub {ProcessDecoder::get_options_for_code_array("TEST", ["MATT", undef])}, "Dies when missing code 1 which cannot be compensated for with logpoints");
+
+
+
+
+
+
+
+
+

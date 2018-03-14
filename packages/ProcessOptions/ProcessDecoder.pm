@@ -13,8 +13,34 @@ my $placeholder_option = "PLACEHOLDER";
 my $get_all_possible_options_for_code_sth;
 my %okay_codes_to_ignore;
 
+sub get_options_for_code_array{
+	my ($tech, $codes) = @_;
+	unless(defined $tech and defined $codes){
+		confess "Necessary into not provided! Probably Programmer's Fault";
+	}
+	my @options;
+	for (my $code_num = 0; $code_num < scalar @{$codes}; $code_num++){
+		my $code = $codes->[$code_num];
+		if (defined $code){
+			my $options = get_options_for_code($tech, $code_num, $code);
+			push @options, @{$options};
+		}else{
+			if(okay_to_ignore_code($tech, $code_num)){
+				Logging::debug("Ignoring code #$code_num on $tech");
+			}else{
+				confess "Given a code that was undef, but was not allowed to ignore it ($tech, code #$code_num)";
+			}
+		}
+	}
+	return \@options;
+}
+
 sub okay_to_ignore_code{
 	my ($tech, $code_num) = @_;
+	unless (defined $tech and defined $code_num){
+		confess "Neccessary info not provided! Probably Programmer's Fault";
+	}
+	# memoize
 	my $key = "$tech - $code_num";
 	unless(defined $okay_codes_to_ignore{$key}){
 		# get all possible options from the process code
