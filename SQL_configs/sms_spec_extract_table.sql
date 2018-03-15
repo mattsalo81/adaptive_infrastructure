@@ -1,4 +1,4 @@
-create table etest_daily_sms_extract(
+create table daily_sms_extract(
 	device 			varchar2	(32)	not null,
 	technology	 	varchar2	(32)	not null,
 	family 			varchar2	(32)	not null,

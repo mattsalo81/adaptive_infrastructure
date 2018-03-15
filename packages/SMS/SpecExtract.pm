@@ -13,7 +13,7 @@ my %family2tech;
 my %lpt_opn2area;
 
 sub update_sms_table{
-	my $table = 'etest_daily_sms_extract';
+	my $table = 'daily_sms_extract';
 	my $trans = Connect::new_transaction("etest");
 	eval{
 		# empty table in transaction
@@ -147,7 +147,7 @@ sub get_technology_from_family{
 	unless (defined $family2tech{$family}){
 		Logging::debug("Looking for technology for $family in etest db");
 		my $conn = Connect::read_only_connection("etest");
-		my $sql = "select technology from etest_family_to_technology where UPPER(family) = ?";
+		my $sql = "select technology from family_to_technology where UPPER(family) = ?";
 		my $sth = $conn->prepare($sql);
 		$sth->execute($family);
 		my ($technology) = $sth->fetchrow_array();

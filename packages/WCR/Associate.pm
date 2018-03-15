@@ -78,19 +78,19 @@ sub update_lookup_table{
 	# prepare download handle to get coordrefs
 	Logging::event("Updating coordref -> wcr lookup table");
 	my $etest = Connect::read_only_connection("etest");
-	my $download_sql = q{select distinct coordref from etest_daily_sms_extract};
+	my $download_sql = q{select distinct coordref from daily_sms_extract};
 	my $download_sth = $etest->prepare($download_sql);
 	
 	# start upload transaction
 	my $trans = Connect::new_transaction("etest");
 	eval{
 		# clear old table
-		my $delete_sql = q{delete from etest_coordref2wcrepo where 1=1};
+		my $delete_sql = q{delete from coordref2wcrepo where 1=1};
 		$trans->prepare($delete_sql)->execute();
 		$download_sth->execute();
 		
 		# prepare upload sth
-		my $upload_sql = q{insert into etest_coordref2wcrepo (coordref, WAFERCONFIGFILE) values (?,?)};
+		my $upload_sql = q{insert into coordref2wcrepo (coordref, WAFERCONFIGFILE) values (?,?)};
 		my $up_sth = $trans->prepare($upload_sql);
 	
 		# start populating the lookup

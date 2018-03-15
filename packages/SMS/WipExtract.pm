@@ -39,12 +39,12 @@ sub update_wip_extract{
 	my $num_lots = 0;
 	eval{
 		# delete everything in WIP extract
-		my $del_sth = $trans->prepare(q{delete from etest_daily_wip_extract where 1=1});
+		my $del_sth = $trans->prepare(q{delete from daily_wip_extract where 1=1});
 		$del_sth->execute();
 		# start pulling data from sms
 		my $d_sth = get_wip_query();
 		$d_sth->execute() or confess "Could not query SMS wip tables";
-		my $u_sth = $trans->prepare(q{insert into etest_daily_wip_extract (lot, device, lpt, wafers) values (?, ?, ?, ?)});
+		my $u_sth = $trans->prepare(q{insert into daily_wip_extract (lot, device, lpt, wafers) values (?, ?, ?, ?)});
 		while(my $rec = $d_sth->fetchrow_hashref("NAME_uc")){
 			if (($num_lots % $milestone == 0) && $num_lots > 0){
 				Logging::event("Added $num_lots lots to wip extract");
