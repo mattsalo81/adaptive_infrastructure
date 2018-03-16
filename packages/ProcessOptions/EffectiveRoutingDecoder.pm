@@ -78,35 +78,49 @@ sub HPA07_get_codes_from_routing{
 	my ($routing) = @_;
 	my $area;
 	($area, $routing) = strip_test_area($routing);
-	my $main_code = substr($routing, 6, 2);
+	if ($routing eq "M102W3"){
+		$routing = "M102W3++";
+	}
+	my $main_code;
+	if(length($routing) > 8 && substr($routing,6,1) eq "V"){
+		# class v routings push the device code back
+		$main_code = substr($routing, 7, 2);
+	}else{
+		$main_code = substr($routing, 6, 2);
+	}
+	my $isoj;
+	if (substr($routing,4,1) eq "J") {
+		$isoj = "J";
+	}else{
+		$isoj = "NOTJ";
+	}
 	my $num_ml = substr($routing, 5, 1);
 	my $flavor_code = substr($routing, 1, 3);
 	if ($num_ml !~ m/^[0-4]$/ || $main_code eq "" || $flavor_code !~ m/^10[0237]$/){
 		confess "Unexpected HPA07 routing format <$routing>";
 	}
-	return [$area, $num_ml, $main_code, $flavor_code];
+	return [$area, $num_ml, $main_code, $flavor_code, $isoj];
 }
 
 # code 0 -> Test Area
 # code 1 -> # of ML
-# code 2 -> char 1
-# code 3 -> char 2
-# code 4 -> char 3
-# code 5 -> optional char 4
+# code 2 -> 3 char
+# code 3 -> optional char 4
 sub LBC8_get_codes_from_routing{
 	my ($routing) = @_;
-	my ($area, $char_1, $char_2, $char_3, $char_4, $num_ml);
+	my ($area, $three_char, $char_4, $num_ml);
 	($area, $routing) = strip_test_area($routing);
-	if ($routing =~ m/DCU-(.)(.)(.)(.?)-([0-9])$/){
+	if ($routing =~ m/DCU-(...)(.?)-([0-9])$/){
 		# DCU routing
-		($char_1, $char_2, $char_3, $char_4, $num_ml) = ($1, $2, $3, $4, $5);
-	}elsif($routing =~ m/^.....([0-9])(.)(.)(.)(.?)$/){
+		($three_char, $char_4, $num_ml) = ($1, $2, $3);
+	}elsif($routing =~ m/^.....([0-9])(...)(.?)$/){
 		# 9/10 character routings
-		($num_ml, $char_1, $char_2, $char_3, $char_4) = ($1, $2, $3, $4, $5);
+		($num_ml, $three_char, $char_4) = ($1, $2, $3);
 	}else{
 		confess "Unexpected LBC8 Routing format <$routing>";
 	}
-	return [$area, $num_ml, $char_1, $char_2, $char_3, $char_4];
+	$char_4 = "NONE" if $char_4 eq "";
+	return [$area, $num_ml, $three_char, $char_4];
 }
 
 # code 0 -> Test Area
