@@ -50,3 +50,6 @@ is(scalar @match2, scalar @{$array2}, "Found correct number of entries");
 my $str2 = join(", ", sort @{$array2});
 is(join(", ", sort @match2), $str2, "Found correct matches");
 
+dies_ok(sub{ProcessEncoder::update_code("TEST3", 0, {'!@#$%^&*()\'' => "TEST"})}, "Will not upload weird characters to DB");
+dies_ok(sub{ProcessEncoder::update_code("TEST3", 0, {'TEST' => '!@#$%^&*()\''})}, "Will not upload weird characters to DB");
+

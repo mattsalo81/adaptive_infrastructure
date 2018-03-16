@@ -7,9 +7,37 @@ use Data::Dumper;
 use Database::Connect;
 use ProcessOptions::ProcessDecoder;
 use Logging;
+use ProcessOptions::Encode::Global;
 
 my $table = "process_code_to_option";
 
+sub update_codes_for_all_techs{
+	my $conn = Connect::read_only_connection("etest");
+	my $sql = q{select distinct technology from daily_sms_extract};
+	my $sth = $conn->prepare($sql);
+	$sth->execute() or confess "Could not get list of technologies from daily_sms_extract";
+	my $techs = $sth->fetchall_arrayref();
+	my @techs = map{$_->[0]} @{$techs};
+	foreach my $tech (@techs){
+		eval{
+			update_codes_for_tech($tech);
+			Logging::event("Updated $tech process encoding");
+			1;
+		} or do {
+			my $e = $@;
+			Logging::error("Could not update $tech process encoding because of : $e");
+		}
+	}
+}
+
+sub update_codes_for_tech{
+	my ($tech) = @_;
+	my $codes = Encode::Global::get_codes($tech);
+	for( my $code_num = 0; $code_num < scalar @{$codes}; $code_num++){
+		my $code = $codes->[$code_num];
+		update_code($tech, $code_num, $code);
+	}	
+}
 
 # takes technology, code_number, and a lookup table (hashref)
 # keys of lookup table are codes, values are array-refs of options
@@ -31,6 +59,9 @@ sub update_code{
 		foreach my $code (keys %{$lookup}){
 			Logging::debug("Updating ($tech - $code_num - $code) in database");
 			foreach my $option (@{$lookup->{$code}}){
+				if($code =~ m/[^a-z0-9\+\.\/_]/i or $option =~ m/[^a-z0-9\+\.\/_]/i){
+					confess "Unexpected character in ($tech - $code_num - $code -> $option)";
+				}
 				Logging::diag("Updating ($tech - $code_num - $code -> $option) in database");
 				unless($u_sth->execute($tech, $code_num, $code, $option)){
 					confess "Could not update ($tech - $code_num - $code -> $option) in database";
