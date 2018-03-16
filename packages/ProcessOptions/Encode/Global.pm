@@ -13,6 +13,28 @@ my @areas = (
 	'PARAMETRIC',
 );
 
+sub parse_old_txt_format{
+	my ($text) = @_;
+	my @lines = split(/\n+/, $text);
+	my %codes;
+	foreach my $line (@lines){
+		$line =~ s/^\s*//;
+		next if $line =~ m/^#/;
+		next if $line =~ m/^\s*$/;
+		if ($line =~ m{^a-z0-9_ \.\+\/]}i){
+			confess "Unexpected characters in line <$line>";
+		}
+		my @fields = split /\s+/, $line;
+		my $code = shift @fields;
+		if (defined $codes{$code}){
+			push @{$codes{$code}}, @fields;
+		}else{
+			$codes{$code} = \@fields;
+		}
+	}
+	return \%codes;
+}
+
 sub get_area_codes{
 	my @been_to;
 	my @after;
