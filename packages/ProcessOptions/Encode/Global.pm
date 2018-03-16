@@ -5,6 +5,13 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
 use Logging;
+use ProcessOptions::Encode::F05;
+use ProcessOptions::Encode::HPA07;
+use ProcessOptions::Encode::LBC5;
+use ProcessOptions::Encode::LBC7;
+use ProcessOptions::Encode::LBC8;
+use ProcessOptions::Encode::LBC8LV;
+use Switch;
 
 my @areas = (
 	'GATE',
@@ -12,6 +19,23 @@ my @areas = (
 	'METAL2',
 	'PARAMETRIC',
 );
+
+sub get_codes{
+	my ($tech) = @_;
+	my $codes;
+	switch ($tech){
+		case 'F05' 	{$codes = Encode::F05::get_codes()}
+		case 'HPA07' 	{$codes = Encode::HPA07::get_codes()}
+		case 'LBC5' 	{$codes = Encode::LBC5::get_codes()}
+		case 'LBC7' 	{$codes = Encode::LBC7::get_codes()}
+		case 'LBC8' 	{$codes = Encode::LBC8::get_codes()}
+		case 'LBC8LV' 	{$codes = Encode::LBC8LV::get_codes()}
+		else {
+			confess("No defined method in Encode::Global for getting codes from <$tech>");
+		}
+	}
+	return $codes;
+}
 
 sub parse_old_txt_format{
 	my ($text) = @_;

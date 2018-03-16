@@ -6,9 +6,12 @@ require Test::Homebrew_Exception;
 use ProcessOptions::Encode::Global;
 use Data::Dumper;
 
-
-my $codes = Encode::Global::get_codes("F05");
+my $codes = Encode::Global::get_codes("LBC8LV");
 
 print Dumper $codes;
 ok(defined $codes, "Codes are defined");
 
+ok(defined $codes->[2], "First char is defined");
+ok(defined $codes->[3], "Second char is defined");
+ok(defined $codes->[4], "Third char is defined");
+ok(defined $codes->[5], "Fourth char is defined");
