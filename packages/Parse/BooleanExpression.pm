@@ -8,17 +8,23 @@ use Logging;
 use Parse::RecDescent;
 use SMS::LogpointRequirements;
 
-# This package contains the logic for interpreting a boolean expression of logpoints
+# This package contains the logic for interpreting a boolean expression of logpoints or process options
 # expressions can have & (and) | (or) ^ (xor) ! (not) and parenthesis.
 # this uses the RecDescent module from CPAN to parse + create an executable perl string
-# this uses LogpointRequirements to query sms to see if logpoints are/are not in routing
 #
 # originally this was planned to also have -> (implication) <- (reverse implication) and <=> (equality) but ran into
 # some trouble with the parser.  Apparently recursive descent parsers cannot parse a left-recursive language so I had to adapt + throw out some features
+# 
+# admittedly, this package is a bit more complex than I'd like, as it uses lambda functions to evaluate whether a logpoint/opn is used
+# But this was done to allow the one parser to be used everywhere
+# there is a lambda function for evaluating logpoints and a lambda function for evaluating process options.  
+# They must each take one parameter, being either the logpoint or the process option.
 
 
-our $current_routing = "A6.0B4EDBS";
-my $parser;
+our $current_routing;
+my $current_lpt_lambda;
+my $current_opt_lambda;
+my $static_parser;
 
 # Enable warnings within the Parse::RecDescent module.
 $::RD_ERRORS = 1; # Make sure the parser dies when it encounters an error
@@ -30,6 +36,7 @@ my $grammar = q{
 #
 
 LPT		: /[0-9]{4}/		# logpoints
+OPT		: /[0-9A-Z_]+/i		# process option
 AND		: /[\.\+]|&&?/i
 OR		: /\|\|?/i
 XOR		: /\^/
@@ -69,7 +76,9 @@ TERM_E		: STD_BIN_AND FACTOR TERM_E(s)
                 { $return = ""}
 
 FACTOR		: LPT
-                { $return = "LogpointRequirements::does_routing_use_lpt('$BooleanExpression::current_routing', '$item{'LPT'}')"}
+                { $return = "check_lpt('$item{'LPT'}')"}
+		| OPT
+		{ $return = "check_opt('$item{'OPT'}')"}
 		| LEFT_PAREN EXPRESSION RIGHT_PAREN
                 { $return = "( $item[2] )"}
 		| STD_UN_OP EXPRESSION
@@ -80,46 +89,123 @@ startrule	: EXPRESSION
 
 };
 
+# init the parser with the given lambdas (just in case we want to split this singleton into a class)
 sub init{
-	$parser = Parse::RecDescent->new($grammar) unless defined $parser;
+	my ($lpt_lambda, $opt_lambda) = @_;
+	$current_lpt_lambda = $lpt_lambda;
+	$current_opt_lambda = $opt_lambda;
+	$static_parser = Parse::RecDescent->new($grammar) unless defined $static_parser;
+	return $static_parser;
 }
 
-sub set_routing{
-	my ($routing) = @_;
-	$current_routing = $routing;
+# If the class lambda is defined (static), then pass it the option and return the result, otherwise die
+# called by the evaluatable string produced by the parser
+sub check_opt{
+        my ($opt) = @_;
+        if(defined $current_opt_lambda){
+                my $success;
+                eval{
+                        $success = $current_opt_lambda->($opt);
+                        1;
+                }or do{
+                        my $e = $@;
+                        confess "Ran into error determining if option <$opt> was valid : $e";
+                };
+                return $success;
+        }else{
+                confess "Encountered an option <$opt> but have no way to check if valid";
+        }
+        return undef;
 }
 
-sub does_routing_match_lpt_string{
+# If the class lambda is defined (static), then pass it the lpt and return the result, otherwise die
+# called by the evaluatable string produced by the parser
+sub check_lpt{
+	my ($lpt) = @_;
+	if(defined $current_lpt_lambda){
+		my $success;
+		eval{
+			$success = $current_lpt_lambda->($lpt);
+			1;
+		}or do{
+			my $e = $@;
+			confess "Ran into error determining if logpoint <$lpt> was valid : $e";
+		};
+		return $success;
+	}else{
+		confess "Encountered a logpoint <$lpt> but have no way to check if valid";
+	}
+	return undef;
+}
+
+# create the lambda for checking SMS routing and evaluate expression
+sub does_sms_routing_match_lpt_string{
 	my ($routing, $lpt_string) = @_;
-       	my $result = get_eval($routing, $lpt_string); 
-	my $value = eval($result);
-	return $value;
+
+	my $lpt_lambda = sub {
+		my ($lpt) = @_;
+		return LogpointRequirements::does_routing_use_lpt($routing, $lpt);
+	};
+
+	return get_result_general($lpt_string, $lpt_lambda, undef);
 }
 
-sub is_valid_lpt_string{
+# create the lambda for checking if process option in a list
+sub does_list_match_opt_string{
+	my ($opt_list, $opt_string) = @_;
+	my %options;
+	$options{@{$opt_list}} = @{$opt_list};
+
+	my $opt_lambda = sub{
+		my ($opt) = @_;
+		return defined $options{$opt};
+	};
+
+	return get_result_general($opt_string, undef, $opt_lambda);	
+}
+
+
+# evaluate expression with provided lambdas (undef means don't allow)
+sub get_result_general{
+	my ($expression, $lpt_lambda, $opt_lambda) = @_;
+	my $parser = init($lpt_lambda, $opt_lambda);
+	my $eval_text = get_eval($parser, $expression);
+	my $value = eval($eval_text);
+	my $e = $@;
+	if ($e !~ m/^\s*$/ or not defined $value ){
+		confess "Failed to interpret <$expression> because of : $e";
+	}
+	if (defined $value){
+		return $value;
+	}else{
+		confess "Failed to interpret <$expression> with provided lambdas, got undef?";
+	};
+	return undef;
+}
+
+# parses the expression to make sure that all characters are accounted for.  Does not execute any code besides the parser
+sub is_valid_expression{
 	my ($lpt_string) = @_;
 	my $copy = $lpt_string;
 	# store vars
 	my @old = ($::RD_ERRORS, $::RD_WARN, $::RD_HINT);
 	# silence errors
 	($::RD_ERRORS, $::RD_WARN, $::RD_HINT) = (0, 0, 0);
-	init();
-	set_routing("DUMMY");
+	my $parser = init(undef, undef);
 	my $result = $parser->startrule(\$copy);
 	($::RD_ERRORS, $::RD_WARN, $::RD_HINT) = @old;
 	return defined $result && $copy =~ m/^\s*$/;
 }
 
+# uses the provided parser + expression to create an evaluatable perl string
 sub get_eval{
-	my ($routing, $lpt_string) = @_;
-        init();
-        set_routing($routing);
-        my $copy = $lpt_string;
-        my $result = $parser->startrule(\$copy);
-        unless (defined $result && $copy =~ m/^\s*$/){
-                confess "Parser failed to interpret <$lpt_string>";
+	my ($parser, $expression) = @_;
+        my $copy = $expression;
+        my $eval_text = $parser->startrule(\$copy);
+        unless (defined $eval_text && $copy =~ m/^\s*$/){
+                confess "Parser failed to interpret <$expression>";
         };
-        return $result;
+        return $eval_text;
 }
 
 1;

@@ -7,6 +7,7 @@ sub dies_ok{
 	eval{
 		$func->();
 		ok(0, "Did not Die : $text");
+		1;
 	} or do {
 		ok(1, "Died successfully : $text");
 	};
@@ -17,8 +18,11 @@ sub throws_ok{
         eval{
                 $func->();
                 ok(0, "Did not Die : $text");
+		1;
         } or do {
 		my $e = $@;
+		# remove throws_ok from error message incase this is a stack trace...
+		$e =~ s/throws_ok[^\n]*called/throws_ok(ARGS REMOVED) called/ig;
 		if ($e =~ m/$regex/){
 			ok(1, "Threw Successfully : $text");
 		}else{

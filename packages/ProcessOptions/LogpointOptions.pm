@@ -22,7 +22,7 @@ sub get_process_options_from_routing{
 	my %options;
 	foreach my $rule (@{$rules}){
 		my ($logpoint_expression, $option) = @{$rule};
-		if (BooleanExpression::does_routing_match_lpt_string($routing, $logpoint_expression)){
+		if (BooleanExpression::does_sms_routing_match_lpt_string($routing, $logpoint_expression)){
 			$options{$option} = "yep";
 		}
 	}
