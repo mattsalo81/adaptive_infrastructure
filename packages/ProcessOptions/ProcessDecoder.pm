@@ -8,6 +8,17 @@ use Logging;
 use Database::Connect;
 use ProcessOptions::LogpointOptions;
 
+# This package takes process codes and list of process codes and converts them into lists of process options
+# may also reference the logpoint table to determine if it is okay to ignore a code
+#
+# For each technology, there can be multiple, independent process codes.  There is one for the test area, there is one for the number of metal levels,
+# most have a PI defined process code, some have an additional character we need to check, etc.
+# this system handles as many process codes as needed.  Process Codes are passed in an array by their "code_num" which specifies which code to use in the database.
+# 
+# process codes are stored in a table with four attributes: technology, code_num, process_code, and process_option
+# this is not a pure RDS table, because if there are no process_options for a process_code, then there would normally be no entry in the table, and we'd have to have a table of valid options
+# instead, I've created a dummy option called "PLACEHOLDER" that the methods will add/remove as necessary to keep the table valid.
+
 my $options_for_code_sth;
 my $placeholder_option = "PLACEHOLDER";
 my $get_all_possible_options_for_code_sth;

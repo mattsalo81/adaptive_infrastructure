@@ -9,6 +9,13 @@ use Carp;
 use Data::Dumper;
 use Logging;
 
+# this package contains all the information needed to create an extrat of all devices + their common specs.
+# this extract should be referenced if at all possible, instead of rewriting a similar SMS query elsewhere
+# If information is not in the table, but could be and is needed elsewhere, this table should be updated to include it
+# 
+# This package uses EffectiveRouting generators to create the EffectiveRouting attribute.  The Effective Routing will be used
+# to generate KLF names/determine process codes, so should be unique to the process options included
+
 my %family2tech;
 my %lpt_opn2area;
 

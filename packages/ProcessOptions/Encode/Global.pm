@@ -13,6 +13,8 @@ use ProcessOptions::Encode::LBC8;
 use ProcessOptions::Encode::LBC8LV;
 use Switch;
 
+# This package is used to generate the process codes used to populate the process code table.  It is highly technology dependent.
+
 my @areas = (
 	'GATE',
 	'METAL1',
@@ -20,6 +22,8 @@ my @areas = (
 	'PARAMETRIC',
 );
 
+# return array-ref of process code structures, organized by their code_num
+# process code structures are hash-refs, keys are the code, values are an array-ref of process options for that code
 sub get_codes{
 	my ($tech) = @_;
 	my $codes;

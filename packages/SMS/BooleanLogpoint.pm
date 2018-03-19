@@ -8,6 +8,15 @@ use Logging;
 use Parse::RecDescent;
 use SMS::LogpointRequirements;
 
+# This package contains the logic for interpreting a boolean expression of logpoints
+# expressions can have & (and) | (or) ^ (xor) ! (not) and parenthesis.
+# this uses the RecDescent module from CPAN to parse + create an executable perl string
+# this uses LogpointRequirements to query sms to see if logpoints are/are not in routing
+#
+# originally this was planned to also have -> (implication) <- (reverse implication) and <=> (equality) but ran into
+# some trouble with the parser.  Apparently recursive descent parsers cannot parse a left-recursive language so I had to adapt + throw out some features
+
+
 our $current_routing = "A6.0B4EDBS";
 my $parser;
 

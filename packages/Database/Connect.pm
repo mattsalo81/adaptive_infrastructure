@@ -7,6 +7,14 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Database::ConnectionInfo;
 use Logging;
 
+# this package contains helper functions for creating DBI connections.
+# There are read_only_connections and transaction.  There is only one read_only_connection per DB to cut down on resources/overhead
+# it has been intentionally set to read only to prevent data corruption.  Do not try to modify the db with a read_only_connection, instead use a transaction.
+#
+# a transaction connection is unique to each call to new_transaction, meaning you can have multiple simultaneous transaction.
+# each update/insert/delete that occurs in a transaction is queued in a separate space and does not affect the real tables until committed
+# using a transaction, you can apply multiple, interdependent queries/updates as one atomic operation, or rollback the database without committing any.
+
 my %connections;
 
 sub read_only_connection{

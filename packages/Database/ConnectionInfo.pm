@@ -3,7 +3,8 @@ use warnings;
 use strict;
 use Carp;
 
-
+# contains all information necessary for logging into a database
+# originally used Mark's SWAT::DATABASE but had issues with testware's TNSNAMES.ORA.
 
 my %connection_info = (
 	sms		=>	['DBI:Oracle:SMSDWDE2','rptfw','rptfw'],

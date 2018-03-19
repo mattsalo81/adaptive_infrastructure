@@ -7,6 +7,8 @@ use Data::Dumper;
 use Logging;
 use Database::Connect;
 
+# this package handles all the logic for checking for process options in a routing based on the logpoints used
+
 my $get_all_options_sth;
 
 sub get_all_options_for_tech{

@@ -8,6 +8,10 @@ use Logging;
 use ProcessOptions::ProcessDecoder;
 use Switch;
 
+# this package contains all the logic for taking an effective routing (generated earlier) and breaking it down into the process codes
+# then using the codes to determine the process options through the ProcessDecoder.
+# it allows easy transition from effective routing -> process options
+
 sub get_options_for_routing{
 	my ($technology, $routing) = @_;
 	my $codes = get_codes_from_routing($technology, $routing);

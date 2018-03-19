@@ -5,6 +5,13 @@ use lib '/dm5/ki/adaptive_infrastructure/packages/';
 use Carp;
 use Data::Dumper;
 
+# general puprose logging package.
+# allows four levels of logging (silent, event, debug, and diag)
+# allows error messages
+# by default, all log messages get printed to stdout and all error messages get printed to stderr
+# but these could all be easily redirected to an email or a file by setting the file handle
+
+
 my $log = *STDOUT;
 my $err = *STDERR;
 

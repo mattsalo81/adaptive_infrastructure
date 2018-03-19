@@ -8,6 +8,8 @@ use Logging;
 use DBI;
 use Database::Connect;
 
+# This package queries SMS and creates a summary of the active WIP.  It will be used to prioritize recipes along with the spec extract
+
 sub get_wip_query{
 	Logging::debug("connecting to sms to query WIP");
 	my $conn = Connect::read_only_connection("sms");

@@ -9,6 +9,8 @@ use ProcessOptions::ProcessDecoder;
 use Logging;
 use ProcessOptions::Encode::Global;
 
+# This is the handler class for uploading process codes to the process code database
+
 my $table = "process_code_to_option";
 
 sub update_codes_for_all_techs{
