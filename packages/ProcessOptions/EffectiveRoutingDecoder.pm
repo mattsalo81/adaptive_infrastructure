@@ -12,9 +12,9 @@ use Switch;
 # then using the codes to determine the process options through the ProcessDecoder.
 # it allows easy transition from effective routing -> process options
 
-sub get_options_for_routing{
-	my ($technology, $routing) = @_;
-	my $codes = get_codes_from_routing($technology, $routing);
+sub get_options_for_effective_routing{
+	my ($technology, $effective_routing) = @_;
+	my $codes = get_codes_from_routing($technology, $effective_routing);
 	return get_options_for_code_array($technology, $codes);
 }
 

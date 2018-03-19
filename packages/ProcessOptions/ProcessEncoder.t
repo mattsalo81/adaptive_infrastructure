@@ -19,9 +19,9 @@ my @random_words = (
 	'HANG',
 );
 
-my $word1 = $random_words[int(rand(scalar @random_words - 1))];
-my $word2 = $random_words[int(rand(scalar @random_words - 1))];
-my $word3 = $random_words[int(rand(scalar @random_words - 1))];
+my $word1 = $random_words[int(rand(scalar @random_words - 1))] . "1";
+my $word2 = $random_words[int(rand(scalar @random_words - 1))] . "2";
+my $word3 = $random_words[int(rand(scalar @random_words - 1))] . "3";
 
 my $array1 = [$word1];
 my $array2 = [$word2];
