@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Database::Connect;
-use SMS::BooleanLogpoint;
+use Parse::BooleanExpression;
 
 # this package handles all the logic for checking for process options in a routing based on the logpoints used
 
@@ -22,7 +22,7 @@ sub get_process_options_from_routing{
 	my %options;
 	foreach my $rule (@{$rules}){
 		my ($logpoint_expression, $option) = @{$rule};
-		if (BooleanLogpoint::does_routing_match_lpt_string($routing, $logpoint_expression)){
+		if (BooleanExpression::does_routing_match_lpt_string($routing, $logpoint_expression)){
 			$options{$option} = "yep";
 		}
 	}

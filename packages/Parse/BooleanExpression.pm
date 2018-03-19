@@ -1,4 +1,4 @@
-package BooleanLogpoint;
+package BooleanExpression;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
@@ -69,7 +69,7 @@ TERM_E		: STD_BIN_AND FACTOR TERM_E(s)
                 { $return = ""}
 
 FACTOR		: LPT
-                { $return = "LogpointRequirements::does_routing_use_lpt('$BooleanLogpoint::current_routing', '$item{'LPT'}')"}
+                { $return = "LogpointRequirements::does_routing_use_lpt('$BooleanExpression::current_routing', '$item{'LPT'}')"}
 		| LEFT_PAREN EXPRESSION RIGHT_PAREN
                 { $return = "( $item[2] )"}
 		| STD_UN_OP EXPRESSION
