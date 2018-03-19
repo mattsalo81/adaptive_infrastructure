@@ -6,9 +6,9 @@ require Test::Homebrew_Exception;
 use ProcessOptions::EffectiveRoutingDecoder;
 
 throws_ok(sub {EffectiveRoutingDecoder::get_codes_from_routing("not a real tech", "whatever")}, "No defined way to parse routing", "Throws error when encountering new tech");
-my $codes = EffectiveRoutingDecoder::get_codes_from_routing("TEST", "TESTMS");
+my $codes = EffectiveRoutingDecoder::get_codes_from_routing("TEST", "TESTMATT");
 is(scalar @{$codes}, 1, "basic get_codes_from_routing");
-is($codes->[0], "MS", "basic get_codes_from_routing");
+is($codes->[0], "MATT", "basic get_codes_from_routing");
 
 dies_ok(sub{EffectiveRoutingDecoder::get_options_for_code_array("TEST", [])}, "testing empty code array");
 my $options;
