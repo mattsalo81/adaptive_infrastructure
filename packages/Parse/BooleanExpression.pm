@@ -151,11 +151,10 @@ sub does_sms_routing_match_lpt_string{
 }
 
 # create the lambda for checking if process option in a list
-sub does_list_match_opt_string{
+sub does_opt_list_match_opt_string{
 	my ($opt_list, $opt_string) = @_;
 	my %options;
-	$options{@{$opt_list}} = @{$opt_list};
-
+	@options{@{$opt_list}} = @{$opt_list};
 	my $opt_lambda = sub{
 		my ($opt) = @_;
 		return defined $options{$opt};
