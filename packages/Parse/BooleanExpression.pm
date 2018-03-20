@@ -37,6 +37,9 @@ my $grammar = q{
 
 LPT		: /[0-9]{4}/		# logpoints
 OPT		: /[0-9A-Z_]+/i		# process option
+EQ		: /<(-|=){1,2}>|={1,2}/
+IMP		: /(-|=){1,2}>/
+RIMP		: /<(-|=){1,2}/
 AND		: /[\.\+]|&&?/i
 OR		: /\|\|?/i
 XOR		: /\^/
@@ -59,6 +62,15 @@ STD_UN_OP	: NOT
                 { $return = "!" }
 
 # Expressions
+STATEMENT	: EXPRESSION EQ EXPRESSION
+		{ $return = "$item[1] == $item[3]" }
+		| EXPRESSION IMP EXPRESSION
+		{ $return = "BooleanExpression::implies(sub{return ($item[1])}, sub{return ($item[3])})" }
+		| EXPRESSION RIMP EXPRESSION
+		{ $return = "BooleanExpression::implies(sub{return ($item[3])}, sub{return ($item[1])})" }
+		| EXPRESSION
+		{ $return = "$item[1]" }
+		
 EXPRESSION	: TERM EXPRESSION_E
                 { $return = "$item[1] $item[2]"}
 
@@ -79,13 +91,15 @@ FACTOR		: LPT
                 { $return = "check_lpt('$item{'LPT'}')"}
 		| OPT
 		{ $return = "check_opt('$item{'OPT'}')"}
+		| LEFT_PAREN STATEMENT RIGHT_PAREN
+                { $return = "( $item[2] )"}
 		| LEFT_PAREN EXPRESSION RIGHT_PAREN
                 { $return = "( $item[2] )"}
 		| STD_UN_OP EXPRESSION
                 { $return = "$item[1] $item[2]"}
 		
 
-startrule	: EXPRESSION
+startrule	: STATEMENT
 
 };
 
@@ -205,6 +219,20 @@ sub get_eval{
                 confess "Parser failed to interpret <$expression>";
         };
         return $eval_text;
+}
+
+sub implies{
+	# takes two lambda functions and returns p -> q.  evaluates p first, short circuits if false
+	# ie. if p evaluates false, then q does not need to be evaluated, so it is not.
+	my ($p, $q) = @_;
+	my $p_val = $p->();
+	if (! $p_val){
+		return 1;
+	}else{
+		my $q_val = $q->();
+		return $q_val;
+	}
+	return undef;
 }
 
 1;
