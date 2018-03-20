@@ -1,0 +1,2 @@
+#!/bin/sh
+find packages | grep -v RecDescent | grep -v "Encode/LBC8.pm" | grep '\.' | xargs cat | wc -l

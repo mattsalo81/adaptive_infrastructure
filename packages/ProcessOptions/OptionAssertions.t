@@ -6,10 +6,7 @@ require Test::Homebrew_Exception;
 use ProcessOptions::OptionAssertions;
 use ProcessOptions::CompositeOptions;
 use SMS::LogpointRequirements;
-use ProcessOptions::Decoder;
 
-my $routing = "A72AF3A+";
-my $eff_rout = "TESTMATT";
 
 # check the assertions for TEST
 my $asserts = OptionAssertions::get_all_assertions("TEST");
@@ -20,6 +17,7 @@ is($asserts[0], "DANG && WOW", "Found first assertion");
 is($asserts[1], "DUMMY -> DANG", "Found first assertion");
 
 #check that test routing TESTMATT is okay
+my $routing = "A72AF3A+";
 my @comp = sort @{CompositeOptions::get_composite_options_for_routing_and_effective_routing("TEST", $routing, "TESTMATT")};
 my $i = 0;
 is(scalar @comp, 6 , "Correct number of options for basic list");
@@ -44,8 +42,20 @@ ok(LogpointRequirements::does_routing_use_lpt($routing, $lpt), "Checking that te
 $lpt = '3362';
 ok(LogpointRequirements::does_routing_use_lpt($routing, $lpt), "Checking that test routing uses $lpt");
 
-ok(Decoder::get_options_for_routing_and_effective_routing("TEST", $routing, $eff_rout), "Successfully returns options (probably, didn't check them but I check them in other tests)");
-dies_ok(sub{Decoder::get_options_for_routing_and_effective_routing("TESTFAIL", $routing, $eff_rout)}, "Fail test");
+# test try_assertion_against_routing_and_options
 
 
-1;
+ok(OptionAssertions::try_assertion_against_routing_and_options("9300", $routing, \@comp), "assertion passes");
+ok(!OptionAssertions::try_assertion_against_routing_and_options("9455", $routing, \@comp), "assertion fails");
+ok(OptionAssertions::try_assertion_against_routing_and_options("DANG", $routing, \@comp), "assertion passes");
+ok(!OptionAssertions::try_assertion_against_routing_and_options("DUMMY", $routing, \@comp), "assertion fails");
+
+ok(OptionAssertions::try_assertion_against_routing_and_options("9300 -> DANG", $routing, \@comp), "assertion passes");
+ok(OptionAssertions::try_assertion_against_routing_and_options("DUMMY -> DANG", $routing, \@comp), "assertion passes");
+ok(!OptionAssertions::try_assertion_against_routing_and_options("9300 -> DUMMY", $routing, \@comp), "assertion fails");
+
+
+ok(OptionAssertions::try_all_assertions_against_routing_and_options("TEST", $routing, \@comp), "Wrapper works");
+dies_ok(sub{OptionAssertions::try_all_assertions_against_routing_and_options("TESTFAIL", $routing, \@comp)}, "failing assertion");
+
+

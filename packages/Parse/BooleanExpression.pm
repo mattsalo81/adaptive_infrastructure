@@ -152,6 +152,25 @@ sub check_lpt{
 	return undef;
 }
 
+sub does_sms_routing_and_options_match_expression{
+	my ($routing, $opt_list, $expression) = @_;
+
+	my $lpt_lambda = sub {
+                my ($lpt) = @_;
+                return LogpointRequirements::does_routing_use_lpt($routing, $lpt);
+        };
+
+	my %options;
+        @options{@{$opt_list}} = @{$opt_list};
+        my $opt_lambda = sub{
+                my ($opt) = @_;
+                return defined $options{$opt};
+        };
+
+	return get_result_general($expression, $lpt_lambda, $opt_lambda);
+
+}
+
 # create the lambda for checking SMS routing and evaluate expression
 sub does_sms_routing_match_lpt_string{
 	my ($routing, $lpt_string) = @_;
