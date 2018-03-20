@@ -10,18 +10,18 @@ my $codes = EffectiveRoutingDecoder::get_codes_from_routing("TEST", "TESTMATT");
 is(scalar @{$codes}, 1, "basic get_codes_from_routing");
 is($codes->[0], "MATT", "basic get_codes_from_routing");
 
-dies_ok(sub{EffectiveRoutingDecoder::get_options_for_code_array("TEST", [])}, "testing empty code array");
+ok(ProcessDecoder::get_options_for_code_array("EMPTY", []), "testing empty code array");
 my $options;
 
-$options = EffectiveRoutingDecoder::get_options_for_code_array("TEST", ['MATT']);
+$options = ProcessDecoder::get_options_for_code_array("TEST", ['MATT']);
 is(@{$options}, 2, "Checking correct number of results for test case");
 is(join(",", @{$options}), "SHAZAM,WOW", "Correct results for test case");
 
-$options = EffectiveRoutingDecoder::get_options_for_code_array("TEST", [undef, 'MATT']);
+$options = ProcessDecoder::get_options_for_code_array("TEST", [undef, 'MATT']);
 is(@{$options}, 1, "Checking correct number of results for test case");
 is(join(",", @{$options}), "HEYO", "correct results");
 
-$options = EffectiveRoutingDecoder::get_options_for_code_array("TEST", ['MATT','MATT']);
+$options = ProcessDecoder::get_options_for_code_array("TEST", ['MATT','MATT']);
 is(@{$options}, 3, "Checking correct number of results for test case");
-is(join(",", @{$options}), "HEYO,SHAZAM,WOW", "Correct results");
+is(join(",", sort @{$options}), "HEYO,SHAZAM,WOW", "Correct results");
 

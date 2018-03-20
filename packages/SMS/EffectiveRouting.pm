@@ -26,6 +26,7 @@ sub make_effective_routing{
 		case "LBC8" {$eff = make_effective_routing_LBC8($rec)}
 		case "LBC7" {$eff = make_effective_routing_LBC7($rec)}
 		case "F05"  {$eff = make_effective_routing_F05($rec)}
+		case "LBC5" {$eff = make_effective_routing_LBC5($rec)};
 	}	
 	# Nothing special LBC5
 	# Nothing special HPA07

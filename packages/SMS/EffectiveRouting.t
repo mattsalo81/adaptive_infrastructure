@@ -26,12 +26,13 @@ my $record = {
         DEVICE          =>      'M17_MSSOMESTUFF',
         ROUTING         =>      'WHATEVER',
         PROD_GRP        =>      'LBC7-DLM',
+	AREA		=>	'PARAMETRIC',
 };
-is(EffectiveRouting::make_effective_routing_LBC7($record), "WHATEVER", "LBC7 basic routing");
+is(EffectiveRouting::make_effective_routing($record), "PARAMETRIC__WHATEVER", "LBC7 basic routing");
 $record->{"ROUTING"} = "DCU";
-is(EffectiveRouting::make_effective_routing_LBC7($record), "DCU-MS-2", "LBC7 effective routing tests");
+is(EffectiveRouting::make_effective_routing($record), "PARAMETRIC__DCU-MS-2", "LBC7 effective routing tests");
 $record->{"PROD_GRP"} = "Doesn't work";
-dies_ok(sub {EffectiveRouting::make_effective_routing_LBC7($record)}, "LBC7 effective routing tests - no metal level in prod grp");
+dies_ok(sub {EffectiveRouting::make_effective_routing($record)}, "LBC7 effective routing tests - no metal level in prod grp");
 
 
 
@@ -41,22 +42,24 @@ my $record = {
         DEVICE          =>      'M2HSOMESTUFF',
         ROUTING         =>      'WHATEVER',
         FE_STRATEGY     =>      'Something X2L',
+	AREA		=>	'PARAMETRIC',
 };
-is(EffectiveRouting::make_effective_routing_F05($record), "WHATEVER-2", "F05 basic routing");
+is(EffectiveRouting::make_effective_routing($record), "PARAMETRIC__WHATEVER-2", "F05 basic routing");
 $record->{"FE_STRATEGY"} = "Doesn't work";
-dies_ok(sub {EffectiveRouting::make_effective_routing_F05($record)}, "F05 effective routing tests - no metal level in fe_strategy");
+dies_ok(sub {EffectiveRouting::make_effective_routing($record)}, "F05 effective routing tests - no metal level in fe_strategy");
 delete $record->{"FE_STRATEGY"};
-dies_ok(sub {EffectiveRouting::make_effective_routing_F05($record)}, "F05 effective routing tests - no fe_strategy");
+dies_ok(sub {EffectiveRouting::make_effective_routing($record)}, "F05 effective routing tests - no fe_strategy");
 
 # LBC5
-my $record = {
-        TECH            =>      'LBC55',
+my $lbc5_record = {
+        TECH            =>      'LBC5',
         DEVICE          =>      'M06ORWHATEVER',
         ROUTING         =>      'WHATEVER',
+	AREA		=>	'PARAMETRIC',
 };
-is(EffectiveRouting::make_effective_routing_LBC5($record), "WHATEVER-X", "LBC5X basic routing");
-$record->{"DEVICE"} = "M05ORWHATEVER";
-is(EffectiveRouting::make_effective_routing_LBC5($record), "WHATEVER", "LBC5 basic routing");
+is(EffectiveRouting::make_effective_routing($lbc5_record), "PARAMETRIC__WHATEVER-X", "LBC5X basic routing");
+$lbc5_record->{"DEVICE"} = "M05ORWHATEVER";
+is(EffectiveRouting::make_effective_routing($lbc5_record), "PARAMETRIC__WHATEVER", "LBC5 basic routing");
 
 
 
