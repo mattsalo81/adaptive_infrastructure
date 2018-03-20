@@ -6,5 +6,5 @@ require Test::Homebrew_Exception;
 use ProcessOptions::Decoder;
 use Data::Dumper;
 
-my $lookup = Decoder::get_effective_routings_to_routings_for_tech("LBC8");
+my $lookup = Decoder::get_active_effective_routings_to_routings_for_tech("LBC8");
 ok(defined($lookup), "didn't die");

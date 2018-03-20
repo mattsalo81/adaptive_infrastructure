@@ -21,7 +21,7 @@ sub upload_effective_routing_options_for_tech{
 		# delete current info in transaction
 		$trans->prepare("delete from $table where technology = ?")->execute($tech);
 		# get relationship between routings and effective routings (supports multiple routings on eff_rout for later)
-		my $eff2routs = get_effective_routings_to_routings_for_tech($tech);
+		my $eff2routs = get_active_effective_routings_to_routings_for_tech($tech);
 		# get upload handle
 		my $u_sth = $trans->prepare(qq{
 				insert into $table (technology, effective_routing, process_option)
@@ -55,16 +55,18 @@ sub upload_effective_routing_options_for_tech{
 	};
 }
 
-sub get_effective_routings_to_routings_for_tech{
+sub get_active_effective_routings_to_routings_for_tech{
 	my ($tech) = @_; 
         my $d_sql = q{
 		select distinct 
-			routing, 
-			effective_routing 
+			s.routing, 
+			s.effective_routing 
 		from 
-			daily_sms_extract 
+			daily_sms_extract s
+			inner join daily_wip_extract w
+				on s.device = w.device
 		where 
-			technology = ?
+			s.technology = ?
 	};
         my $conn = Connect::read_only_connection("etest");
         my $d_sth = $conn->prepare($d_sql);

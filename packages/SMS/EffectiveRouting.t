@@ -34,6 +34,7 @@ $record->{"PROD_GRP"} = "Doesn't work";
 dies_ok(sub {EffectiveRouting::make_effective_routing_LBC7($record)}, "LBC7 effective routing tests - no metal level in prod grp");
 
 
+
 # F05
 my $record = {
         TECH            =>      'F05',
@@ -46,6 +47,16 @@ $record->{"FE_STRATEGY"} = "Doesn't work";
 dies_ok(sub {EffectiveRouting::make_effective_routing_F05($record)}, "F05 effective routing tests - no metal level in fe_strategy");
 delete $record->{"FE_STRATEGY"};
 dies_ok(sub {EffectiveRouting::make_effective_routing_F05($record)}, "F05 effective routing tests - no fe_strategy");
+
+# LBC5
+my $record = {
+        TECH            =>      'LBC55',
+        DEVICE          =>      'M06ORWHATEVER',
+        ROUTING         =>      'WHATEVER',
+};
+is(EffectiveRouting::make_effective_routing_LBC5($record), "WHATEVER-X", "LBC5X basic routing");
+$record->{"DEVICE"} = "M05ORWHATEVER";
+is(EffectiveRouting::make_effective_routing_LBC5($record), "WHATEVER", "LBC5 basic routing");
 
 
 

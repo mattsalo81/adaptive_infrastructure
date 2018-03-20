@@ -45,6 +45,19 @@ sub make_effective_routing{
 	return $eff;
 }
 
+sub make_effective_routing_LBC5{
+	my ($rec) = @_;
+	my $device = $rec->{"DEVICE"};
+        my $routing = $rec->{"ROUTING"};
+	unless(defined $device && defined $routing){
+		confess("Missing crucial information to generate LBC5 effective routing. Probably programmer's fault");
+	}
+	if ($device =~ m/^M06/){
+		$routing .= "-X";
+	}
+	return $routing;
+}
+
 sub make_effective_routing_LBC7{
 	my ($rec) = @_;
         my $device = $rec->{"DEVICE"};
