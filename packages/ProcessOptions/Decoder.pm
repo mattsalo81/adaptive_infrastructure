@@ -7,6 +7,100 @@ use Data::Dumper;
 use Logging;
 use ProcessOptions::CompositeOptions;
 use ProcessOptions::OptionAssertions;
+use Database::Connect;
+
+my $upload_sth;
+my $table = "effective_routing_to_options";
+
+
+sub upload_effective_routing_options_for_tech{
+	my ($tech) = @_;
+	my $trans = Connect::new_transaction("etest");
+	Logging::event("Updating process options for effective routings in $tech");
+	eval{
+		# delete current info in transaction
+		$trans->prepare("delete from $table where technology = ?")->execute($tech);
+		# get relationship between routings and effective routings (supports multiple routings on eff_rout for later)
+		my $eff2routs = get_effective_routings_to_routings_for_tech($tech);
+		# get upload handle
+		my $u_sth = $trans->prepare(qq{
+				insert into $table (technology, effective_routing, process_option)
+				values (?, ?, ?)
+		});
+		# try each effective routing
+		foreach my $effective_routing (keys %{$eff2routs}){
+			Logging::debug("Updating process options for effective routing <$effective_routing> in $tech");
+			eval{
+				my $options = get_options_for_possibly_conflicting_routings_on_effective_routing(
+							$tech, $eff2routs->{$effective_routing}, $effective_routing);
+				foreach my $opt (@{$options}){
+					$u_sth->execute($tech, $effective_routing, $opt);
+				}
+				1;
+			} or do {
+				my $e = $@;
+				if ($e =~ m/(No options found for code <[^>]*> in database)/){
+					Logging::error($1);
+				}else{
+					Logging::error("Could not update effective routing <$effective_routing> in tech <$tech> because : $e");
+				}
+			};
+		}
+		$trans->commit();
+		1;
+	} or do {
+		my $e = $@;
+		$trans->rollback();
+		confess "Could not update effective routings for $tech because of : $e";
+	};
+}
+
+sub get_effective_routings_to_routings_for_tech{
+	my ($tech) = @_; 
+        my $d_sql = q{
+		select distinct 
+			routing, 
+			effective_routing 
+		from 
+			daily_sms_extract 
+		where 
+			technology = ?
+	};
+        my $conn = Connect::read_only_connection("etest");
+        my $d_sth = $conn->prepare($d_sql);
+	$d_sth->execute($tech) or confess "Could not get all routings/effective routings for $tech";
+	my $matrix = $d_sth->fetchall_arrayref();
+	my %lookup;
+	foreach my $record (@{$matrix}){
+		my ($routing, $effective_routing) = @{$record};
+		unless(defined $lookup{$effective_routing}){
+			$lookup{$effective_routing} = [];
+		}
+		push @{$lookup{$effective_routing}}, $routing;
+	}
+	return \%lookup;
+}
+
+sub get_options_for_possibly_conflicting_routings_on_effective_routing{
+	my ($tech, $routings, $effective_routing) = @_;
+	my @final_options;
+	my $init_rout;
+	my $i = 0;
+	foreach my $routing (@{$routings}){
+		my @options = sort @{get_options_for_routing_and_effective_routing($tech, $routing, $effective_routing)};
+		if ($i == 0){
+			@final_options = @options;
+			$init_rout = $routing;
+		}else{
+			# check if routings do not conflict -> they have identical options
+			unless((scalar @options == scalar @final_options) && (join("", @options) eq join("@final_options"))){
+				confess "Could not resolve conflicts on effective routing <$effective_routing> - <$init_rout> and <$routing> have conflicting process options!";
+			}
+		}
+		$i++;
+	}
+	return \@final_options;
+}
 
 sub get_options_for_routing_and_effective_routing{
 	my ($tech, $routing, $effective_routing) = @_;
@@ -20,5 +114,19 @@ sub get_options_for_routing_and_effective_routing{
 	};
 	return $options;
 }
+
+sub get_upload_query{
+	unless(defined $upload_sth){
+		my $conn = Connect::new_transaction("etest");
+		my $sql = qq{
+
+		};
+		$upload_sth = $conn->prepare($sql);
+	}
+	unless(defined $upload_sth){
+		confess "Could not get the sth to upload options";
+	}
+}
+
 
 1;
