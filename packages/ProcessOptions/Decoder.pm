@@ -41,6 +41,8 @@ sub upload_effective_routing_options_for_tech{
 				my $e = $@;
 				if ($e =~ m/(No options found for code <[^>]*> in database)/){
 					Logging::error($1);
+				}elsif($e =~ m/(Given a code that was undef, but was not allowed to ignore it \([^)]*\))/){
+					Logging::error($1);
 				}else{
 					Logging::error("Could not update effective routing <$effective_routing> in tech <$tech> because : $e");
 				}

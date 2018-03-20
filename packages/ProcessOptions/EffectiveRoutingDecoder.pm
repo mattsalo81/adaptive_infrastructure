@@ -15,29 +15,8 @@ use Switch;
 sub get_options_for_effective_routing{
 	my ($technology, $effective_routing) = @_;
 	my $codes = get_codes_from_routing($technology, $effective_routing);
-	return get_options_for_code_array($technology, $codes);
+	return ProcessDecoder::get_options_for_code_array($technology, $codes);
 }
-
-# takes an array of codes
-# each index is the code_num (so we can have multiple decoders per each char/code in a routing)
-# each value is the process code
-# undef is okay
-sub get_options_for_code_array{
-	my ($technology, $codes) = @_;
-        my %options;
-	if (scalar @{$codes} == 0){
-		confess "Tried to get process options, but not provided any process codes! Probably Programmer's Fault";
-	}
-        for (my $code_num = 0; $code_num < scalar @{$codes}; $code_num++){
-                my $code = $codes->[$code_num];
-                next unless defined $code;
-                my $options = ProcessDecoder::get_options_for_code($technology, $code_num, $code);
-                @options{@{$options}} = @{$options};
-        }
-	my @unique = sort keys %options;
-	return \@unique;
-}
-
 
 # returns an array of codes
 # $return->[0] is assumed to be code_type 0
@@ -65,10 +44,16 @@ sub LBC5_get_codes_from_routing{
 	my ($routing) = @_;
 	my $area;
 	($area, $routing) = strip_test_area($routing);
-	my $main_code = substr($routing, 6, 2);
 	my $num_ml = substr($routing, 5, 1);
-	if ($num_ml !~ m/^[0-4]$/ || $main_code eq ""){
-		confess "Unexpected LBC5 routing format <$routing>";
+	my $main_code;
+	if ($routing =~ m/-X$/){
+		$main_code = substr($routing, 6, 2);
+		if ($num_ml !~ m/^[0-4]$/ || $main_code eq ""){
+			confess "Unexpected LBC5X routing format <$routing>";
+		}
+	}else{
+		# don't trust the code for LBC5...
+		$main_code = undef;
 	}
 	return [$area, $num_ml, $main_code];
 }
