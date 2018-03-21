@@ -161,9 +161,11 @@ sub does_sms_routing_and_options_match_expression{
         };
 
 	my %options;
-        @options{@{$opt_list}} = @{$opt_list};
+	my @upper = map {tr/[a-z]/[A-Z]/; $_} @{$opt_list};
+        @options{@upper} = @upper;
         my $opt_lambda = sub{
                 my ($opt) = @_;
+		$opt =~ tr/[a-z]/[A-Z]/;
                 return defined $options{$opt};
         };
 
@@ -187,9 +189,11 @@ sub does_sms_routing_match_lpt_string{
 sub does_opt_list_match_opt_string{
 	my ($opt_list, $opt_string) = @_;
 	my %options;
-	@options{@{$opt_list}} = @{$opt_list};
+	my @upper = map {tr/[a-z]/[A-Z]/; $_} @{$opt_list};
+        @options{@upper} = @upper;
 	my $opt_lambda = sub{
 		my ($opt) = @_;
+		$opt =~ tr/[a-z]/[A-Z]/;
 		return defined $options{$opt};
 	};
 

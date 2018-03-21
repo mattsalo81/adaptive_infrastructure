@@ -37,3 +37,7 @@ $list = ['OPT1','OPT2'];
 $exp = "1234";
 dies_ok(sub{BooleanExpression::does_opt_list_match_opt_string($list, $exp)}, "cannot parse logpoints because logpoint not provided");
 
+# case insensitivity
+$list = ['OPT1','opt2'];
+$exp = "opt1 && OPT2";
+ok(BooleanExpression::does_opt_list_match_opt_string($list, $exp), "Successfully determines if \"$exp\" matches \"" . join(", ", @{$list}) . "\"");
