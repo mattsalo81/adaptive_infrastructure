@@ -85,7 +85,7 @@ sub HPA07_get_codes_from_routing{
 	}
 	my $num_ml = substr($routing, 5, 1);
 	my $flavor_code = substr($routing, 1, 3);
-	if ($num_ml !~ m/^[0-4]$/ || $main_code eq "" || $flavor_code !~ m/^10[0237]$/){
+	if ($num_ml !~ m/^[0-7]$/ || $main_code eq "" || $flavor_code !~ m/^10[0237]$/){
 		confess "Unexpected HPA07 routing format <$routing>";
 	}
 	return [$area, $num_ml, $main_code, $flavor_code, $isoj];
@@ -119,7 +119,7 @@ sub LBC7_get_codes_from_routing{
         my ($routing) = @_;
         my ($area, $main_code, $num_ml);
 	($area, $routing) = strip_test_area($routing);
-	if ($routing =~ m/(DCU|FVDCA)-(..)-(.)$/){
+	if ($routing =~ m/(DCU.?|FVDCA)-(..)-(.)$/){
                 # DCU routing
 		($main_code, $num_ml) = ($2, $3);
         }elsif($routing =~ m/^.....([0-9])(..)/){
@@ -156,6 +156,7 @@ sub LBC8LV_get_codes_from_routing{
 	my ($area, $num_ml, $char_1, $char_2, $char_3, $char_4);
 	($area, $routing) = strip_test_area($routing);
 	if ($routing =~ m/^.....([0-9])(.)(.)(.)(.)$/){
+		# M180VXISO4
 		($num_ml, $char_1, $char_2, $char_3, $char_4) = ($1, $2, $3, $4, $5);
 	}else{
 		confess "Unexpected LBC8LV Routing format <$routing>";

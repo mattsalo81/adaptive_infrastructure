@@ -20,7 +20,7 @@ use ProcessOptions::LogpointOptions;
 # instead, I've created a dummy option called "PLACEHOLDER" that the methods will add/remove as necessary to keep the table valid.
 
 my $options_for_code_sth;
-my $placeholder_option = "PLACEHOLDER";
+our $placeholder_option = "PLACEHOLDER";
 my $get_all_possible_options_for_code_sth;
 my %okay_codes_to_ignore;
 

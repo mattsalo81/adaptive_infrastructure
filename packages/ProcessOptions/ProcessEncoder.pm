@@ -60,6 +60,7 @@ sub update_code{
 		my $u_sth = get_update_options_in_trans_sth($trans);
 		foreach my $code (keys %{$lookup}){
 			Logging::debug("Updating ($tech - $code_num - $code) in database");
+			my $num_opt = 0;
 			foreach my $option (@{$lookup->{$code}}){
 				if($code =~ m/[^a-z0-9\+\.\/_]/i or $option =~ m/[^a-z0-9\+\.\/_]/i){
 					confess "Unexpected character in ($tech - $code_num - $code -> $option)";
@@ -68,6 +69,11 @@ sub update_code{
 				unless($u_sth->execute($tech, $code_num, $code, $option)){
 					confess "Could not update ($tech - $code_num - $code -> $option) in database";
 				}
+				$num_opt++;
+			}
+			# put a placeholder value in
+			if ($num_opt == 0){
+				$u_sth->execute($tech, $code_num, $code, $ProcessDecoder::placeholder_option) or confess "Could not add placeholder for ($tech - $code_num - $code)";
 			}
 		}
 		$trans->commit();

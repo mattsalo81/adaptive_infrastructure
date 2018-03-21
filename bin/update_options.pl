@@ -6,4 +6,6 @@ use Data::Dumper;
 use Logging;
 use ProcessOptions::Decoder;
 
-Decoder::upload_effective_routing_options_for_tech("LBC5");
+foreach my $tech (@ARGV){
+	Decoder::upload_effective_routing_options_for_tech($tech);
+}
