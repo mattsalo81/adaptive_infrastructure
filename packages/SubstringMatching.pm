@@ -6,6 +6,26 @@ use Carp;
 use Data::Dumper;
 use Logging;
 
+
+sub longest_common_substring{
+	my ($str1, $str2) = @_;
+	my @arr1 = split //, $str1;
+	my @arr2 = split //, $str2;
+	my $max = 0;
+	my @lcs;
+	for(my $i = 0; $i < scalar @arr1; $i++){
+		for(my $j = 0; $j < scalar @arr2; $j++){
+			if ($arr1[$i] eq $arr2[$j]){
+				$lcs[$i][$j] ||= 0;
+				$lcs[$i+1][$j+1] = $lcs[$i][$j] + 1;
+				$max = $lcs[$i+1][$j+1] if $max < $lcs[$i+1][$j+1];
+			}
+		}
+	}
+	return $max;
+}
+
+
 # calculates levenshtein edit distance between two strings.
 sub levenshtein {
     my ($str1, $str2) = @_;

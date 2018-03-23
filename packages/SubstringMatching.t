@@ -12,3 +12,8 @@ is(SubstringMatching::levenshtein("", ""), 0, "Two empty strings ok");
 is(SubstringMatching::levenshtein("4321", "1234"), 4, "reversed strings");
 dies_ok(sub{SubstringMatching::levenshtein(undef, "1234")}, "Undefined strings");
 
+
+
+is(SubstringMatching::longest_common_substring("1234", "1234"), 4, "Identical strings have max common substring");
+is(SubstringMatching::longest_common_substring("111111123444444", "1234"), 4, "total substring");
+is(SubstringMatching::longest_common_substring("1a2a3a4", "1234"), 1, "Common sequence is 4 but substring is 1");
