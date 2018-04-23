@@ -11,6 +11,7 @@ UNIT TESTING:
 	2. Don't be cheap on the unit tests.  I've already needed most of the ones I've written during refactors.  
 	3. If you find a bug, write a unit test for it and fix it
 	4. run_regression_tests can be run from the project root.  Run it before committing.
+	5. Keep methods short enough that they can be easily tested.  Break relevant sub-blocks into testable chunks
 
 ERROR CHECKING:
 	1. If something cannot be handled immediately, throw an exception (die, carp or confess). 
@@ -30,3 +31,6 @@ PACKAGING:
 	1. Keep any useful logic in a package, not a .pl
 	2. Separate useful non-database logic from database packages.  -> keep it callable from sources without oracle configured
 
+DOCUMENTATION:
+	1. Keep functions short enough that the method name should be enough, comment otherwise
+	2. Use the ETEST confluence page for overviews of how things work

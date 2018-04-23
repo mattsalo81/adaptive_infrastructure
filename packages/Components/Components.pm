@@ -6,8 +6,19 @@ use Carp;
 use Data::Dumper;
 use Logging;
 
-sub get_component_info_for_design{
+sub get_components_for_device{
+	my ($device) = @_;	
+}
+
+sub get_components_for_design{
+	my ($design) = @_;	
+
+}
+
+sub get_designs_for_device{
+	my ($device) = @_;
 	
+
 }
 
 1;
