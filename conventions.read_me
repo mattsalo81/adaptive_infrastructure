@@ -1,0 +1,30 @@
+Style conventions for adaptive infrastructure:
+
+REVISION CONTROL:
+	1. Use git
+	2. commit often
+	3. push often
+	4. mattcommit can be called from the project root.
+
+UNIT TESTING:
+	1. Write unit tests. Name the files <thing>.t
+	2. Don't be cheap on the unit tests.  I've already needed most of the ones I've written during refactors.  
+	3. If you find a bug, write a unit test for it and fix it
+	4. run_regression_tests can be run from the project root.  Run it before committing.
+
+ERROR CHECKING:
+	1. If something cannot be handled immediately, throw an exception (die, carp or confess). 
+		a. Always use a call-stack trace (confess).  
+		b. If you want cleaner output from a script (not package) catch the exception and cut it down.
+	2. Use 'eval {<code>; 1;} or {my $e = $@; <error handling>}' to catch/handle exceptions.  
+
+DATABASES:
+	1. Connect to the databases through the Database::Connect packages only
+	2. use a read_only_connection for all queries
+	3. use a transaction for anything that modifies any tables
+		a. Always check for errors that could leave the database in an incomplete/inconsistant state
+		b. Rollback/Commit your transaction as necessary
+
+PACKAGING:
+	1. Keep any useful logic in a package, not a .pl
+	2. Separate useful non-database logic from database packages.  -> keep it callable from sources without oracle configured
