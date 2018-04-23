@@ -1,4 +1,4 @@
-package Reticles;
+package Photomasks;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
@@ -7,19 +7,19 @@ use Data::Dumper;
 use Logging;
 use Database::Connect;
 
-my $reticles_for_device_sth;
+my $photomasks_for_device_sth;
 
-sub get_reticles_for_device{
+sub get_photomasks_for_device{
 	my ($device) = @_;
-	my $sth = get_reticles_for_device_sth();
-	$sth->execute($device) or confess "Could not get reticles for device $device";
+	my $sth = get_photomasks_for_device_sth();
+	$sth->execute($device) or confess "Could not get photomasks for device $device";
 	my $rows = $sth->fetchall_arrayref();
-	my @reticles = map {$_->[0]} @{$rows};
-	return \@reticles;
+	my @photomasks = map {$_->[0]} @{$rows};
+	return \@photomasks;
 }
 
-sub get_reticles_for_device_sth{
-	unless (defined $reticles_for_device_sth){
+sub get_photomasks_for_device_sth{
+	unless (defined $photomasks_for_device_sth){
 		my $sql = q{
 			select distinct 
 				oo.photomask
@@ -42,12 +42,12 @@ sub get_reticles_for_device_sth{
 	                	and oo.opn = '3600'
 		};
 		my $conn = Connect::read_only_connection('sms');
-		$reticles_for_device_sth = $conn->prepare($sql);
+		$photomasks_for_device_sth = $conn->prepare($sql);
 	}
-	unless (defined $reticles_for_device_sth){
-		confess "Could not get reticles_for_device_sth";
+	unless (defined $photomasks_for_device_sth){
+		confess "Could not get photomasks_for_device_sth";
 	}
-	return $reticles_for_device_sth;
+	return $photomasks_for_device_sth;
 }
 
 1;
