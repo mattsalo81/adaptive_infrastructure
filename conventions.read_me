@@ -24,7 +24,9 @@ DATABASES:
 	3. use a transaction for anything that modifies any tables
 		a. Always check for errors that could leave the database in an incomplete/inconsistant state
 		b. Rollback/Commit your transaction as necessary
+	4. Keep any SQL configuration you do in a file in the SQL_configs directory
 
 PACKAGING:
 	1. Keep any useful logic in a package, not a .pl
 	2. Separate useful non-database logic from database packages.  -> keep it callable from sources without oracle configured
+
