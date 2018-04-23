@@ -11,6 +11,7 @@ my %connection_info = (
 	sd_limits	=>	['DBI:Oracle:D5PDEDB','sd_limits','limpara'],
 	etest		=>	['DBI:Oracle:D5PDEDB','etest','DM5etest'],
 	wcrepo		=>	['DBI:Oracle://lepftds.itg.ti.com:1521','PTWAFER_RO','3fL5ug9ZPP6dY9u4'],
+	onepg		=>	['DBI:Oracle://lesonepg.itg.ti.com:1521', 'RO_DM5PARA', 'i9WPkrlUVD3p'],
 	# soon - missing table access
 	# wcrepo	=>	['DBI:Oracle://lepftds.itg.ti.com:1521','DM5ETEST','1Adaptive'],
 );
