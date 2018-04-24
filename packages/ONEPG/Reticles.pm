@@ -34,7 +34,6 @@ sub convert_photomask_to_reticle{
 	return $mask;
 }
 
-
 sub get_chips_for_reticle_base{
         my ($base) = @_;
         my $sth = get_chips_for_reticle_base_sth();
