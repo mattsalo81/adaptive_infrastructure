@@ -20,48 +20,53 @@ my $manual_components_for_design_sth;
 sub get_all_components_for_device{
 	my ($device) = @_;	
 	# logical flow described on confluence
+	Logging::debug("Looking for component information for $device");
 
 	# get photomasks from SMS
 	my $masks = Photomasks::get_photomasks_for_device($device);
+	Logging::diag("Photomasks : " . join(", ", @{$masks}));
 
 	# convert all photomasks to reticles
 	my @reticles = map {Reticles::convert_photomask_to_reticle($_)} @{$masks};
+	Logging::diag("Reticles : " . join(", ", @reticles));
 
 	# get onepg chips and components (from reticles)
-	my @onepg_chips;
-	my @onepg_reticle_comps;
+	my %onepg_chips;
+	my %onepg_reticle_comps;
 	foreach my $reticle (@reticles){
 		my $chips = Reticles::get_chips_for_reticle_base($reticle);
-		push @onepg_chips, @{$chips};
+		@onepg_chips{@{$chips}} = @{$chips};
 		my $comps = CompCount::get_components_for_reticle_base($reticle);
-		push @onepg_reticle_comps, @{$comps};
+		@onepg_reticle_comps{@{$comps}} = @{$comps};
 	}
+	Logging::diag("Chips from ONEPG : " . join(", ", keys %onepg_chips));
+	Logging::diag("Components from ONEPG : " . join(", ", keys %onepg_reticle_comps));
 
 	# get manually added chips
 	my $manual_chips = get_manual_designs_for_device($device);
+	Logging::diag("Manually applied chips : " . join(", ", @{$manual_chips}));
 	
-	# create master chip list (in hash, so it's unique)
-	my %all_chips;
-	@all_chips{@onepg_chips} = @onepg_chips;
+	# create master chip list 
+	my %all_chips = (%onepg_chips);
 	@all_chips{@{$manual_chips}} = @{$manual_chips};
 
 	# get onepg components (from all chips)
-	my @onepg_chip_comps;
-	my @etest_chip_comps;
+	my %onepg_chip_comps;
+	my %etest_chip_comps;
 	foreach my $chip (keys %all_chips){
 		my $comps = CompCount::get_components_for_chip($chip);
-		push @onepg_chip_comps, @{$comps};
+		@onepg_chip_comps{@{$comps}} = @{$comps};
 		$comps = get_manual_components_for_design($chip);
-		push @etest_chip_comps, @{$comps};
+		@etest_chip_comps{@{$comps}} = @{$comps};
 	}
+	Logging::diag("ONEPG Components from chip lists : ", join(", ", keys %onepg_chip_comps));
+	Logging::diag("Manual Components from chip lists : ", join(", ", keys %etest_chip_comps));
+	
 
 	# combine all component sources;
-	my %all_comps;
-	@all_comps{@onepg_reticle_comps} = @onepg_reticle_comps;
-	@all_comps{@onepg_chip_comps} = @onepg_chip_comps;
-	@all_comps{@etest_chip_comps} = @etest_chip_comps;
-
+	my %all_comps = (%onepg_reticle_comps, %onepg_chip_comps, %etest_chip_comps);
 	my @uniq_comps = keys %all_comps;
+	Logging::diag("All Components : " . join(", ", @uniq_comps));
 
 	return \@uniq_comps;
 }
