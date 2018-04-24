@@ -12,7 +12,8 @@ my %connection_info = (
 	etest		=>	['DBI:Oracle:D5PDEDB','etest','DM5etest'],
 	#wcrepo		=>	['DBI:Oracle://lepftds.itg.ti.com:1521','PTWAFER_RO','3fL5ug9ZPP6dY9u4'],
 	wcrepo		=>	['DBI:Oracle://lepftds.itg.ti.com:1521','PTWAFER_RO','Z0YF8mZmJS5Xos9t'],
-	onepg		=>	['DBI:Oracle://lesonepg.itg.ti.com:1521', 'RO_DM5PARA', 'i9WPkrlUVD3p'],
+	onepg_staging	=>	['DBI:Oracle://lesonepg.itg.ti.com:1521', 'RO_DM5PARA', 'i9WPkrlUVD3p'],
+	onepg		=>	['DBI:Oracle://leponepg.itg.ti.com:1521', 'RO_DM5PARA', '1Adaptive!'],
 	# soon - missing table access
 	# wcrepo	=>	['DBI:Oracle://lepftds.itg.ti.com:1521','DM5ETEST','1Adaptive'],
 );
