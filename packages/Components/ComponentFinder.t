@@ -37,13 +37,20 @@ ok(in_list($test_comp, $comps), "Found a known manual component for test design"
 
 # general tests
 $comps = ComponentFinder::get_all_components_for_device($test_device);
-ok(in_list($test_comp, $comps), "Found the manually configured component through a manual device-> chip association");
+ok(defined $comps->{$test_comp}, "Found the manually configured component through a manual device-> chip association");
+is($comps->{$test_comp}, "Y", "Manually configured component was flagged as manual");
 
 my $real_comps = ComponentFinder::get_all_components_for_device($known_device);
-ok(in_list($known_component, $real_comps), "Found a manually identified component in a real device");
+ok(defined $real_comps->{$known_component}, "Found a manually identified component in a real device");
+is($real_comps->{$known_component}, "N", "Independantly found component was flagged as not-manual");
 
 my $pretend_comps = ComponentFinder::get_all_components_for_device($pretend_device);
-ok(in_list($known_component, $real_comps), "Manually linked a device to a chip, then found a component from the real chip");
-ok(have_same_elements($real_comps, $real_comps), "Manually linked a device to a chip, then found all the components of the real chip");
+ok(defined $pretend_comps->{$known_component}, "Manually linked a device to a chip, then found a component from the real chip");
+is($pretend_comps->{$known_component}, "Y", "Manually configured component was flagged as manual");
+
+my @list1 = keys %{$real_comps};
+my @list2 = keys %{$pretend_comps};
+
+ok(have_same_elements(\@list1, \@list2), "Manually linked a device to a chip, then found all the components of the real chip");
 
 

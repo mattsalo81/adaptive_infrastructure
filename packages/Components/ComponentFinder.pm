@@ -35,12 +35,12 @@ sub get_all_components_for_device{
 	my %onepg_reticle_comps;
 	foreach my $reticle (@reticles){
 		my $chips = Reticles::get_chips_for_reticle_base($reticle);
-		@onepg_chips{@{$chips}} = @{$chips};
+		@onepg_chips{@{$chips}} = ("N") x scalar @{$chips};
 		my $comps = CompCount::get_components_for_reticle_base($reticle);
-		@onepg_reticle_comps{@{$comps}} = @{$comps};
+		@onepg_reticle_comps{@{$comps}} = ("N") x scalar @{$comps};
 	}
-	Logging::diag("Chips from ONEPG : " . join(", ", keys %onepg_chips));
-	Logging::diag("Components from ONEPG : " . join(", ", keys %onepg_reticle_comps));
+	Logging::diag("Chips from ONEPG : " . Dumper \%onepg_chips);
+	Logging::diag("Components from ONEPG : " . Dumper \%onepg_reticle_comps);
 
 	# get manually added chips
 	my $manual_chips = get_manual_designs_for_device($device);
@@ -48,27 +48,27 @@ sub get_all_components_for_device{
 	
 	# create master chip list 
 	my %all_chips = (%onepg_chips);
-	@all_chips{@{$manual_chips}} = @{$manual_chips};
+	@all_chips{@{$manual_chips}} = ("Y") x scalar @{$manual_chips};
 
 	# get onepg components (from all chips)
 	my %onepg_chip_comps;
 	my %etest_chip_comps;
 	foreach my $chip (keys %all_chips){
+		my $manual = $all_chips{$chip};
 		my $comps = CompCount::get_components_for_chip($chip);
-		@onepg_chip_comps{@{$comps}} = @{$comps};
+		@onepg_chip_comps{@{$comps}} = ($manual) x scalar @{$comps};
 		$comps = get_manual_components_for_design($chip);
-		@etest_chip_comps{@{$comps}} = @{$comps};
+		@etest_chip_comps{@{$comps}} = ($manual) x scalar @{$comps};
 	}
-	Logging::diag("ONEPG Components from chip lists : ", join(", ", keys %onepg_chip_comps));
-	Logging::diag("Manual Components from chip lists : ", join(", ", keys %etest_chip_comps));
+	Logging::diag("ONEPG Components from chip lists : " . Dumper \%onepg_chip_comps);
+	Logging::diag("Manual Components from chip lists : " . Dumper \%etest_chip_comps);
 	
 
 	# combine all component sources;
 	my %all_comps = (%onepg_reticle_comps, %onepg_chip_comps, %etest_chip_comps);
-	my @uniq_comps = keys %all_comps;
-	Logging::diag("All Components : " . join(", ", @uniq_comps));
+	Logging::diag("All Components : " . Dumper(\%all_comps));
 
-	return \@uniq_comps;
+	return \%all_comps;
 }
 
 sub get_manual_components_for_design{

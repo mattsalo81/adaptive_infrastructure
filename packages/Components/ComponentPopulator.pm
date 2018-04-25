@@ -7,15 +7,29 @@ use Data::Dumper;
 use Logging;
 use Components::ComponentFinder;
 use Database::Connect;
+use SMS::SMSDigest;
+#	my $devices = SMSDigest::get_all_devices();
 
-sub update_raw_components_for_device{
-	my ($device) = @_;
-	my $conn = Connect::read_only_connection("etest");
-	my $dev_sql = q{select distinct device from daily_sms_extract};	
-	my $dev
+sub update_components_for_tech{
+	my ($tech) = @_;
+	my $table = "raw_component_info";
+	my $trans = Connect::new_transaction("etest");
+	eval{
+		# get delete sth
+		my $del_sql = q{delete from $table where device = ?};
+		my $del_sth = $trans->prepare($del_sql);
+		# get ins sth
+		my $ins_sql = q{insert into $table (device, component, manual) values (?, ?, ?)};
+		my $ins_sth = $trans->prepare($ins_sql);
+
+	} or do {
+
+	}	
+
+
 }
 
-q
+
 sub update_codes_for_all_techs{
         my $conn = Connect::read_only_connection("etest");
         my $sql = q{select distinct technology from daily_sms_extract};
