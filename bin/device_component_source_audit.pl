@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages/';
-use Components::Components;
+use Components::ComponentFinder;
 use Logging;
 use Data::Dumper;
 
@@ -12,4 +12,4 @@ unless (defined $device){
 }
 
 Logging::set_level("DIAG");
-my $comps = Components::get_all_components_for_device($device);
+my $comps = ComponentFinder::get_all_components_for_device($device);
