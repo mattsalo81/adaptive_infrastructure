@@ -26,6 +26,7 @@ DATABASES:
 		a. Always check for errors that could leave the database in an incomplete/inconsistant state
 		b. Rollback/Commit your transaction as necessary
 	4. Keep any oracle table configuration you do in a file in the SQL_configs directory
+		a. Any test cases needed by unit tests should be included in the SQL_config file for the table
 	5. Keep any SQL near where it's going to be used.  use q{} for quotes and sanely format the sql.
 
 PACKAGING:

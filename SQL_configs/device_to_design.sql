@@ -7,3 +7,5 @@ create table device_to_design_manual(
 );
 insert into device_to_design_manual (device, design, notes) values
 ('TEST_DEVICE', 'TEST_CHIP', 'For database testing');
+insert into device_to_design_manual (device, design, notes) values
+('TEST_C65310B0', 'C65310B0', 'For database testing - links fake device to real chip');
