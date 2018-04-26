@@ -24,7 +24,7 @@ sub execute_sql_transaction{
 		foreach my $statement (split(';', $sql)){
 			next if $statement =~ m/^\s*$/;
 			$statement =~ s/^\n*//;
-			$statement =~ s/^--[^\n]*\n//;
+			$statement =~ s/^--[^\n]*\n//g;
 			$statement =~ s/\n*$/ /g;
 			my $sth = $trans->prepare($statement) or die "Could not prepare <$statement>";
 			$sth->execute() or die "Could not execure <$statement>";
