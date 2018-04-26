@@ -16,9 +16,8 @@ my %connection_info = (
 	onepg		=>	['DBI:Oracle://leponepg.itg.ti.com:1521', 'RO_DM5PARA', '1Adaptive!'],
 	# soon - missing table access
 	# wcrepo	=>	['DBI:Oracle://lepftds.itg.ti.com:1521','DM5ETEST','1Adaptive'],
+	pde		=>	['DBI:Oracle:D5PDEDB', 'sd_pde', 'sitepde'],
 );
-
-
 
 sub get_info_for{
 	my ($name) = @_;

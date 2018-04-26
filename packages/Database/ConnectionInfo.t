@@ -24,3 +24,7 @@ DBI->connect(@info) or die "could not connect to wcrepo";
 my @info = ConnectionInfo::get_info_for("onepg");
 is(@info, 3, "correct format for connection info");
 DBI->connect(@info) or die "could not connect to onepg";
+
+my @info = ConnectionInfo::get_info_for("pde");
+is(@info, 3, "correct format for connection info");
+DBI->connect(@info) or die "could not connect to pde";
