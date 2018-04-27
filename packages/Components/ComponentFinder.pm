@@ -9,7 +9,7 @@ use Database::Connect;
 use SMS::Photomasks;
 use ONEPG::Reticles;
 use ONEPG::CompCount;
-use Prenote::PrenoteFinder
+use Prenote::PrenoteComponents;
 
 # For all component purposes, If I refer to a "chip" or a "product" or a "design" I am refering to the same things.
 # the ONEPG uses "chips", but historically in test we use the phrase "Design".
@@ -63,10 +63,15 @@ sub get_all_components_for_device{
 	}
 	Logging::diag("ONEPG Components from chip lists : " . Dumper \%onepg_chip_comps);
 	Logging::diag("Manual Components from chip lists : " . Dumper \%etest_chip_comps);
-	
+
+	# get components from prenotes
+	my $prenote_comps = PrenoteComponents::get_components_for_device($device);
+	Logging::diag("Components from prenotes : " . Dumper $prenote_comps);
 
 	# combine all component sources;
 	my %all_comps = (%onepg_reticle_comps, %onepg_chip_comps, %etest_chip_comps);
+	@all_comps{keys %{$prenote_comps}} = ("N") x scalar keys %{$prenote_comps};
+	
 	Logging::diag("All Components : " . Dumper(\%all_comps));
 
 	return \%all_comps;
