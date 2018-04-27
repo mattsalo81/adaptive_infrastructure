@@ -26,7 +26,7 @@ sub update_components_for_tech{
 		my $del_sql = qq{delete from $table where device = ?};
 		my $del_sth = $trans->prepare($del_sql);
 		# get ins sth
-		my $ins_sql = qq{insert into $table (device, component, manual) values (?, ?, ?)};
+		my $ins_sql = qq{insert into $table (technology, device, component, manual) values (?, ?, ?, ?)};
 		my $ins_sth = $trans->prepare($ins_sql);
 		# delete + insert
 		foreach my $device (@{SMSDigest::get_all_devices_in_tech($tech)}){
@@ -34,7 +34,7 @@ sub update_components_for_tech{
 			$del_sth->execute($device);
 			my $components = ComponentFinder::get_all_components_for_device($device);
 			foreach my $comp (keys %{$components}){
-				$ins_sth->execute($device, $comp, $components->{$comp});
+				$ins_sth->execute($tech, $device, $comp, $components->{$comp});
 			}
 		}
 		$trans->commit();

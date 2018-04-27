@@ -30,12 +30,15 @@ sub get_device_fully_defined_sth{
 			from
 				$raw_table rc
 			where
-				rc.device = ?
-				and raw.component not in (
+				rc.technology = ?
+				and rc.device = ?
+				and rc.component not in (
 					select distinct 
 						l.raw_name
 					from
 						$lookup_table l
+					where
+						l.technology = rc.technology
 					)
 		};
 		my $conn = Connect::read_only_connection('etest');
