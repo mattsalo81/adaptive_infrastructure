@@ -27,7 +27,7 @@ sub update_codes_for_all_techs{
 			1;
 		} or do {
 			my $e = $@;
-			Logging::error("Could not update $tech process encoding because of : $e");
+			warn "Could not update $tech process encoding because of : $e";
 		}
 	}
 }

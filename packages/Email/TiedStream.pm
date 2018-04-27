@@ -13,8 +13,9 @@ use Logging;
 our $all_streams = "";
 
 sub TIEHANDLE{
-	my ($class) = @_;
-	bless [""], $class;
+	my ($class, $glob) = @_;
+	confess "Did not receive file glob" unless defined $glob;
+	bless ["", $glob], $class;
 }
 
 sub FETCH{
@@ -27,6 +28,7 @@ sub PRINT{
 	my $self = shift;
 	$self->[0] .= join("", @_);
 	$all_streams .= join("", @_);
+	print {$self->[1]} join("", @_);
 }
 
 sub PRINTF{
@@ -35,17 +37,12 @@ sub PRINTF{
 	my $text = sprintf($fmt, @_);
 	$self->[0] .= $text;
 	$all_streams .= $text;
+	print {$self->[1]} $text;
 }
 
 sub READLINE{
 	my $self = shift;
 	return $self->[0];
-}
-
-sub has_contents{
-	my ($self) = @_;
-	confess "Something went wrong" unless ref $self;
-	return ($self->[0] eq "");
 }
 
 1;

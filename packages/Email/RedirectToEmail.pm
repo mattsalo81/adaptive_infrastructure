@@ -5,6 +5,7 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
 use Email::TiedStream;
+use Logging;
 
 my @emails = ('m-salo@ti.com');
 
@@ -13,10 +14,13 @@ print "Using RedirectToEmail.pm.  if anything on STDERR is read, STDOUT and STDE
 *OLD_STDOUT = *STDOUT;
 *OLD_STDERR = *STDERR;
 
-tie *TIED_STDOUT, 'TiedStream';
-tie *TIED_STDERR, 'TiedStream';
+tie *TIED_STDOUT, 'TiedStream', *OLD_STDOUT;
+tie *TIED_STDERR, 'TiedStream', *OLD_STDERR;
 *STDOUT = *TIED_STDOUT;
 *STDERR = *TIED_STDERR;
+
+Logging::set_log(*TIED_STDOUT);
+Logging::set_err(*TIED_STDERR);
 
 END{
 	*STDOUT = *OLD_STDOUT;
