@@ -9,6 +9,7 @@ use Database::Connect;
 use SMS::Photomasks;
 use ONEPG::Reticles;
 use ONEPG::CompCount;
+use Prenote::PrenoteFinder
 
 # For all component purposes, If I refer to a "chip" or a "product" or a "design" I am refering to the same things.
 # the ONEPG uses "chips", but historically in test we use the phrase "Design".

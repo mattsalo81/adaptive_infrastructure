@@ -6,6 +6,19 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Data::Dumper;
+use Prenote::PrenoteFinder;
+
+sub get_components_for_device{
+	my ($device) = @_;
+	my $prenotes = PrenoteFinder::find_prenotes_for_device($device);
+	my %components;
+	foreach my $prenote (keys %{$prenotes}){
+		Logging::diag("looking for components in <$prenote>");
+		my $comps = get_components_from_prenote($prenote);
+		@components{keys %{$comps}} = values %{$comps};
+	}
+	return \%components;
+}
 
 sub get_components_from_prenote{
 	my ($prenote_dir) = @_;
