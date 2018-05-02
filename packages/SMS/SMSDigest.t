@@ -8,6 +8,7 @@ use SMS::SMSDigest;
 
 my $known_tech = 'LBC5';
 my $known_device = "M06ECDC65310C1"; # must be active and in known_tech
+my $known_eff_rout = "PARAMETRIC__A72AE3BE-X";
 
 my $techs = SMSDigest::get_all_technologies();
 ok(defined($techs), "Got something");
@@ -29,4 +30,7 @@ $dev = SMSDigest::get_all_active_devices_in_tech($known_tech);
 ok(defined ($dev), "Got some device for $known_tech");
 ok(in_list($known_device, $dev), "Found $known_device in active list for $known_tech");
 
+my $eff = SMSDigest::get_all_effective_routings_in_tech($known_tech);
+ok(defined ($eff), "Got some device for $known_tech");
+ok(in_list($known_eff_rout, $eff), "Found $known_eff_rout in active list for $known_tech");
 

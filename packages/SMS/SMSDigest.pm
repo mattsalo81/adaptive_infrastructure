@@ -28,6 +28,17 @@ sub get_all_devices_in_tech{
 	return \@devices
 }
 
+sub get_all_effective_routings_in_tech{
+	my ($tech) = @_;
+        my $sql = q{select distinct effective_routing from daily_sms_extract where technology = ?};
+	my $conn = Connect::read_only_connection("etest");
+        my $sth = $conn->prepare($sql);
+        $sth->execute($tech) or confess "Could not get list of effective_routing for $tech from daily_sms_extract";
+        my $eff_rout = $sth->fetchall_arrayref();
+        my @eff_rout = map{$_->[0]} @{$eff_rout};
+	return \@eff_rout;
+}
+
 sub get_all_devices{
         my $sql = q{select distinct device from daily_sms_extract};
 	my $conn = Connect::read_only_connection("etest");
