@@ -33,7 +33,12 @@ sub upload_effective_routing_options_for_tech{
 			eval{
 				my $options = get_options_for_possibly_conflicting_routings_on_effective_routing(
 							$tech, $eff2routs->{$effective_routing}, $effective_routing);
-				foreach my $opt (@{$options}){
+				# add BASELINE option
+				my %options;
+				@options{@{$options}} = @{$options};
+				$options{"BASELINE"} = "BASELINE";
+				
+				foreach my $opt (keys %options){
 					$u_sth->execute($tech, $effective_routing, $opt);
 				}
 				1;
@@ -43,6 +48,8 @@ sub upload_effective_routing_options_for_tech{
 					Logging::error($1);
 				}elsif($e =~ m/(Given a code that was undef, but was not allowed to ignore it \([^)]*\))/){
 					Logging::error($1);
+				}elsif($e =~ m/(No defined way to parse routings for technology <[^>]*>)/){
+					die($1);
 				}else{
 					Logging::error("Could not update effective routing <$effective_routing> in tech <$tech> because : $e");
 				}
@@ -53,7 +60,7 @@ sub upload_effective_routing_options_for_tech{
 	} or do {
 		my $e = $@;
 		$trans->rollback();
-		confess "Could not update effective routings for $tech because of : $e";
+		warn "Could not update effective routings for $tech because of : $e";
 	};
 }
 

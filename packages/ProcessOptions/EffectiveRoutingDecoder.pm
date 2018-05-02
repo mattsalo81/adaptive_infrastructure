@@ -32,7 +32,7 @@ sub get_codes_from_routing{
 		case 'LBC7' {$codes = LBC7_get_codes_from_routing($routing)}
 		case 'LBC8' {$codes = LBC8_get_codes_from_routing($routing)}
 		case 'LBC8LV' {$codes = LBC8LV_get_codes_from_routing($routing)}
-		else {confess "No defined way to parse routings for technology <$technology>, need to edit <get_codes_from_routing>\n";}
+		else {die "No defined way to parse routings for technology <$technology>, need to edit <get_codes_from_routing>\n";}
 	}
 	return $codes;
 }
