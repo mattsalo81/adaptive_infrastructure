@@ -1,6 +1,8 @@
 create table f_summary (
 	technology			varchar2 (16) 	not null,
 	etest_name			varchar2 (32) 	not null,
+	parm_type_pcd			varchar2 (3)	check (parm_type_pcd in ('MON', 'WAS', 'REL')),
+	sampling_rate			varchar2 (3)	check (sampling_rate in ('MON', 'WAS', 'REL')),
 	svn				varchar2 (32),
 	process_options			varchar2 (128),
 	component			varchar2 (128),
@@ -25,19 +27,28 @@ create table f_summary (
 					and pass_criteria_percent <= 1 
 					and pass_criteria_percent >=0
 					and dispo_rule in ('MRP', 'LRP', 'OPAP', 'OFAF')
-					and spec_upper is not null
 					and spec_lower is not null
+	),
+	constraint fsum_dispo_lim check(
+				spec_lower is null or 
+					spec_lower is not null
+					and spec_upper is not null
 					and spec_upper >= spec_lower
 					and reverse_spec_limit in ('Y', 'N')
 	),
 	constraint fsum_ink check(
 				reliability is null or 
 					reliability in ('Y', 'N')
-					and reliability_upper is not null
 					and reliability_lower is not null
+	),
+	constraint fsum_ink_lim check(
+				reliability_lower is null or 
+					reliability_lower is not null
+					and reliability_upper is not null
 					and reliability_upper >= reliability_lower
 					and reverse_reliability_limit in ('Y', 'N')
 	),
+	
 	constraint fsum_deac check (deactivate in ('Y', 'N'))
 
 );

@@ -4,6 +4,7 @@ create table limits_database  (
 	item				varchar2 (32)   not null,
 	etest_name			varchar2 (32) 	not null,
 	deactivate			varchar2 (1)    default 'N',
+        sampling_rate                   varchar2 (3)    check (sampling_rate in ('MON', 'WAS', 'REL')),
 	dispo				varchar2 (1),
 	pass_criteria_percent		number   (2,2),
 	reprobe_map			varchar2 (32),
@@ -15,26 +16,35 @@ create table limits_database  (
 	reliability_upper		number,
 	reliability_lower		number,
 	reverse_reliability_limit	varchar2 (1),
+        limit_comments                  varchar2 (1024),
 	constraint ld_pk PRIMARY KEY (technology, item_type, item, etest_name),
-	constraint ld_dispo check(
-				dispo is null or 
-					dispo in ('Y', 'N') 
-					and pass_criteria_percent <= 1 
-					and pass_criteria_percent >=0
-					and dispo_rule in ('MRP', 'LRP', 'OPAP', 'OFAF')
-					and spec_upper is not null
-					and spec_lower is not null
-					and spec_upper >= spec_lower
-					and reverse_spec_limit in ('Y', 'N')
-	),
-	constraint ld_ink check(
-				reliability is null or 
-					reliability in ('Y', 'N')
-					and reliability_upper is not null
-					and reliability_lower is not null
-					and reliability_upper >= reliability_lower
-					and reverse_reliability_limit in ('Y', 'N')
-	),
+        constraint ld_dispo check(
+                                dispo is null or
+                                        dispo in ('Y', 'N')
+                                        and pass_criteria_percent <= 1
+                                        and pass_criteria_percent >=0
+                                        and dispo_rule in ('MRP', 'LRP', 'OPAP', 'OFAF')
+                                        and spec_lower is not null
+        ),
+        constraint ld_dispo_lim check(
+                                spec_lower is null or
+                                        spec_lower is not null
+                                        and spec_upper is not null
+                                        and spec_upper >= spec_lower
+                                        and reverse_spec_limit in ('Y', 'N')
+        ),
+        constraint ld_ink check(
+                                reliability is null or
+                                        reliability in ('Y', 'N')
+                                        and reliability_lower is not null
+        ),
+        constraint ld_ink_lim check(
+                                reliability_lower is null or
+                                        reliability_lower is not null
+                                        and reliability_upper is not null
+                                        and reliability_upper >= reliability_lower
+                                        and reverse_reliability_limit in ('Y', 'N')
+        ),
 	constraint ld_deac check (deactivate in ('Y', 'N')),
 	constraint ld_funny check (item_type != 'TECHNOLOGY' or technology = item)
 

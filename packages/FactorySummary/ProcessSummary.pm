@@ -14,7 +14,7 @@ sub process_f_summary_for_tech{
 		my $effective_routings = SMSDigest::get_all_effective_routings_in_tech($tech);
 		my $conn = Connect::read_only_connection('etest');		
 
-
+		
 
 
 
