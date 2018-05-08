@@ -17,9 +17,9 @@ ok($photomasks = Photomasks::get_photomasks_for_device($device), "Sucessfully Ra
 
 my $photomask_found = "";
 foreach my $photomask (@{$photomasks}){
-	if ($photomask eq $known_photomask){
-		$photomask_found = $photomask;
-	}
+    if ($photomask eq $known_photomask){
+        $photomask_found = $photomask;
+    }
 }
 
 is ($photomask_found, $known_photomask, "Found expected photomask in <" . join(", ", @{$photomasks}) . ">");

@@ -21,8 +21,8 @@ my $lpt_sth;
 # REPLACED BY RECURSIVE DESCENT ALGO
 sub parse_lpt_string{
         my ($string) = @_;
-	my $forb_lpt = [];
-	my $req_lpt = [];
+    my $forb_lpt = [];
+    my $req_lpt = [];
         $string =~ s/\s//g;
         Logging::diag("parsing string <$string> header");
         my @logpoints = split /\./, $string;
@@ -33,60 +33,60 @@ sub parse_lpt_string{
                 }elsif($logpoint =~ m/^([0-9]{4})$/){
                         push @{$req_lpt}, $1;
                 }else{
-			confess "Unrecognized format in logpoint <$logpoint> of string <$string>";
-		}
+            confess "Unrecognized format in logpoint <$logpoint> of string <$string>";
         }
-	return ($req_lpt, $forb_lpt);
+        }
+    return ($req_lpt, $forb_lpt);
 }
 
 # takes a list of routings and returns only those that meet the lpt string requirements
 # REPLACED BY RECURSIVE DESCENT ALGO
 sub get_list_of_routings_matching_lpt_string{
-	my ($input_routings, $string) = @_;
-	my @matching_routings;
-	my ($req_lpt, $forb_lpt) = parse_lpt_string($string);
-	return [] unless ((scalar @{$req_lpt} + scalar @{$forb_lpt}) > 0);
-	ROUTING: foreach my $possible_routing(@{$input_routings}){
-		Logging::debug("checking if $possible_routing matches $string");
-		next ROUTING unless (does_routing_match_lpt_lists($possible_routing, $req_lpt, $forb_lpt));
-		Logging::debug("it's good!");
-		push @matching_routings, $possible_routing;
-	}
-	return \@matching_routings;
+    my ($input_routings, $string) = @_;
+    my @matching_routings;
+    my ($req_lpt, $forb_lpt) = parse_lpt_string($string);
+    return [] unless ((scalar @{$req_lpt} + scalar @{$forb_lpt}) > 0);
+    ROUTING: foreach my $possible_routing(@{$input_routings}){
+        Logging::debug("checking if $possible_routing matches $string");
+        next ROUTING unless (does_routing_match_lpt_lists($possible_routing, $req_lpt, $forb_lpt));
+        Logging::debug("it's good!");
+        push @matching_routings, $possible_routing;
+    }
+    return \@matching_routings;
 }
 
 # takes a single routing, a list of required logpoints, and a list of forbidden logpoints
 # returns true/false if that routing satisfies those requirements
 # REPLACED BY RECURSIVE DESCENT ALGO
 sub does_routing_match_lpt_lists{
-	my ($routing, $req_lpt, $forb_lpt) = @_;
-	REQ_LPT: foreach my $lpt (@{$req_lpt}){
+    my ($routing, $req_lpt, $forb_lpt) = @_;
+    REQ_LPT: foreach my $lpt (@{$req_lpt}){
                 Logging::diag("$routing must have $lpt");
-		return 0 unless does_routing_use_lpt($routing, $lpt);
+        return 0 unless does_routing_use_lpt($routing, $lpt);
         }
-	FORB_LPT: foreach my $lpt (@{$forb_lpt}){
-               	Logging::diag("cannot have $lpt");
+    FORB_LPT: foreach my $lpt (@{$forb_lpt}){
+                   Logging::diag("cannot have $lpt");
                 return 0 if does_routing_use_lpt($routing, $lpt);
         }
-	return 1;	
+    return 1;	
 }
 
 # used for the recursive Descent parser
 # returns true if routing goes through LPT
 sub does_routing_use_lpt{
-	my ($routing, $lpt) = @_;
-	my $hash_ref = get_routing_list_at_lpt($lpt);
-	unless (defined $hash_ref){
-		confess "get_routing_list_at_lpt did not return as expected, probably programmer's fault";
-	}
-	return (defined $hash_ref->{$routing} ? 1 : 0);
+    my ($routing, $lpt) = @_;
+    my $hash_ref = get_routing_list_at_lpt($lpt);
+    unless (defined $hash_ref){
+        confess "get_routing_list_at_lpt did not return as expected, probably programmer's fault";
+    }
+    return (defined $hash_ref->{$routing} ? 1 : 0);
 }
 
 # takes a single routing and a logpoint string.
 # returns true/false if that routing satisfies the string
 sub does_routing_match_lpt_string{
-	my ($routing, $string) = @_;
-	return (scalar @{get_list_of_routings_matching_lpt_string([$routing], $string)} > 0);
+    my ($routing, $string) = @_;
+    return (scalar @{get_list_of_routings_matching_lpt_string([$routing], $string)} > 0);
 }
 
 # gets a list of all routings that go through the given logpoint
@@ -105,32 +105,32 @@ sub get_routing_list_at_lpt{
                 }
                 $lpt_table{$lpt} = \%routings;
         }
-	Logging::diag("Returning Cached logpoints for <$lpt>");
+    Logging::diag("Returning Cached logpoints for <$lpt>");
         return $lpt_table{$lpt};
 }
 
 
 sub get_lpt_routing_list_sth{
-	unless (defined $lpt_sth){
-        	my $sql = q{
-        	select distinct
-        	  rd.routing
-        	from
-        	  smsdw.routing_def rd
-        	  INNER JOIN smsdw.routing_flw_def rfd
-        	        on  rfd.facility = rd.facility
-        	        and rfd.routing = rd.routing 
-        	        and rfd.rev = rd.rev
-        	        and rfd.lpt = ?
-        	where
-        	  rd.facility = 'DP1DM5' and
-        	  rd.status = 'A'
-		};
-        	$lpt_sth = Connect::read_only_connection("sms")->prepare($sql) or confess "Could not prepare $sql";
-	}
-	unless (defined $lpt_sth){
-		confess "Could not get statement handle for querying logpionts.  Probably programmer's fault";
-	}
+    unless (defined $lpt_sth){
+            my $sql = q{
+            select distinct
+              rd.routing
+            from
+              smsdw.routing_def rd
+              INNER JOIN smsdw.routing_flw_def rfd
+                    on  rfd.facility = rd.facility
+                    and rfd.routing = rd.routing 
+                    and rfd.rev = rd.rev
+                    and rfd.lpt = ?
+            where
+              rd.facility = 'DP1DM5' and
+              rd.status = 'A'
+        };
+            $lpt_sth = Connect::read_only_connection("sms")->prepare($sql) or confess "Could not prepare $sql";
+    }
+    unless (defined $lpt_sth){
+        confess "Could not get statement handle for querying logpionts.  Probably programmer's fault";
+    }
         return $lpt_sth;
 }
 

@@ -20,18 +20,18 @@ my %first_character_code_photomask = (
 );
 
 sub convert_photomask_to_reticle{
-	my ($mask) = @_;
-	$mask =~ s/\s//g;
-	$mask =~ s/\-//;
-	if ($mask !~ m/^[A-Z]?[0-9]+$/){
-		confess "Unexpected photomask format";
-	}
-	# convert first character
-	foreach my $char (reverse sort keys %first_character_code_photomask){
-		my $code = $first_character_code_photomask{$char};
-		last if ($mask =~ s/^$char/$code/);
-	}	
-	return $mask;
+    my ($mask) = @_;
+    $mask =~ s/\s//g;
+    $mask =~ s/\-//;
+    if ($mask !~ m/^[A-Z]?[0-9]+$/){
+        confess "Unexpected photomask format";
+    }
+    # convert first character
+    foreach my $char (reverse sort keys %first_character_code_photomask){
+        my $code = $first_character_code_photomask{$char};
+        last if ($mask =~ s/^$char/$code/);
+    }	
+    return $mask;
 }
 
 sub get_chips_for_reticle_base{

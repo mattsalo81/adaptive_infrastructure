@@ -9,58 +9,58 @@ use Data::Dumper;
 use Prenote::PrenoteFinder;
 
 sub get_components_for_device{
-	my ($device) = @_;
-	my $prenotes = PrenoteFinder::find_prenotes_for_device($device);
-	my %components;
-	foreach my $prenote (keys %{$prenotes}){
-		Logging::diag("looking for components in <$prenote>");
-		my $comps = get_components_from_prenote($prenote);
-		@components{keys %{$comps}} = values %{$comps};
-	}
-	return \%components;
+    my ($device) = @_;
+    my $prenotes = PrenoteFinder::find_prenotes_for_device($device);
+    my %components;
+    foreach my $prenote (keys %{$prenotes}){
+        Logging::diag("looking for components in <$prenote>");
+        my $comps = get_components_from_prenote($prenote);
+        @components{keys %{$comps}} = values %{$comps};
+    }
+    return \%components;
 }
 
 sub get_components_from_prenote{
-	my ($prenote_dir) = @_;
-	unless (-d $prenote_dir){
-		confess "Could not access directory $prenote_dir";
-	}
-	my @comp_files = glob "$prenote_dir/comp/*.CompCount.txt";
-	my %components;
-	foreach my $file (@comp_files){
-		my $comps = parse_compcount_file($file);
-		@components{@{$comps}} = ("$file") x scalar @{$comps};
-	}
-	return \%components;
+    my ($prenote_dir) = @_;
+    unless (-d $prenote_dir){
+        confess "Could not access directory $prenote_dir";
+    }
+    my @comp_files = glob "$prenote_dir/comp/*.CompCount.txt";
+    my %components;
+    foreach my $file (@comp_files){
+        my $comps = parse_compcount_file($file);
+        @components{@{$comps}} = ("$file") x scalar @{$comps};
+    }
+    return \%components;
 }
 
 sub parse_compcount_file{
-	my ($file) = @_;
-	open my $fh, $file or confess "could not open $file to parse component info";
-	my @components;
-	my $in_comp = 0;
-	while(<$fh>){
-		# move to header
-		if (m/Component Usage/){
-			$in_comp = 1;
-			next
-		}
-		next unless $in_comp;
-		# remove comments
-		s/#.*//;
-		# skip blank;
-		next if m/^\s*$/;
-		# pull component info
-		if (m/^\s*([a-zA-Z0-9_]+)\s+([0-9]+)\s*/){
-			my ($comp, $count) = ($1, $2);
-			push @components, $comp if $count
-		}
-		# exit if done with components
-		last if m/:/;
-	} 
-	close $fh;
-	Logging::diag("Found " . (scalar @components) . " in file " . $file . " : " . Dumper(\@components));
-	return \@components;
+    my ($file) = @_;
+    open my $fh, $file or confess "could not open $file to parse component info";
+    my @components;
+    my $in_comp = 0;
+    while(<$fh>){
+        # move to header
+        if (m/Component Usage/){
+            $in_comp = 1;
+            next
+        }
+        next unless $in_comp;
+        # remove comments
+        s/#.*//;
+        # skip blank;
+        next if m/^\s*$/;
+        # pull component info
+        if (m/^\s*([a-zA-Z0-9_]+)\s+([0-9]+)\s*/){
+            my ($comp, $count) = ($1, $2);
+            push @components, $comp if $count
+        }
+        # exit if done with components
+        last if m/:/;
+    } 
+    close $fh;
+    Logging::diag("Found " . (scalar @components) . " in file " . $file . " : " . Dumper(\@components));
+    return \@components;
 }
 
 1;

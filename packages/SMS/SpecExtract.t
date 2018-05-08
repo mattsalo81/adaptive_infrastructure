@@ -9,7 +9,7 @@ use DBI;
 is(SpecExtract::get_technology_from_family("TEST_family"), "TEST_TECH", "case insensitivity");
 is(SpecExtract::get_technology_from_family("TEST_family"), "TEST_TECH", "case insensitivity");
 is(SpecExtract::get_technology_from_family("I don't exist"), "UNDEF", 
-				"returns string UNDEF (not undef) on entry not found");
+                "returns string UNDEF (not undef) on entry not found");
 
 # sms Extract
 my $sth = SpecExtract::get_device_extract_handle();
@@ -23,15 +23,15 @@ ok(defined $format->{"PROGRAM"}, "seeing if we got a particular field (program)"
 
 # COT
 my $record = {
-	PROD_GRP	=>	'this is a COT device',
+    PROD_GRP	=>	'this is a COT device',
 };
 is(SpecExtract::get_COT_from_record($record), 'Y', "Identifying COT devices by product group");
 my $record = {
-	PROD_GRP	=>	'this is not a SEE OH TEE device',
+    PROD_GRP	=>	'this is not a SEE OH TEE device',
 };
 is(SpecExtract::get_COT_from_record($record), 'N', "Identifying not-COT devices by product group");
 my $record = {
-	PRODuct_GRoup	=> 	'this is a bad record',
+    PRODuct_GRoup	=> 	'this is a bad record',
 };
 dies_ok(sub {SpecExtract::get_COT_from_record($record)}, "Testing invalid records");
 

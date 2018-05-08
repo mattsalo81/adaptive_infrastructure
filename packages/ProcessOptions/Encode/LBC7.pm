@@ -12,10 +12,10 @@ use ProcessOptions::Encode::Global;
 my $options;
 
 sub get_codes{
-	my $area = Encode::Global::get_area_codes();
-	my $ml	= Encode::Global::get_num_ml_codes();
-	my $main = Encode::Global::parse_old_txt_format($options);	
-	return [$area, $ml, $main];
+    my $area = Encode::Global::get_area_codes();
+    my $ml	= Encode::Global::get_num_ml_codes();
+    my $main = Encode::Global::parse_old_txt_format($options);	
+    return [$area, $ml, $main];
 }
 
 $options = q{

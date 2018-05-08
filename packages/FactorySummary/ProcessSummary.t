@@ -7,6 +7,5 @@ require Test::Lists;
 use FactorySummary::ProcessSummary;
 use Data::Dumper;
 
-my $rec = ProcessSummary::get_f_summary_records_for_tech('LBC5');
-print Dumper $rec;
+ProcessSummary::get_f_summary_records_for_parameter('LBC5', 'GOI_HEP');
 

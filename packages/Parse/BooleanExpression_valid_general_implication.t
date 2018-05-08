@@ -7,8 +7,8 @@ use Parse::BooleanExpression;
 
 # helper functions -> process options resolve to true, logpoints die
 sub my_eval{
-	my ($expr) = @_;
-	return BooleanExpression::get_result_general($expr, sub{die "Resolved to logpoint which is a killable offense"}, sub {die "ERROR" if $_[0] =~ m/DIE/; return $_[0] =~ m/T/});
+    my ($expr) = @_;
+    return BooleanExpression::get_result_general($expr, sub{die "Resolved to logpoint which is a killable offense"}, sub {die "ERROR" if $_[0] =~ m/DIE/; return $_[0] =~ m/T/});
 }
 
 ok(my_eval("T"), "true resolves to a process option, process options all true");

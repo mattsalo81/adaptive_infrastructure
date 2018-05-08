@@ -17,14 +17,14 @@ my $three_char_str;
 my $char_4_str;
 
 sub get_codes{
-	# I really would have liked to procedurally generate the 3-character codes for LBC8
-	# seeing as its /supposedly/ alphabetized and all the process options are binary permutations
-	# but they decided to remove "ASS" and "TIT" from the order because I guess politeness is more important than robustness
-	my $area = Encode::Global::get_area_codes();
-	my $ml	= Encode::Global::get_num_ml_codes();
-	my $three_char = Encode::Global::parse_old_txt_format($three_char_str);	
-	my $char_4 = Encode::Global::parse_old_txt_format($char_4_str);	
-	return [$area, $ml, $three_char, $char_4];
+    # I really would have liked to procedurally generate the 3-character codes for LBC8
+    # seeing as its /supposedly/ alphabetized and all the process options are binary permutations
+    # but they decided to remove "ASS" and "TIT" from the order because I guess politeness is more important than robustness
+    my $area = Encode::Global::get_area_codes();
+    my $ml	= Encode::Global::get_num_ml_codes();
+    my $three_char = Encode::Global::parse_old_txt_format($three_char_str);	
+    my $char_4 = Encode::Global::parse_old_txt_format($char_4_str);	
+    return [$area, $ml, $three_char, $char_4];
 }
 
 $three_char_str = q{

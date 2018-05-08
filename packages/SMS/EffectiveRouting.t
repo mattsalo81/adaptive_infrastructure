@@ -7,11 +7,11 @@ use SMS::EffectiveRouting;
 # effective routing
 # LBC8
 my $record = {
-	TECH		=>	'LBC8',
-	DEVICE		=>	'M08_MJS1_SOMESTUFF',
-	ROUTING		=>	'WHATEVER',
-	PROD_GRP	=>	'LBC8-DLM',
-	AREA		=>	'PARAMETRIC',
+    TECH		=>	'LBC8',
+    DEVICE		=>	'M08_MJS1_SOMESTUFF',
+    ROUTING		=>	'WHATEVER',
+    PROD_GRP	=>	'LBC8-DLM',
+    AREA		=>	'PARAMETRIC',
 };
 is(EffectiveRouting::make_effective_routing($record), "PARAMETRIC__WHATEVER", "LBC8 basic routing");
 $record->{"ROUTING"} = "DCU";
@@ -26,7 +26,7 @@ my $record = {
         DEVICE          =>      'M17_MSSOMESTUFF',
         ROUTING         =>      'WHATEVER',
         PROD_GRP        =>      'LBC7-DLM',
-	AREA		=>	'PARAMETRIC',
+    AREA		=>	'PARAMETRIC',
 };
 is(EffectiveRouting::make_effective_routing($record), "PARAMETRIC__WHATEVER", "LBC7 basic routing");
 $record->{"ROUTING"} = "DCU";
@@ -42,7 +42,7 @@ my $record = {
         DEVICE          =>      'M2HSOMESTUFF',
         ROUTING         =>      'WHATEVER',
         FE_STRATEGY     =>      'Something X2L',
-	AREA		=>	'PARAMETRIC',
+    AREA		=>	'PARAMETRIC',
 };
 is(EffectiveRouting::make_effective_routing($record), "PARAMETRIC__WHATEVER-2", "F05 basic routing");
 $record->{"FE_STRATEGY"} = "Doesn't work";
@@ -55,7 +55,7 @@ my $lbc5_record = {
         TECH            =>      'LBC5',
         DEVICE          =>      'M06ORWHATEVER',
         ROUTING         =>      'WHATEVER',
-	AREA		=>	'PARAMETRIC',
+    AREA		=>	'PARAMETRIC',
 };
 is(EffectiveRouting::make_effective_routing($lbc5_record), "PARAMETRIC__WHATEVER-X", "LBC5X basic routing");
 $lbc5_record->{"DEVICE"} = "M05ORWHATEVER";

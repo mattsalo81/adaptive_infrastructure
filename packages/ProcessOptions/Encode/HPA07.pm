@@ -17,20 +17,20 @@ use ProcessOptions::Encode::Global;
 my $options;
 
 sub get_codes{
-	my $area = Encode::Global::get_area_codes();
-	my $ml	= Encode::Global::get_num_ml_codes();
-	my $main = Encode::Global::parse_old_txt_format($options);	
-	my $flavor = Encode::Global::parse_old_txt_format(q{
-		100	50HPA07
-		102	33HPA07
-		103	50HPA07
-		107	50HPA07 
-	});
-	my $isoj = Encode::Global::parse_old_txt_format(q{
-		J	ISOS
-		NOTJ	
-	});
-	return [$area, $ml, $main, $flavor, $isoj];
+    my $area = Encode::Global::get_area_codes();
+    my $ml	= Encode::Global::get_num_ml_codes();
+    my $main = Encode::Global::parse_old_txt_format($options);	
+    my $flavor = Encode::Global::parse_old_txt_format(q{
+        100	50HPA07
+        102	33HPA07
+        103	50HPA07
+        107	50HPA07 
+    });
+    my $isoj = Encode::Global::parse_old_txt_format(q{
+        J	ISOS
+        NOTJ	
+    });
+    return [$area, $ml, $main, $flavor, $isoj];
 }
 
 $options = q{

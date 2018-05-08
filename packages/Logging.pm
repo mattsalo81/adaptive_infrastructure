@@ -18,58 +18,58 @@ my $err = *STDERR;
 # logging level...
 my $level = 1;
 my %log_levels = (
-	SILENT	=> 0,
-	EVENT	=> 1,
-	DEBUG	=> 2,
-	DIAG	=> 3,
+    SILENT	=> 0,
+    EVENT	=> 1,
+    DEBUG	=> 2,
+    DIAG	=> 3,
 );
 
 sub set_level{
-	my ($value) = @_;
-	$value =~ tr/a-z/A-Z/;
-	if (defined $log_levels{$value}){
-		$level = $log_levels{$value};
-	}elsif ($level == 0 || $level == 1 || $level == 2 || $level == 3){
-		$level = $value;
-	}else{
-		confess("Could not set log_level to <$value>\n");
-	}
-	event("log level set to $level");
+    my ($value) = @_;
+    $value =~ tr/a-z/A-Z/;
+    if (defined $log_levels{$value}){
+        $level = $log_levels{$value};
+    }elsif ($level == 0 || $level == 1 || $level == 2 || $level == 3){
+        $level = $value;
+    }else{
+        confess("Could not set log_level to <$value>\n");
+    }
+    event("log level set to $level");
 }
 
 sub set_log{
-	($log) = @_;
+    ($log) = @_;
 }
 
 sub event{
-	my ($text) = @_;
-	print_log($text) if $level >= $log_levels{"EVENT"};
+    my ($text) = @_;
+    print_log($text) if $level >= $log_levels{"EVENT"};
 }
 
 sub debug{
-	my ($text) = @_;
-	print_log($text) if $level >= $log_levels{"DEBUG"};
+    my ($text) = @_;
+    print_log($text) if $level >= $log_levels{"DEBUG"};
 }
 
 sub diag{
-	my ($text) = @_;
-	print_log($text) if $level >= $log_levels{"DIAG"};
+    my ($text) = @_;
+    print_log($text) if $level >= $log_levels{"DIAG"};
 }
 
 sub print_log{
-	my ($text) = @_;
-	$text .= "\n" unless $text =~ m/\n$/;
-	print $log ($text);
+    my ($text) = @_;
+    $text .= "\n" unless $text =~ m/\n$/;
+    print $log ($text);
 }
 
 sub set_err{
-	($err) = @_;
+    ($err) = @_;
 }
 
 sub error{
-	my ($text) = @_;
-	$text .= "\n" unless $text =~ m/\n/;
-	print $err ($text);
+    my ($text) = @_;
+    $text .= "\n" unless $text =~ m/\n/;
+    print $err ($text);
 }
 
 

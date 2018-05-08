@@ -15,9 +15,9 @@ use ProcessOptions::Encode::Global;
 my $options;
 
 sub get_codes{
-	my $area = Encode::Global::get_area_codes();
-	my $ml	= Encode::Global::get_num_ml_codes();
-	return [$area, $ml];
+    my $area = Encode::Global::get_area_codes();
+    my $ml	= Encode::Global::get_num_ml_codes();
+    return [$area, $ml];
 }
 
 1;

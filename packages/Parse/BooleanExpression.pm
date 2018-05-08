@@ -51,7 +51,7 @@ RIGHT_PAREN	: /\)/
 
 STD_BIN_OR	: OR
                 { $return = "||"}
-		| XOR
+        | XOR
                 { $return = "xor"}
 
 STD_BIN_AND	: AND
@@ -63,20 +63,20 @@ STD_UN_OP	: NOT
 
 # Expressions
 STATEMENT	: EXPRESSION EQ EXPRESSION
-		{ $return = "$item[1] == $item[3]" }
-		| EXPRESSION IMP EXPRESSION
-		{ $return = "BooleanExpression::implies(sub{return ($item[1])}, sub{return ($item[3])})" }
-		| EXPRESSION RIMP EXPRESSION
-		{ $return = "BooleanExpression::implies(sub{return ($item[3])}, sub{return ($item[1])})" }
-		| EXPRESSION
-		{ $return = "$item[1]" }
-		
+        { $return = "$item[1] == $item[3]" }
+        | EXPRESSION IMP EXPRESSION
+        { $return = "BooleanExpression::implies(sub{return ($item[1])}, sub{return ($item[3])})" }
+        | EXPRESSION RIMP EXPRESSION
+        { $return = "BooleanExpression::implies(sub{return ($item[3])}, sub{return ($item[1])})" }
+        | EXPRESSION
+        { $return = "$item[1]" }
+        
 EXPRESSION	: TERM EXPRESSION_E
                 { $return = "$item[1] $item[2]"}
 
 EXPRESSION_E	: STD_BIN_OR TERM EXPRESSION_E(s)
                 { $return = "$item[1] $item[2] " . join(' ', @{$item[3]})}
-		| 
+        | 
                 { $return = ""}
 
 TERM		: FACTOR TERM_E
@@ -84,20 +84,20 @@ TERM		: FACTOR TERM_E
 
 TERM_E		: STD_BIN_AND FACTOR TERM_E(s)
                 { $return = "$item[1] $item[2] " . join(' ', @{$item[3]})}
-		|
+        |
                 { $return = ""}
 
 FACTOR		: LPT
                 { $return = "check_lpt('$item{'LPT'}')"}
-		| OPT
-		{ $return = "check_opt('$item{'OPT'}')"}
-		| LEFT_PAREN STATEMENT RIGHT_PAREN
+        | OPT
+        { $return = "check_opt('$item{'OPT'}')"}
+        | LEFT_PAREN STATEMENT RIGHT_PAREN
                 { $return = "( $item[2] )"}
-		| LEFT_PAREN EXPRESSION RIGHT_PAREN
+        | LEFT_PAREN EXPRESSION RIGHT_PAREN
                 { $return = "( $item[2] )"}
-		| STD_UN_OP EXPRESSION
+        | STD_UN_OP EXPRESSION
                 { $return = "$item[1] $item[2]"}
-		
+        
 
 startrule	: STATEMENT
 
@@ -105,11 +105,11 @@ startrule	: STATEMENT
 
 # init the parser with the given lambdas (just in case we want to split this singleton into a class)
 sub init{
-	my ($lpt_lambda, $opt_lambda) = @_;
-	$current_lpt_lambda = $lpt_lambda;
-	$current_opt_lambda = $opt_lambda;
-	$static_parser = Parse::RecDescent->new($grammar) unless defined $static_parser;
-	return $static_parser;
+    my ($lpt_lambda, $opt_lambda) = @_;
+    $current_lpt_lambda = $lpt_lambda;
+    $current_opt_lambda = $opt_lambda;
+    $static_parser = Parse::RecDescent->new($grammar) unless defined $static_parser;
+    return $static_parser;
 }
 
 # If the class lambda is defined (static), then pass it the option and return the result, otherwise die
@@ -135,107 +135,107 @@ sub check_opt{
 # If the class lambda is defined (static), then pass it the lpt and return the result, otherwise die
 # called by the evaluatable string produced by the parser
 sub check_lpt{
-	my ($lpt) = @_;
-	if(defined $current_lpt_lambda){
-		my $success;
-		eval{
-			$success = $current_lpt_lambda->($lpt);
-			1;
-		}or do{
-			my $e = $@;
-			confess "Ran into error determining if logpoint <$lpt> was valid : $e";
-		};
-		return $success;
-	}else{
-		confess "Encountered a logpoint <$lpt> but have no way to check if valid";
-	}
-	return undef;
+    my ($lpt) = @_;
+    if(defined $current_lpt_lambda){
+        my $success;
+        eval{
+            $success = $current_lpt_lambda->($lpt);
+            1;
+        }or do{
+            my $e = $@;
+            confess "Ran into error determining if logpoint <$lpt> was valid : $e";
+        };
+        return $success;
+    }else{
+        confess "Encountered a logpoint <$lpt> but have no way to check if valid";
+    }
+    return undef;
 }
 
 sub does_sms_routing_and_options_match_expression{
-	my ($routing, $opt_list, $expression) = @_;
+    my ($routing, $opt_list, $expression) = @_;
 
-	my $lpt_lambda = sub {
+    my $lpt_lambda = sub {
                 my ($lpt) = @_;
                 return LogpointRequirements::does_routing_use_lpt($routing, $lpt);
         };
 
-	my %options;
-	my @upper = map {tr/[a-z]/[A-Z]/; $_} @{$opt_list};
+    my %options;
+    my @upper = map {tr/[a-z]/[A-Z]/; $_} @{$opt_list};
         @options{@upper} = @upper;
         my $opt_lambda = sub{
                 my ($opt) = @_;
-		$opt =~ tr/[a-z]/[A-Z]/;
+        $opt =~ tr/[a-z]/[A-Z]/;
                 return defined $options{$opt};
         };
 
-	return get_result_general($expression, $lpt_lambda, $opt_lambda);
+    return get_result_general($expression, $lpt_lambda, $opt_lambda);
 
 }
 
 # create the lambda for checking SMS routing and evaluate expression
 sub does_sms_routing_match_lpt_string{
-	my ($routing, $lpt_string) = @_;
+    my ($routing, $lpt_string) = @_;
 
-	my $lpt_lambda = sub {
-		my ($lpt) = @_;
-		return LogpointRequirements::does_routing_use_lpt($routing, $lpt);
-	};
+    my $lpt_lambda = sub {
+        my ($lpt) = @_;
+        return LogpointRequirements::does_routing_use_lpt($routing, $lpt);
+    };
 
-	return get_result_general($lpt_string, $lpt_lambda, undef);
+    return get_result_general($lpt_string, $lpt_lambda, undef);
 }
 
 # create the lambda for checking if process option in a list
 sub does_opt_list_match_opt_string{
-	my ($opt_list, $opt_string) = @_;
-	my %options;
-	my @upper = map {tr/[a-z]/[A-Z]/; $_} @{$opt_list};
+    my ($opt_list, $opt_string) = @_;
+    my %options;
+    my @upper = map {tr/[a-z]/[A-Z]/; $_} @{$opt_list};
         @options{@upper} = @upper;
-	my $opt_lambda = sub{
-		my ($opt) = @_;
-		$opt =~ tr/[a-z]/[A-Z]/;
-		return defined $options{$opt};
-	};
+    my $opt_lambda = sub{
+        my ($opt) = @_;
+        $opt =~ tr/[a-z]/[A-Z]/;
+        return defined $options{$opt};
+    };
 
-	return get_result_general($opt_string, undef, $opt_lambda);	
+    return get_result_general($opt_string, undef, $opt_lambda);	
 }
 
 
 # evaluate expression with provided lambdas (undef means don't allow)
 sub get_result_general{
-	my ($expression, $lpt_lambda, $opt_lambda) = @_;
-	my $parser = init($lpt_lambda, $opt_lambda);
-	my $eval_text = get_eval($parser, $expression);
-	my $value = eval($eval_text);
-	my $e = $@;
-	if ($e !~ m/^\s*$/ or not defined $value ){
-		confess "Failed to interpret <$expression> because of : $e";
-	}
-	if (defined $value){
-		return $value;
-	}else{
-		confess "Failed to interpret <$expression> with provided lambdas, got undef?";
-	};
-	return undef;
+    my ($expression, $lpt_lambda, $opt_lambda) = @_;
+    my $parser = init($lpt_lambda, $opt_lambda);
+    my $eval_text = get_eval($parser, $expression);
+    my $value = eval($eval_text);
+    my $e = $@;
+    if ($e !~ m/^\s*$/ or not defined $value ){
+        confess "Failed to interpret <$expression> because of : $e";
+    }
+    if (defined $value){
+        return $value;
+    }else{
+        confess "Failed to interpret <$expression> with provided lambdas, got undef?";
+    };
+    return undef;
 }
 
 # parses the expression to make sure that all characters are accounted for.  Does not execute any code besides the parser
 sub is_valid_expression{
-	my ($lpt_string) = @_;
-	my $copy = $lpt_string;
-	# store vars
-	my @old = ($::RD_ERRORS, $::RD_WARN, $::RD_HINT);
-	# silence errors
-	($::RD_ERRORS, $::RD_WARN, $::RD_HINT) = (0, 0, 0);
-	my $parser = init(undef, undef);
-	my $result = $parser->startrule(\$copy);
-	($::RD_ERRORS, $::RD_WARN, $::RD_HINT) = @old;
-	return defined $result && $copy =~ m/^\s*$/;
+    my ($lpt_string) = @_;
+    my $copy = $lpt_string;
+    # store vars
+    my @old = ($::RD_ERRORS, $::RD_WARN, $::RD_HINT);
+    # silence errors
+    ($::RD_ERRORS, $::RD_WARN, $::RD_HINT) = (0, 0, 0);
+    my $parser = init(undef, undef);
+    my $result = $parser->startrule(\$copy);
+    ($::RD_ERRORS, $::RD_WARN, $::RD_HINT) = @old;
+    return defined $result && $copy =~ m/^\s*$/;
 }
 
 # uses the provided parser + expression to create an evaluatable perl string
 sub get_eval{
-	my ($parser, $expression) = @_;
+    my ($parser, $expression) = @_;
         my $copy = $expression;
         my $eval_text = $parser->startrule(\$copy);
         unless (defined $eval_text && $copy =~ m/^\s*$/){
@@ -245,17 +245,17 @@ sub get_eval{
 }
 
 sub implies{
-	# takes two lambda functions and returns p -> q.  evaluates p first, short circuits if false
-	# ie. if p evaluates false, then q does not need to be evaluated, so it is not.
-	my ($p, $q) = @_;
-	my $p_val = $p->();
-	if (! $p_val){
-		return 1;
-	}else{
-		my $q_val = $q->();
-		return $q_val;
-	}
-	return undef;
+    # takes two lambda functions and returns p -> q.  evaluates p first, short circuits if false
+    # ie. if p evaluates false, then q does not need to be evaluated, so it is not.
+    my ($p, $q) = @_;
+    my $p_val = $p->();
+    if (! $p_val){
+        return 1;
+    }else{
+        my $q_val = $q->();
+        return $q_val;
+    }
+    return undef;
 }
 
 1;

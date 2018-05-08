@@ -8,15 +8,15 @@ use ProcessOptions::ProcessEncoder;
 use ProcessOptions::ProcessDecoder;
 
 my @random_words = (
-	'THANG',
-	'THING',
-	'THINK',
-	'THANK',
-	'HUNK',
-	'HONK',
-	'HANK',
-	'HAND',
-	'HANG',
+    'THANG',
+    'THING',
+    'THINK',
+    'THANK',
+    'HUNK',
+    'HONK',
+    'HANK',
+    'HAND',
+    'HANG',
 );
 
 my $word1 = $random_words[int(rand(scalar @random_words - 1))] . "1";
@@ -27,14 +27,14 @@ my $array1 = [$word1];
 my $array2 = [$word2];
 
 if (rand(1) > .5){
-	push @{$array1}, $word3;
+    push @{$array1}, $word3;
 }else{
-	push @{$array2}, $word3;
+    push @{$array2}, $word3;
 }
 
 my $lookup = {
-	CODE1	=>	$array1,
-	CODE2	=>	$array2,
+    CODE1	=>	$array1,
+    CODE2	=>	$array2,
 };
 
 ProcessEncoder::update_code("TEST2", 0, $lookup);
