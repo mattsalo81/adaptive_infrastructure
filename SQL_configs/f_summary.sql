@@ -52,3 +52,5 @@ create table f_summary (
     constraint fsum_deac check (deactivate in ('Y', 'N'))
 
 );
+insert into f_summary (technology, etest_name, process_options) values 
+('TEST_GOOD_TECH', 'PARM1', 'BASELINE');
