@@ -1,5 +1,6 @@
 create table limits_database  (
 	technology			varchar2 (16)   not null,
+        test_area                       varchar2 (16)   not null,
 	item_type			varchar2 (16)   check (item_type in ('TECHNOLOGY', 'ROUTING', 'PROGRAM', 'DEVICE')),
 	item				varchar2 (32)   not null,
 	etest_name			varchar2 (32) 	not null,
@@ -17,7 +18,7 @@ create table limits_database  (
 	reliability_lower		number,
 	reverse_reliability_limit	varchar2 (1),
         limit_comments                  varchar2 (1024),
-	constraint ld_pk PRIMARY KEY (technology, item_type, item, etest_name),
+	constraint ld_pk PRIMARY KEY (technology, test_area, item_type, item, etest_name),
         constraint ld_dispo check(
                                 dispo is null or
                                         dispo in ('Y', 'N')
@@ -49,24 +50,24 @@ create table limits_database  (
 	constraint ld_funny check (item_type != 'TECHNOLOGY' or technology = item)
 
 );
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'TECHNOLOGY', 'TEST_TECH', 'PARM1', 'Y');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'TECHNOLOGY', 'TEST_TECH', 'PARM2', 'N');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'ROUTING', 'TEST_ROUT', 'PARM2', 'Y');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'TECHNOLOGY', 'TEST_TECH', 'PARM3', 'N');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'ROUTING', 'TEST_ROUT', 'PARM3', 'N');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'PROGRAM', 'TEST_PROG', 'PARM3', 'Y');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'TECHNOLOGY', 'TEST_TECH', 'PARM4', 'N');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'ROUTING', 'TEST_ROUT', 'PARM4', 'N');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'PROGRAM', 'TEST_PROG', 'PARM4', 'N');
-insert into limits_database (technology, item_type, item, etest_name, deactivate) values 
-('TEST_TECH', 'DEVICE', 'TEST_DEV', 'PARM4', 'Y');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'TECHNOLOGY', 'TEST_TECH', 'PARM1', 'Y');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'TECHNOLOGY', 'TEST_TECH', 'PARM2', 'N');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'ROUTING', 'TEST_ROUT', 'PARM2', 'Y');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'TECHNOLOGY', 'TEST_TECH', 'PARM3', 'N');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'ROUTING', 'TEST_ROUT', 'PARM3', 'N');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'PROGRAM', 'TEST_PROG', 'PARM3', 'Y');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'TECHNOLOGY', 'TEST_TECH', 'PARM4', 'N');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'ROUTING', 'TEST_ROUT', 'PARM4', 'N');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'PROGRAM', 'TEST_PROG', 'PARM4', 'N');
+insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate) values 
+('TEST_TECH', 'TEST_AREA', 'DEVICE', 'TEST_DEV', 'PARM4', 'Y');
 
