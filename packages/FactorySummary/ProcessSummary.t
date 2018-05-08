@@ -7,5 +7,16 @@ require Test::Lists;
 use FactorySummary::ProcessSummary;
 use Data::Dumper;
 
-ProcessSummary::get_f_summary_records_for_parameter('LBC5', 'GOI_HEP');
+# check to see if we get records
+my $records = ProcessSummary::get_f_summary_records_for_parameter('TEST_GOOD_TECH', 'EXISTS');
+is( $records->[0]->{"ETEST_NAME"}, "EXISTS", "Found a record that we know exists");
+ok(! defined $records->[1], "Didn't find anything unexpected");
+
+# check to see
+$records = ProcessSummary::get_f_summary_records_for_parameter('TEST_GOOD_TECH', 'DIFF_OPT');
+ok(in_list($records->[0]->{"PROCESS_OPTIONS"}, ["OPTION1"]), "Found known process options on a known parameter");
+ok(in_list($records->[1]->{"PROCESS_OPTIONS"}, ["OPTION2"]), "Found known process options on a known parameter");
+ok($records->[0]->{"PROCESS_OPTIONS"} ne $records->[1]->{"PROCESS_OPTIONS"}, "Found 2 distinct process options on a known parmaeter");
+ok(! defined $records->[2], "Didn't find anything unexpected");
+
 

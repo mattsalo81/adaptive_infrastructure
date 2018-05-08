@@ -52,5 +52,11 @@ create table f_summary (
     constraint fsum_deac check (deactivate in ('Y', 'N'))
 
 );
+-- Known parameter that exists
 insert into f_summary (technology, etest_name, process_options) values 
-('TEST_GOOD_TECH', 'PARM1', 'BASELINE');
+('TEST_GOOD_TECH', 'EXISTS', 'BASELINE');
+-- Testing if we can get muliple parameters
+insert into f_summary (technology, etest_name, process_options) values 
+('TEST_GOOD_TECH', 'DIFF_OPT', 'OPTION1');
+insert into f_summary (technology, etest_name, process_options) values 
+('TEST_GOOD_TECH', 'DIFF_OPT', 'OPTION2');

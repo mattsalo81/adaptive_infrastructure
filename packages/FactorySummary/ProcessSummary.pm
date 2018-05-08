@@ -30,7 +30,7 @@ sub process_f_summary_for_tech{
     }
 }
 
-# returns array of hash-refs for records.  Keys in hashref are all uppercase
+# returns array of hash-refs for records on parameter/tech.  Keys in hashref are all uppercase
 sub get_f_summary_records_for_parameter{
     my ($tech, $parameter) = @_;
     my $sth = get_f_summary_records_for_parameter_sth();
