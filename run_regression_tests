@@ -1,1 +1,1 @@
-prove -r | grep --colour ok
+prove -r | grep --colour "\.\.*ok"
