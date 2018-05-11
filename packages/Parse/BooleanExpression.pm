@@ -7,6 +7,7 @@ use Data::Dumper;
 use Logging;
 use Parse::RecDescent;
 use SMS::LogpointRequirements;
+use ProcessOptions::OptionLookup;
 
 # This package contains the logic for interpreting a boolean expression of logpoints or process options
 # expressions can have & (and) | (or) ^ (xor) ! (not) and parenthesis.
@@ -152,6 +153,20 @@ sub check_lpt{
     return undef;
 }
 
+# evaluate process option expression using the process option database
+sub does_effective_routing_match_expression_using_database{
+    my ($technology, $routing, $opt_string) = @_;
+
+    my $opt_lambda = sub{
+        my ($opt) = @_;
+        return OptionLookup::does_effective_routing_have_option($technology, $routing, $opt);
+    };
+
+    return get_result_general($opt_string, undef, $opt_lambda);
+}
+
+# evaluate process option expression using a reference option list and a logpoint expression
+# using SMS
 sub does_sms_routing_and_options_match_expression{
     my ($routing, $opt_list, $expression) = @_;
 
