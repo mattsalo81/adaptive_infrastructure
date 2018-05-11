@@ -61,7 +61,7 @@ $records = [
 $sms = [
     {AREA => "PARAMETRIC", EFFECTIVE_ROUTING => "TEST1"},
 ];
-my ($functional, $limits) = ProcessSummary::process_f_summary_parameter_records($records, $sms);
+($functional, $limits) = ProcessSummary::process_f_summary_parameter_records($records, $sms);
 is(scalar @{$limits}, 1, "Found exactly one limit for test case 2");
 is($limits->[0]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
 is($limits->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");

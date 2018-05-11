@@ -23,4 +23,12 @@ sub have_same_elements{
     return lists_identical(\@sort1, \@sort2);
 }
 
+sub hashes_identical{
+    my ($hash1, $hash2) = @_;
+    return 0 unless(scalar keys %{$hash1} == scalar keys %{$hash2});
+    my @hash1 = map {($_, $hash1->{$_})} sort keys %{$hash1};
+    my @hash2 = map {($_, $hash2->{$_})} sort keys %{$hash2};
+    return lists_identical(\@hash1, \@hash2);
+}
+
 1;

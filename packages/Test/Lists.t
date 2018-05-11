@@ -21,4 +21,29 @@ ok(have_same_elements($list1, $list2), "same list twice, different references");
 ok(have_same_elements($list1, $list3), "same list twice, but mixed"); 
 ok(!have_same_elements($list1, $list4), "different lists"); 
 
+my $hash1 = {
+    A   => "WOW",
+    B   => "HOORAY",
+    C   => undef,
+    D   => 1,
+};
+my $hash2 = {
+    D   => 1,
+    B   => "HOORAY",
+    A   => "WOW",
+    C   => undef,
+};
+my $hash3 = {
+    A   => "WOW",
+    B   => "HOORAY",
+    C   => undef,
+    D   => 1,
+    E   => "UHOH",
+};
+
+ok(hashes_identical($hash1, $hash1), "compares two identical references");
+ok(hashes_identical($hash1, $hash2), "compares two identical hashes, but different references");
+ok(!hashes_identical($hash1, $hash3), "compares two different hashes");
+ok(!hashes_identical($hash3, $hash1), "compares two different hashes");
+
 
