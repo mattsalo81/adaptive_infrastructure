@@ -36,3 +36,7 @@ ok(OptionLookup::does_effective_routing_have_option($known_tech, $eff_1, $opt1),
 ok(OptionLookup::does_effective_routing_have_option($known_tech, $eff_1, $opt2_case), "Case insensitive");
 ok(!OptionLookup::does_effective_routing_have_option($known_tech, $eff_2, $opt1), "Returns false when option not there");
 dies_ok(sub{OptionLookup::does_effective_routing_have_option($known_tech, $missing_eff, $opt1)}, "Dies okay when routing/tech not defined");
+
+# option availability test
+ok(OptionLookup::are_options_available_for_effective_routing($known_tech, $eff_1), "Returns true when options available");
+ok(!OptionLookup::are_options_available_for_effective_routing($known_tech, $missing_eff), "Returns false when options unavailable");

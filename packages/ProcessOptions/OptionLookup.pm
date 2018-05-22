@@ -9,6 +9,7 @@ use Database::Connect;
 
 my %effective_routing_to_option;
 my $options_for_effective_routing_sth;
+my $undef_error_msg = "No options defined for";
 
 sub does_effective_routing_have_option{
     my ($technology, $effective_routing, $process_option) = @_;
@@ -37,7 +38,7 @@ sub get_options_for_effective_routing{
         $effective_routing_to_option{$effective_routing} = \%options;
     }
     if (scalar keys %{$effective_routing_to_option{$effective_routing}} == 0){
-        confess "No options defined for technology <$technology> and effective routing <$effective_routing>";
+        confess "$undef_error_msg technology <$technology> and effective routing <$effective_routing>";
     }
     return $effective_routing_to_option{$effective_routing};
 }
@@ -60,6 +61,17 @@ sub get_options_for_effective_routing_sth{
         confess "Could not get options_for_effective_routing_sth";
     }
     return $options_for_effective_routing_sth;
+}
+
+sub are_options_available_for_effective_routing{
+    my ($tech, $effective_routing) = @_;
+    my $success = 1;
+    eval{
+        get_options_for_effective_routing($tech, $effective_routing);
+    } or do {
+        $success = 0;
+    };
+    return $success;
 }
 
 1;

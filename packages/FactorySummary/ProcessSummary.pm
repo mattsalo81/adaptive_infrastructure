@@ -6,6 +6,8 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Database::Connect;
+use FactorySummary::ParameterProcessing;
+use SMS::SMSDigest;
 
 my $f_summary_records_for_parameter_sth;
 my $factory_summary_table = "f_summary";
@@ -16,9 +18,9 @@ sub process_technology{
     my $parms = get_all_f_summary_parameters_for_technology($technology);
     my @functional;
     my @limits;
-    foreach my $parm (@{$parms}){
+    foreach my $parameter (@{$parms}){
         my $records = get_f_summary_records_for_parameter($technology, $parameter);
-        my $sms = 
+        my $sms = SMSDigest::get_entries_for_tech($technology);
         my ($func, $lim) = ParameterProcessing::process_f_summary_parameter_records($records, $sms);
     }
 }

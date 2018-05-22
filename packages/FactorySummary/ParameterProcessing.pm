@@ -22,7 +22,7 @@ use Parse::BooleanExpression;
 #               arrayref of records to add to limitsdb
 sub process_f_summary_parameter_records{
     my @args = @_;
-    my $lambda = &does_f_summary_record_match_effective_routing_options;
+    my $lambda = \&does_f_summary_record_match_effective_routing_options;
     return _process_f_summary_parameter_records(@args, $lambda);
 }
 
