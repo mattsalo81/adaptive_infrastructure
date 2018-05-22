@@ -19,6 +19,8 @@ sub reset_memoization{
     %memoize = ();
 }
 
+my @functional_fields = q(technology test_area effective_routing etest_name svn component parm_type_pcd test_type description);
+
 # takes 
 #               arrayref of hashrefs for a particular parameter from the f_summary
 #               hashref of TESTAREAS to arrayref of EFFECTIVE_ROUTING
@@ -56,6 +58,7 @@ sub _process_f_summary_parameter_records{
     # create the technology level record
     my $tech_rec = LimitRecord->new_copy_from_f_summary($records->[0]);
     $tech_rec->set_item_type('TECHNOLOGY', $tech_rec->get('TECHNOLOGY'));
+    $tech_rec->comment("Generated from Factory Summary");
     if(scalar @{$records} > 1){
         # records will be set at the effective routing, so dummy this one
         $tech_rec->dummify();
@@ -91,6 +94,7 @@ sub _process_f_summary_parameter_records{
             my @unresolved_records = map {LimitRecord->new_copy_from_f_summary($_)} @matching_records;
             my $resolved_record = LimitRecord->merge(\@unresolved_records);
             if (defined $resolved_record){
+                $resolved_record->comment("Generated from Factory Summary");
                 $resolved_record->set_item_type('EFFECTIVE_ROUTING', $eff_rout);
                 push @effective_routing_limits, @{$resolved_record->create_copies_at_each_area([$area])};
             }
@@ -121,6 +125,14 @@ sub does_f_summary_record_match_effective_routing_options{
     }
     return $memoize{$key};
 
+}
+
+#my @functional_fields = q(technology test_area effective_routing etest_name svn component parm_type_pcd test_type description);
+sub assert_constraints_for_functional_parameter_table{
+    my ($parameter_f_summary_records) = @_;
+    # All records must have identical values, otherwise print a warning
+    if(scalar @{$parameter_f_summary_records} > 1){
+    }
 }
 
 1;

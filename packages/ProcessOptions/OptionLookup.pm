@@ -68,6 +68,7 @@ sub are_options_available_for_effective_routing{
     my $success = 1;
     eval{
         get_options_for_effective_routing($tech, $effective_routing);
+        1;
     } or do {
         $success = 0;
     };

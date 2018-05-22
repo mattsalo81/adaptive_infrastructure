@@ -177,4 +177,14 @@ sub merge{
     return $resolved;
 }
 
+sub comment{
+    my ($self, $comment) = @_;
+    $self->{"LIMIT_COMMENTS"} = $comment;
+}
+
+# just incase we switch from the hashref
+sub index_array{
+    my $self = shift;
+    return map {$self->{$_}} @_;
+}
 1;
