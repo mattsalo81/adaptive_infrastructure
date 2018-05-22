@@ -15,12 +15,24 @@ push @limit_fields, qw(dispo pass_criteria_percent reprobe_map dispo_rule spec_u
 push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_reliability_limit limit_comments);
 @limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
 
-sub update_functional_and_limits{
-    my ($functional, $limits) = @_;
-    my $technology = $functional->[0]->{"TECHNOLOGY"};
-    unless(defined $technology){
-        confess "Could not extract technology from functional parameters provided";
+sub update_technology_functional_and_limits{
+    my ($technology) = @_;
+    eval{
+        my ($func, $lim) = ProcessSummary::process_technology($technology);
+        update_functional_and_limits($technology, $func, $lim);
+        1;
+    }or do{
+        my $e = $@;
+        if ($e =~ m/Could not find any F-summary entries/){
+            print "Skipping $technology, no F-summary records found\n";
+        }else{
+            confess "Could not update $technology functional parameter table and limits database because : $e";
+        }
     }
+}
+
+sub update_functional_and_limits{
+    my ($technology, $functional, $limits) = @_;
     my $trans = Connect::new_transaction("etest");
     eval{
         update_functional_list($trans, $technology, $functional);

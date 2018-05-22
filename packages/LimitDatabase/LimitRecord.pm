@@ -11,7 +11,7 @@ use Logging;
 # Configuration information
 my %item_types = (
     TECHNOLOGY        => 1,
-    EFFECTIVE_ROUTING => 1,
+    ROUTING           => 1,
     PROGRAM           => 1,
     DEVICE            => 1,
 );
