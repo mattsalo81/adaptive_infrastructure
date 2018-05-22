@@ -85,6 +85,11 @@ sub _process_f_summary_parameter_records{
                         TEST_AREA             =>        $area,
                         TECHNOLOGY            =>        $technology,
                         ETEST_NAME            =>        $parameter,
+                        SVN                   =>        $record->{"SVN"},
+                        COMPONENT             =>        $record->{"COMPONENT"},
+                        PARM_TYPE_PCD         =>        $record->{"PARM_TYPE_PCD"},
+                        TEST_TYPE             =>        $record->{"TEST_TYPE"},
+                        DESCRIPTION           =>        $record->{"DESCRIPTION"},
                     };
                     
                     # store record as matching
