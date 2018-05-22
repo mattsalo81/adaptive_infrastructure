@@ -34,7 +34,32 @@ my %dummy_values = (
     LIMIT_COMMENTS              => "Dummy limit",
 );
 
+# all possible fields
+#my @all_fields = (
+#    'technology',
+#    'test_area',
+#    'item_type',
+#    'item',
+#    'etest_name',
+#    'deactivate',
+#    'sampling_rate',
+#    'dispo',
+#    'pass_criteria_percent',
+#    'reprobe_map',
+#    'dispo_rule',
+#    'spec_upper',
+#    'spec_lower',
+#    'reverse_spec_limit',
+#    'reliability',
+#    'reliability_upper',
+#    'reliability_lower',
+#    'reverse_reliability_limit',
+#    'limit_comments',
+#    'constraint',
+#);
+#@all_fields =~ map {tr/a-z/A-Z/; $_} @all_fields;
 
+# fields that can be copied from an f_summary
 my   @fields_that_match_f_summary = qw(Technology etest_name deactivate sampling_rate dispo pass_criteria_percent);
 push @fields_that_match_f_summary, qw(reprobe_map dispo_rule spec_upper spec_lower reverse_spec_limit);
 push @fields_that_match_f_summary, qw(reliability reliability_upper reliability_lower reverse_reliability_limit);
@@ -113,6 +138,43 @@ sub get{
         confess "Could not extract value of <$thing> from LimitRecord";
     }
     return $self->{$thing};
+}
+
+# takes an array ref of limit objects
+# returns undef if none provided
+# returns single object if only one object provided (that ref)
+# if multiple objects provided, tries to resolve into one object.  Returns that object if successful, otherwise dies
+sub merge{
+    my ($class, $objects) = @_;
+    if (scalar @{$objects} == 0){
+        return undef;
+    }
+    if (scalar @{$objects} == 1){
+        return $objects->[0];
+    }
+    my $resolved = LimitRecord->new_empty();
+    foreach my $object (@{$objects}){
+        foreach my $field (keys %{$object}){
+            # merge each field into the resolved limit
+            my $new_value = $object->{$field};
+            if (exists $resolved->{$field}){
+                # compare the two fields
+                my $current_value = $resolved->{$field};
+                my $current_value_clean = $current_value;
+                $current_value_clean = "undef" unless defined $current_value_clean;
+                my $new_value_clean = $new_value;
+                $new_value_clean = "undef" unless defined $new_value_clean;
+                if ($new_value_clean eq $current_value_clean){
+                    # no problem
+                }else{
+                    confess "Unresolvable conflicts for $field on two records";
+                }
+            }else{
+                $resolved->{$field} = $new_value;
+            }
+        }
+    }
+    return $resolved;
 }
 
 1;
