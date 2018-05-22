@@ -6,13 +6,22 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Database::Connect;
-use SMS::SMSDigest;
-use LimitDatabase::LimitRecord;
-use Parse::BooleanExpression;
 
 my $f_summary_records_for_parameter_sth;
 my $factory_summary_table = "f_summary";
 my $all_f_summary_parameters_for_technology_sth;
+
+sub process_technology{
+    my ($technology) = @_;
+    my $parms = get_all_f_summary_parameters_for_technology($technology);
+    my @functional;
+    my @limits;
+    foreach my $parm (@{$parms}){
+        my $records = get_f_summary_records_for_parameter($technology, $parameter);
+        my $sms = 
+        my ($func, $lim) = ParameterProcessing::process_f_summary_parameter_records($records, $sms);
+    }
+}
 
 # returns array of hash-refs for records on parameter/tech.  Keys in hashref are all uppercase
 sub get_f_summary_records_for_parameter{
@@ -53,6 +62,9 @@ sub get_all_f_summary_parameters_for_technology{
     $sth->execute($technology) or confess "Could not get all parameters from f_summary";
     my $records = $sth->fetchall_arrayref();
     my @parameters = map {$_->[0]} @{$records};
+    if (scalar @parameters == 0){
+        confess "Could not find any F-summary entries for $technology";
+    }
     return \@parameters;
 }
 

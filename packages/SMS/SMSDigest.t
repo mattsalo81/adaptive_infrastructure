@@ -34,3 +34,6 @@ my $eff = SMSDigest::get_all_effective_routings_in_tech($known_tech);
 ok(defined ($eff), "Got some device for $known_tech");
 ok(in_list($known_eff_rout, $eff), "Found $known_eff_rout in active list for $known_tech");
 
+my $rec = SMSDigest::get_entries_for_tech("$known_tech");
+ok(scalar @{$rec} > 100, "Found at least 100 records for $known_tech");
+is($rec->[0]->{"TECHNOLOGY"}, $known_tech, "NAME_uc hash format used");
