@@ -21,4 +21,12 @@ ok(in_list($records->[1]->{"PROCESS_OPTIONS"}, ["OPTION2"]), "Found known proces
 ok($records->[0]->{"PROCESS_OPTIONS"} ne $records->[1]->{"PROCESS_OPTIONS"}, "Found 2 distinct process options on a known parmaeter");
 ok(! defined $records->[2], "Didn't find anything unexpected");
 
+# getting parmaeters from f_summary
+my $parms = ProcessSummary::get_all_f_summary_parameters_for_technology("TEST_PARM_TECH");
+is(scalar @{$parms}, 4, "Got all four parms");
+my @parms = sort @{$parms};
+is($parms[0], 'P1', "Correct Names");
+is($parms[1], 'P2', "Correct Names");
+is($parms[2], 'P3', "Correct Names");
+is($parms[3], 'P4', "Correct Names");
 

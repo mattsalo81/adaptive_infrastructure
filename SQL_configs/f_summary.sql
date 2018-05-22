@@ -60,3 +60,12 @@ insert into f_summary (technology, etest_name, process_options) values
 ('TEST_GOOD_TECH', 'DIFF_OPT', 'OPTION1');
 insert into f_summary (technology, etest_name, process_options) values 
 ('TEST_GOOD_TECH', 'DIFF_OPT', 'OPTION2');
+-- Getting all parms for tech
+insert into f_summary (technology, etest_name, process_options) values 
+('TEST_PARM_TECH', 'P1', 'BASELINE');
+insert into f_summary (technology, etest_name, process_options) values 
+('TEST_PARM_TECH', 'P2', 'BASELINE');
+insert into f_summary (technology, etest_name, process_options) values 
+('TEST_PARM_TECH', 'P3', 'BASELINE');
+insert into f_summary (technology, etest_name, process_options) values 
+('TEST_PARM_TECH', 'P4', 'BASELINE');
