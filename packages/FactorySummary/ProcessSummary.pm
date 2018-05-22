@@ -8,6 +8,7 @@ use Logging;
 use Database::Connect;
 use FactorySummary::ParameterProcessing;
 use SMS::SMSDigest;
+use ProcessOptions::OptionLookup;
 
 my $f_summary_records_for_parameter_sth;
 my $factory_summary_table = "f_summary";
@@ -18,11 +19,21 @@ sub process_technology{
     my $parms = get_all_f_summary_parameters_for_technology($technology);
     my @functional;
     my @limits;
+    # Get all SMS records for the technology
+    my $all_sms = SMSDigest::get_entries_for_tech($technology);
+    # remove sms records where the effective routing does not have process options populated
+    my @sms = map {OptionLookup::are_options_available_for_effective_routing($technology, $_->{"EFFECTIVE_ROUTING"}) ? $_ : ()} @{$all_sms};
+    my $test_areas = SMSDigest::convert_sms_records_into_area_to_effective_routing_lookup(\@sms);
+    Logging::event("Processing Factory Summary for $technology");
+    ParameterProcessing::reset_memoization();
     foreach my $parameter (@{$parms}){
+        Logging::debug("Processing Factory Summary for $technology - $parameter");
         my $records = get_f_summary_records_for_parameter($technology, $parameter);
-        my $sms = SMSDigest::get_entries_for_tech($technology);
-        my ($func, $lim) = ParameterProcessing::process_f_summary_parameter_records($records, $sms);
+        my ($func, $lim) = ParameterProcessing::process_f_summary_parameter_records($records, $test_areas);
+        push @functional, @{$func};
+        push @limits, @{$lim};
     }
+    return (\@functional, \@limits);
 }
 
 # returns array of hash-refs for records on parameter/tech.  Keys in hashref are all uppercase

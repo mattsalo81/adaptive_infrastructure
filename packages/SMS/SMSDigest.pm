@@ -89,4 +89,29 @@ sub get_all_active_devices{
     return \@devices
 }
 
+sub convert_sms_records_into_area_to_effective_routing_lookup{
+    my ($sms_records) = @_;
+    my %lookup;
+    # build a unique list of all effecitve routing and test area combinations
+    foreach my $rec (@{$sms_records}){
+        my $area = $rec->{"AREA"};
+        my $effective_routing = $rec->{"EFFECTIVE_ROUTING"};
+        unless (defined $area){
+            confess "Could not extract area from record";
+        }
+        unless (defined $effective_routing){
+            confess "Could not extract effective routing from record";
+        }
+        $lookup{$area} = {} unless scalar keys %{$lookup{$area}};
+        $lookup{$area}->{$effective_routing} = "yep";
+    }
+    # return a simplified list of test areas to effective routings
+    my %area_to_routings;
+    foreach my $area (keys %lookup){
+        $area_to_routings{$area} = [keys %{$lookup{$area}}];
+    }
+    return \%area_to_routings;
+}
+
+
 1;

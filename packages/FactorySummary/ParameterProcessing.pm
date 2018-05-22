@@ -8,15 +8,20 @@ use Logging;
 use Database::Connect;
 use LimitDatabase::LimitRecord;
 use Parse::BooleanExpression;
+use SMS::SMSDigest;
 
 # this package is meant to process a block of f-summary records for a particular technology/parameter against SMS records from the digest
 # process_f_summary_parameter_records will return the functional parameters and the entries for the limitsdb
 
+my %memoize;
 
+sub reset_memoization{
+    %memoize = ();
+}
 
 # takes 
 #               arrayref of hashrefs for a particular parameter from the f_summary
-#               arrayref of sms records (hashref, NAME_uc) from the daily_sms_extract
+#               hashref of TESTAREAS to arrayref of EFFECTIVE_ROUTING
 # returns array of 
 #               arrayref of hashref of {'EFFECTIVE ROUTING', 'TEST_AREA', 'TECHNOLOGY', 'PARAMETER'}
 #               arrayref of records to add to limitsdb
@@ -28,7 +33,7 @@ sub process_f_summary_parameter_records{
 
 # main body of expression, takes a lambda function to decouple testing from the process option DB
 sub _process_f_summary_parameter_records{
-    my ($records, $sms_extracts, $check_match_lambda) = @_;
+    my ($records, $test_areas, $check_match_lambda) = @_;
     my @limit_records;
     my @functional_eff_rout;
 
@@ -47,9 +52,6 @@ sub _process_f_summary_parameter_records{
     unless (defined $parameter){
         confess "Could not extract PARAMETER from first record of f_summary records";
     }
-   
-    # get test area data structure 
-    my $test_areas = convert_sms_records_into_area_to_effective_routing_lookup($sms_extracts);    
 
     # create the technology level record
     my $tech_rec = LimitRecord->new_copy_from_f_summary($records->[0]);
@@ -113,31 +115,12 @@ sub does_f_summary_record_match_effective_routing_options{
     unless(defined $requirements){
         confess "Could not extract process options requirements from record";
     }
-    return BooleanExpression::does_effective_routing_match_expression_using_database($technology, $effective_routing, $requirements);
-}
+    my $key = "$technology $requirements $effective_routing";
+    unless (defined $memoize{$key}){
+        $memoize{$key} = BooleanExpression::does_effective_routing_match_expression_using_database($technology, $effective_routing, $requirements);
+    }
+    return $memoize{$key};
 
-sub convert_sms_records_into_area_to_effective_routing_lookup{
-    my ($sms_records) = @_;
-    my %lookup;
-    # build a unique list of all effecitve routing and test area combinations
-    foreach my $rec (@{$sms_records}){
-        my $area = $rec->{"AREA"};
-        my $effective_routing = $rec->{"EFFECTIVE_ROUTING"};
-        unless (defined $area){
-            confess "Could not extract area from record";
-        }
-        unless (defined $effective_routing){
-            confess "Could not extract effective routing from record";
-        }
-        $lookup{$area} = {} unless scalar keys %{$lookup{$area}};
-        $lookup{$area}->{$effective_routing} = "yep";
-    }
-    # return a simplified list of test areas to effective routings 
-    my %area_to_routings;
-    foreach my $area (keys %lookup){
-        $area_to_routings{$area} = [keys %{$lookup{$area}}];
-    }
-    return \%area_to_routings;
 }
 
 1;

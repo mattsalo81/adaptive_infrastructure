@@ -6,6 +6,7 @@ require Test::Homebrew_Exception;
 require Test::Lists;
 use FactorySummary::ParameterProcessing;
 use Carp;
+use SMS::SMSDigest;
 
 # used for decoupling process option checks from process option db
 my $test_lambda = sub {
@@ -34,10 +35,10 @@ my $records = [
             'ETEST_NAME' => 'DIFF_OPT',
           },
         ];
-my $sms = [
-    {AREA => "PARAMETRIC", EFFECTIVE_ROUTING => "TEST1"},
-];
-my ($functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $sms, $test_lambda);
+my $lookup = {
+    PARAMETRIC  => ["TEST1"]
+};
+my ($functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $lookup, $test_lambda);
 is(scalar @{$limits}, 1, "Found exactly one limit for test case 1");
 is($limits->[0]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
 is($limits->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");
@@ -65,10 +66,10 @@ $records = [
             'ETEST_NAME' => 'DIFF_OPT',
           },
         ];
-$sms = [
-    {AREA => "PARAMETRIC", EFFECTIVE_ROUTING => "TEST1"},
-];
-($functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $sms, $test_lambda);
+$lookup = {
+    PARAMETRIC  => ["TEST1"]
+};
+($functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $lookup, $test_lambda);
 is(scalar @{$limits}, 2, "Found exactly 2 limits for test case 2");
 is($limits->[0]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
 is($limits->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");
