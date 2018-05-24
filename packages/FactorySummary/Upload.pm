@@ -23,7 +23,7 @@ sub update_technology_info_functional_and_limits{
     my ($technology) = @_;
     eval{
         my ($info, $func, $lim) = ProcessSummary::process_technology($technology);
-        update_functional_and_limits($technology, $info, $func, $lim);
+        update_info_functional_and_limits($technology, $info, $func, $lim);
         1;
     }or do{
         my $e = $@;
