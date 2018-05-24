@@ -13,6 +13,7 @@ my $raw_table = 'raw_component_info';
 my $output_table = 'component_info';
 
 my $device_fully_defined_sth;
+my $device_has_components_sth;
 
 sub update_component_info{
     my $techs = SMSDigest::get_all_technologies();
@@ -82,6 +83,7 @@ sub get_undefined_comps{
     return \@undefined_comps;
 }
 
+# checks if a device's raw components are all defined in the cross reference
 sub get_device_fully_defined_sth{
     unless (defined $device_fully_defined_sth){
         my $sql = qq{
@@ -128,5 +130,34 @@ sub get_update_etest_comps_sql{
     };
     return $sql;
 }
+
+sub get_number_components_on_device{
+    my ($technology, $device) = @_;
+    my $sth = get_device_has_components_sth();
+    $sth->execute($technology, $device);
+    # return first value of first record
+    return $sth->fetchrow_arrayref()->[0];
+}
+
+sub get_device_has_components_sth{
+    unless (defined $device_has_components_sth){
+        my $conn = Connect::read_only_connection("etest");
+        my $sql = q{
+            select
+                count(component)
+            from
+                component_info
+            where
+                TECHNOLOGY = ?
+                and device = ?
+        };
+        $device_has_components_sth = $conn->prepare($sql);
+    }
+    unless (defined $device_has_components_sth){
+        confess "could not get device_has_components_sth";
+    }
+    return $device_has_components_sth;
+}
+
 
 1;
