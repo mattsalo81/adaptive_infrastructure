@@ -33,5 +33,3 @@ is($parms[2], 'P3', "Correct Names");
 is($parms[3], 'P4', "Correct Names");
 
 dies_ok(sub{ProcessSummary::get_all_f_summary_parameters_for_technology("I DON'T EXIST")}, "get parms from Non existant technology");
-
-ProcessSummary::process_technology('LBC5');

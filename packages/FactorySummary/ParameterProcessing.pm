@@ -37,6 +37,7 @@ sub process_f_summary_parameter_records{
 # main body of expression, takes a lambda function to decouple testing from the process option DB
 sub _process_f_summary_parameter_records{
     my ($records, $test_areas, $check_match_lambda) = @_;
+    my $parameter_info;
     my @limit_records;
     my @functional_eff_rout;
 
@@ -68,7 +69,7 @@ sub _process_f_summary_parameter_records{
     push @limit_records, @{$tech_rec->create_copies_at_each_area([keys %{$test_areas}])};
 
     # Assert that there are no unresolvable conflicts for fields going into the functionality table
-    assert_constraints_for_functional_parameter_table($records);
+    $parameter_info = get_parameter_info($records);
 
     # determine which routings are functional
     my @effective_routing_limits;
@@ -85,13 +86,7 @@ sub _process_f_summary_parameter_records{
                         TEST_AREA             =>        $area,
                         TECHNOLOGY            =>        $technology,
                         ETEST_NAME            =>        $parameter,
-                        SVN                   =>        $record->{"SVN"},
-                        COMPONENT             =>        $record->{"COMPONENT"},
-                        PARM_TYPE_PCD         =>        $record->{"PARM_TYPE_PCD"},
-                        TEST_TYPE             =>        $record->{"TEST_TYPE"},
-                        DESCRIPTION           =>        $record->{"DESCRIPTION"},
                     };
-                    
                     # store record as matching
                     push @matching_records, $record;
                 }
@@ -115,7 +110,7 @@ sub _process_f_summary_parameter_records{
         push @limit_records, @effective_routing_limits;
     }
 
-    return (\@functional_eff_rout, \@limit_records);
+    return ($parameter_info, \@functional_eff_rout, \@limit_records);
 }
 
 sub does_f_summary_record_match_effective_routing_options{
@@ -137,13 +132,40 @@ sub does_f_summary_record_match_effective_routing_options{
 }
 
 #my @functional_fields = q(technology test_area effective_routing etest_name svn component parm_type_pcd test_type description);
-sub assert_constraints_for_functional_parameter_table{
+sub get_parameter_info{
     my ($parameter_f_summary_records) = @_;
-    # All records must have identical values, otherwise print a warning
+    
+    # input checking
+    if(scalar @{$parameter_f_summary_records} == 0){
+        confess "Could not get parameter information, because no records provided";
+    }
+    my $record = $parameter_f_summary_records->[0];
+    
+    my $technology = $record->{"TECHNOLOGY"};
+    my $parameter = $record->{"ETEST_NAME"};
+
+    unless(defined $technology){
+        confess "Could not extract TECHNOLOGY from record";
+    }
+    unless(defined $parameter){
+        confess "Could not extract PARAMETER from record";
+    }
+
+    # create the parameter info record
+    my $parm_info = {
+        TECHNOLOGY            =>        $technology,
+        ETEST_NAME            =>        $parameter,
+        SVN                   =>        $record->{"SVN"},
+        COMPONENT             =>        $record->{"COMPONENT"},
+        PARM_TYPE_PCD         =>        $record->{"PARM_TYPE_PCD"},
+        TEST_TYPE             =>        $record->{"TEST_TYPE"},
+        DESCRIPTION           =>        $record->{"DESCRIPTION"},
+    };
+
+    # All records must have identical values, otherwise die
     if(scalar @{$parameter_f_summary_records} > 1){
         # use the last one as the reference
         my $ref = $parameter_f_summary_records->[-1];
-        my $parameter = $ref->{"ETEST_NAME"};
         foreach my $other (@{$parameter_f_summary_records}[0..-2]){
             foreach my $field (@functional_fields){
                 my $ref_c = $ref->{$field};
@@ -156,6 +178,8 @@ sub assert_constraints_for_functional_parameter_table{
             }
         }
     }
+
+    return $parm_info;
 }
 
 1;

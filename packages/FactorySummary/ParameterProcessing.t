@@ -43,23 +43,27 @@ my $records = [
 my $lookup = {
     PARAMETRIC  => ["TEST1"]
 };
-my ($functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $lookup, $test_lambda);
+my ($info, $functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $lookup, $test_lambda);
 is(scalar @{$limits}, 1, "Found exactly one limit for test case 1");
 is($limits->[0]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
 is($limits->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");
 is($limits->[0]->{"ITEM_TYPE"}, "TECHNOLOGY", "Correctly set at technology level");
 is($limits->[0]->{"ITEM"}, 'TEST_GOOD_TECH', "Correctly set to technology");
 is(scalar @{$functional}, 1, "Found exactly one functional parameter entry");
-is(scalar keys %{$functional->[0]}, 9, "Found nine fields in the functional parameter");
+is(scalar keys %{$functional->[0]}, 4, "Found four fields in the functional parameter");
 is($functional->[0]->{"TECHNOLOGY"}, 'TEST_GOOD_TECH', "Technology in functional parameter");
 is($functional->[0]->{"EFFECTIVE_ROUTING"}, 'TEST1', "EFFECTIVE ROUTING in functional parameter");
 is($functional->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "ETEST name in functional parameter");
 is($functional->[0]->{"TEST_AREA"}, 'PARAMETRIC', "Test area name in functional parameter");
-is($functional->[0]->{"SVN"}, 'THE NAME', "SVN name in functional parameter");
-is($functional->[0]->{"COMPONENT"}, 'TRANSISTOR', "Component in functional parameter");
-is($functional->[0]->{"PARM_TYPE_PCD"}, 'WAS', "Parm type in functional parameter");
-is($functional->[0]->{"TEST_TYPE"}, 'TRANSISTOR', "test type in functional parameter");
-is($functional->[0]->{"DESCRIPTION"}, 'Whatever dude', "description in functional parameter");
+
+is(scalar keys %{$info}, 7, "Found component info fields");
+is($info->{"ETEST_NAME"}, 'DIFF_OPT', "ETEST name in parameter info");
+is($info->{"TECHNOLOGY"}, 'TEST_GOOD_TECH', "Technology in parameter info");
+is($info->{"SVN"}, 'THE NAME', "SVN name in parameter info");
+is($info->{"COMPONENT"}, 'TRANSISTOR', "Component in parameter info");
+is($info->{"PARM_TYPE_PCD"}, 'WAS', "Parm type in parameter info");
+is($info->{"TEST_TYPE"}, 'TRANSISTOR', "test type in parameter info");
+is($info->{"DESCRIPTION"}, 'Whatever dude', "description in parameter info");
 
 # multiple parameter records
 $records = [
@@ -79,7 +83,7 @@ $records = [
 $lookup = {
     PARAMETRIC  => ["TEST1"]
 };
-($functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $lookup, $test_lambda);
+($info, $functional, $limits) = ParameterProcessing::_process_f_summary_parameter_records($records, $lookup, $test_lambda);
 is(scalar @{$limits}, 2, "Found exactly 2 limits for test case 2");
 is($limits->[0]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
 is($limits->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");

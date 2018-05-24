@@ -17,6 +17,7 @@ my $all_f_summary_parameters_for_technology_sth;
 sub process_technology{
     my ($technology) = @_;
     my $parms = get_all_f_summary_parameters_for_technology($technology);
+    my @parm_info;
     my @functional;
     my @limits;
     # Get all SMS records for the technology
@@ -29,11 +30,12 @@ sub process_technology{
     foreach my $parameter (@{$parms}){
         Logging::debug("Processing Factory Summary for $technology - $parameter");
         my $records = get_f_summary_records_for_parameter($technology, $parameter);
-        my ($func, $lim) = ParameterProcessing::process_f_summary_parameter_records($records, $test_areas);
+        my ($inf, $func, $lim) = ParameterProcessing::process_f_summary_parameter_records($records, $test_areas);
+        push @parm_info, $inf;
         push @functional, @{$func};
         push @limits, @{$lim};
     }
-    return (\@functional, \@limits);
+    return (\@parm_info, \@functional, \@limits);
 }
 
 # returns array of hash-refs for records on parameter/tech.  Keys in hashref are all uppercase

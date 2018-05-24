@@ -9,9 +9,17 @@ use Database::Connect;
 use LimitDatabase::LimitRecord;
 
 my $trans = Connect::new_transaction("etest");
+ok(defined FactorySummary::Upload::get_insert_info_sth($trans), "got sth for parm info");
 ok(defined FactorySummary::Upload::get_insert_functional_sth($trans), "got sth for functional parms");
 ok(defined FactorySummary::Upload::get_insert_limit_sth($trans), "got sth for limits db");
 
+my $info = [
+    {
+        TECHNOLOGY      => "TEST",
+        ETEST_NAME      => "TEST",
+        ETEST_NAME      => "TEST",
+    },
+];
 my $limits = 
 [
     bless {
@@ -32,6 +40,7 @@ my $functional =
         ETEST_NAME              => "TEST",
     },
 ];
+ok(FactorySummary::Upload::update_parm_info_list($trans, "TEST", $info), "parm_info updated, not committed");
 ok(FactorySummary::Upload::update_limit_list($trans, "TEST", $limits), "limits updated, not committed");
 ok(FactorySummary::Upload::update_functional_list($trans, "TEST", $functional), "functional updated, not committed");
 
