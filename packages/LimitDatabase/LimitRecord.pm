@@ -34,36 +34,31 @@ my %dummy_values = (
     LIMIT_COMMENTS              => "Dummy limit",
 );
 
-# all possible fields
-#my @all_fields = (
-#    'technology',
-#    'test_area',
-#    'item_type',
-#    'item',
-#    'etest_name',
-#    'deactivate',
-#    'sampling_rate',
-#    'dispo',
-#    'pass_criteria_percent',
-#    'reprobe_map',
-#    'dispo_rule',
-#    'spec_upper',
-#    'spec_lower',
-#    'reverse_spec_limit',
-#    'reliability',
-#    'reliability_upper',
-#    'reliability_lower',
-#    'reverse_reliability_limit',
-#    'limit_comments',
-#    'constraint',
-#);
-#@all_fields =~ map {tr/a-z/A-Z/; $_} @all_fields;
+# ITEM_TYPE priorities -> Bigger means more important
+my %priority = (
+    TECHNOLOGY  =>      1,
+    ROUTING     =>      2,
+    PROGRAM     =>      3,
+    DEVICE      =>      4,
+    LOT         =>      5,
+    WAFERNO     =>      6,
+);
+
 
 # fields that can be copied from an f_summary
 my   @fields_that_match_f_summary = qw(Technology etest_name deactivate sampling_rate dispo pass_criteria_percent);
 push @fields_that_match_f_summary, qw(reprobe_map dispo_rule spec_upper spec_lower reverse_spec_limit);
 push @fields_that_match_f_summary, qw(reliability reliability_upper reliability_lower reverse_reliability_limit);
 @fields_that_match_f_summary = map {tr/a-z/A-Z/; $_} @fields_that_match_f_summary;
+
+
+# all fields in the limits_database
+my @limit_fields = qw(technology test_area item_type item etest_name deactivate sampling_rate);
+push @limit_fields, qw(dispo pass_criteria_percent reprobe_map dispo_rule spec_upper spec_lower reverse_spec_limit);
+push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_reliability_limit limit_comments);
+@limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
+my %ok_fields;
+@ok_fields{@limit_fields} = @limit_fields;
 
 # a limit record is for populating/pulling from the limits DB
 
@@ -182,9 +177,58 @@ sub comment{
     $self->{"LIMIT_COMMENTS"} = $comment;
 }
 
-# just incase we switch from the hashref
-sub index_array{
-    my $self = shift;
-    return map {$self->{$_}} @_;
+sub get_ordered_keys{
+    my ($class) = @_;
+    return @limit_fields;
+
 }
+
+sub get_ordered_values{
+    my ($self) = @_;
+    return @{$self}{@limit_fields};
+}
+
+sub new_from_hash{
+    my ($class, $hash) = @_;
+    my $self = $class->new_empty();
+    $self->populate_from_hash($hash);
+    return $self;
+}
+
+sub populate_from_hash{
+    my ($self, $hashref) = @_;
+    foreach my $key (keys %{$hashref}){
+        if (defined $ok_fields{$key}){
+            $self->{$key} = $hashref->{$key};
+        }else{
+            confess "Tried to set a LimitRecord value for key $key, which is not a known key";
+        }
+    }
+    return $self;
+}
+
+sub choose_highest_priority{
+    my ($class, $limit1, $limit2) = @_;
+    my $type1 = $limit1->{"ITEM_TYPE"};
+    my $type2 = $limit2->{"ITEM_TYPE"};
+    unless (defined $type1){
+        confess "Limit1 does not have an item_type defined";
+    }
+    unless (defined $type2){
+        confess "Limit2 does not have an item_type defined";
+    }
+    my $p1 = $priority{$type1};
+    my $p2 = $priority{$type2};
+    unless (defined $p1){
+        confess "limit1 has an undefined priority level for item_type $type1";
+    }
+    unless (defined $p2){
+        confess "limit2 has an undefined priority level for item_type $type2";
+    }
+    return $limit1 if($p1 > $p2);
+    return $limit2 if($p1 < $p2);
+    confess "Both limits provided are set at the same item_type level";
+
+}
+
 1;

@@ -14,10 +14,6 @@ my @parm_info_fields = qw(technology etest_name svn component parm_type_pcd test
 my @functional_fields = qw(technology test_area effective_routing etest_name);
 @functional_fields = map {tr/a-z/A-Z/; $_} @functional_fields;
 
-my @limit_fields = qw(technology test_area item_type item etest_name deactivate sampling_rate);
-push @limit_fields, qw(dispo pass_criteria_percent reprobe_map dispo_rule spec_upper spec_lower reverse_spec_limit);
-push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_reliability_limit limit_comments);
-@limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
 
 sub update_technology_info_functional_and_limits{
     my ($technology) = @_;
@@ -104,8 +100,8 @@ sub get_insert_functional_sth{
 
 sub get_insert_limit_sth{
     my ($trans) = @_;
-    my $keys = join(", ", @limit_fields);
-    my $values = join(", ", ("?") x scalar @limit_fields);
+    my $keys = join(", ", LimitRecord->get_ordered_keys());
+    my $values = join(", ", ("?") x scalar LimitRecord->get_ordered_keys());
     my $sql = qq{
         insert into limits_database ($keys) values ($values)
     };
@@ -131,7 +127,7 @@ sub insert_functional{
 
 sub insert_limit{
     my ($sth, $limit) = @_;
-    $sth->execute($limit->index_array(@limit_fields));
+    $sth->execute($limit->get_ordered_values());
 }
 
 sub insert_info{

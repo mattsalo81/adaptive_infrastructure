@@ -68,6 +68,55 @@ is($merged->{"TECHNOLOGY"}, 'TECH', "Correct merged result for technology");
 $lim2->{"TECHNOLOGY"} = 'TACH';
 dies_ok(sub{LimitRecord->merge([$lim1, $lim2])}, "Cannot resolve differing values (technology)");
 
+# keys/values
+my @keys = LimitRecord->get_ordered_keys();
+ok(scalar @keys > 10, "Found at least 10 keys");
+ok(in_list("TECHNOLOGY", \@keys), "Found TECHNOLOGY in keys");
+
+$lim1->{"TECHNOLOGY"} = "TEST";
+my @values = $lim1->get_ordered_values();
+is(scalar @keys, scalar @values, "Same number of keys and values");
+ok(in_list("TEST", \@values), "Found TECHNOLOGY in values");
+
+for (my $i = 0; $i < scalar @keys; $i++){
+    if ($keys[$i] eq 'TECHNOLOGY'){
+        is($values[$i], "TEST", "Found technology key and value at same index");
+    }
+}
+
+# new/populate from hash
+
+my $hash = {
+    TECHNOLOGY => "TESTHASH",
+};
+
+$lim = LimitRecord->new_from_hash($hash);
+is($lim->{"TECHNOLOGY"}, "TESTHASH", "Created new LimitRecord from hash");
+
+$hash = {
+    MANEATER    => "here she comes",
+};
+
+dies_ok(sub{$lim = LimitRecord->new_from_hash($hash)}, "Creating LimitRecord from hash with unexpected field");
+
+
+# limit priorities
+
+my $tech_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"TECHNOLOGY"});
+my $rout_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"ROUTING"});
+my $prog_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"PROGRAM"});
+my $dev_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"DEVICE"});
+my $bad_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"SLDKFJSDF"});
+
+is($dev_limit, LimitRecord->choose_highest_priority($dev_limit, $tech_limit), "Resolving TECH/DEV limits");
+is($dev_limit, LimitRecord->choose_highest_priority($tech_limit, $dev_limit), "Resolving TECH/DEV limits");
+is($prog_limit, LimitRecord->choose_highest_priority($prog_limit, $tech_limit), "Resolving TECH/PROG limits");
+is($prog_limit, LimitRecord->choose_highest_priority($prog_limit, $rout_limit), "Resolving TECH/ROUT limits");
+dies_ok(sub{LimitRecord->choose_highest_priority($prog_limit, $prog_limit)}, "Two limits at same item level");
+dies_ok(sub{LimitRecord->choose_highest_priority($bad_limit, $prog_limit)}, "limit with unexpected item_type");
+
+
+
 
 
 
