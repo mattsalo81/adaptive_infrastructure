@@ -102,10 +102,10 @@ dies_ok(sub{$lim = LimitRecord->new_from_hash($hash)}, "Creating LimitRecord fro
 
 # limit priorities
 
-my $tech_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"TECHNOLOGY"});
-my $rout_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"ROUTING"});
-my $prog_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"PROGRAM"});
-my $dev_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"DEVICE"});
+my $tech_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"TECHNOLOGY", ETEST_NAME=>"TEST1"});
+my $rout_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"ROUTING", ETEST_NAME=>"TEST2"});
+my $prog_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"PROGRAM", ETEST_NAME=>"TEST2"});
+my $dev_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"DEVICE", ETEST_NAME=>"TEST1"});
 my $bad_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"SLDKFJSDF"});
 
 is($dev_limit, LimitRecord->choose_highest_priority($dev_limit, $tech_limit), "Resolving TECH/DEV limits");
@@ -115,8 +115,13 @@ is($prog_limit, LimitRecord->choose_highest_priority($prog_limit, $rout_limit), 
 dies_ok(sub{LimitRecord->choose_highest_priority($prog_limit, $prog_limit)}, "Two limits at same item level");
 dies_ok(sub{LimitRecord->choose_highest_priority($bad_limit, $prog_limit)}, "limit with unexpected item_type");
 
-
-
+# resolving a table
+my $resolved = LimitRecord->resolve_limit_table([$tech_limit, $dev_limit]);
+ok(lists_identical($resolved, [$dev_limit]), "Correctly resolved tech and device limit");
+$resolved = LimitRecord->resolve_limit_table([$rout_limit, $prog_limit]);
+ok(lists_identical($resolved, [$prog_limit]), "Correctly resolved routing and program limit");  
+$resolved = LimitRecord->resolve_limit_table([$tech_limit, $rout_limit, $prog_limit, $dev_limit]);
+ok(lists_identical($resolved, [$dev_limit, $prog_limit]), "Correctly resolved four limits on two parameters, in the order that the parameters originally appeared");  
 
 
 

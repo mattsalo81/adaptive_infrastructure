@@ -26,11 +26,6 @@ sub get_all_limits{
     return \@limits;
 }
 
-sub resolve_limit_table{
-    my ($limits) = @_;
-    
-}
-
 sub get_limits_sth{
     unless (defined $limits_sth){
         my $conn = Connect::read_only_connection("etest");

@@ -7,5 +7,8 @@ require Test::Lists;
 use LimitDatabase::GetLimit;
 use Data::Dumper;
 
+# resolve limits table
+
+
 my $limits = GetLimit::resolve_all("LBC5", "PARAMETRIC__A72AF3BS-X", "M06CF140XXA0", "M06ECF140XXA1S");
 print Dumper($limits);

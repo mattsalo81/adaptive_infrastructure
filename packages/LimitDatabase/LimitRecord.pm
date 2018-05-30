@@ -228,7 +228,27 @@ sub choose_highest_priority{
     return $limit1 if($p1 > $p2);
     return $limit2 if($p1 < $p2);
     confess "Both limits provided are set at the same item_type level";
+}
 
+sub resolve_limit_table{
+    my ($class, $limits) = @_;
+    my @order;
+    my %etest_name_limit;
+    foreach my $limit (@{$limits}){
+        # get dies on failure, no need to check
+        my $etest_name = $limit->get("ETEST_NAME");
+        if(defined $etest_name_limit{$etest_name}){
+            #resolve the limits
+            Logging::diag("Resolving priority for two limits on $etest_name");
+            $limit = LimitRecord->choose_highest_priority($limit, $etest_name_limit{$etest_name});
+        }else{
+            # add the etest_name to the order
+            push @order, $etest_name;
+        }
+        $etest_name_limit{$etest_name} = $limit;
+    }
+    my @resolved_limits = @etest_name_limit{@order};
+    return \@resolved_limits;
 }
 
 1;
