@@ -5,7 +5,7 @@ create table limits_database  (
     item                        varchar2 (32)   not null,
     etest_name                  varchar2 (32)   not null,
     deactivate                  varchar2 (1)    default 'N',
-    sampling_rate               varchar2 (3)    check (sampling_rate in ('MON', 'WAS', 'REL')),
+    sampling_rate               varchar2 (15)   default 'RANDOM',
     dispo                       varchar2 (1),
     pass_criteria_percent       number   (2,2),
     reprobe_map                 varchar2 (32),
@@ -46,6 +46,7 @@ create table limits_database  (
                                         and reliability_upper >= reliability_lower
                                         and reverse_reliability_limit in ('Y', 'N')
         ),
+    constraint ld_sample check (sampling_rate in ('RANDOM', '5 SITE', '9 SITE')),
     constraint ld_deac check (deactivate in ('Y', 'N')),
     constraint ld_funny check (item_type != 'TECHNOLOGY' or technology = item)
 

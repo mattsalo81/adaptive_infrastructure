@@ -27,9 +27,9 @@ sub convert{
         my @parms = map {$_->[0]} @{$parms};
         
         # prepare upload
-        my $up_sql = q{insert into f_summary (technology, etest_name, process_options, component, deactivate, dispo, pass_criteria_percent,
+        my $up_sql = q{insert into f_summary (technology, etest_name, process_options, component, sampling_rate, deactivate, dispo, pass_criteria_percent,
                             spec_upper, spec_lower, reverse_spec_limit, reliability, reliability_upper, reliability_lower, reverse_reliability_limit)
-                             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)};
+                             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)};
         my $up_sth = $trans->prepare($up_sql);
 
         foreach my $parm (@parms){
@@ -43,6 +43,7 @@ sub convert{
                 # Rel stuff
                 my ($rel, $url, $lrl, $rio);
                 my ($dispo, $pass, $usl, $lsl, $io);
+                my $sampling = "RANDOM";
                 if (defined ($rec->{"REL"}) && $rec->{"REL"} ne "N"){
                     unless(defined($rec->{"U_SPEC"}) && defined($rec->{"L_SPEC"})){
                         print Dumper $rec;
@@ -52,6 +53,7 @@ sub convert{
                     $url = sprintf("%G", $rec->{"U_SPEC"});
                     $lrl = sprintf("%G", $rec->{"L_SPEC"});
                     $rio = "N";
+                    $sampling = "9 SITE";
                 } elsif (defined ($rec->{"WAS"}) && $rec->{"WAS"} ne "N"){
                     unless(defined($rec->{"U_SPEC"}) && defined($rec->{"L_SPEC"})){
                         print Dumper $rec;
@@ -62,6 +64,7 @@ sub convert{
                     $usl = sprintf("%G", $rec->{"U_SPEC"});
                     $lsl = sprintf("%G", $rec->{"L_SPEC"});
                     $io = "N";
+                    $sampling = "5 SITE";
                 }
                 # options
                 my $options = $rec->{"OPTIONS"};
@@ -72,11 +75,11 @@ sub convert{
                     $deactivate = "Y";
                 }
                 # keep track of things done already
-                my @stuff = ($output_tech, $parm, $options, $rec->{"COMMENTS"}, $deactivate, $dispo, $pass, $usl, $lsl, $io, $rel, $url, $lrl, $rio);
+                my @stuff = ($output_tech, $parm, $options, $rec->{"COMMENTS"}, $sampling, $deactivate, $dispo, $pass, $usl, $lsl, $io, $rel, $url, $lrl, $rio);
                 my $string = join("-", map {$_ ||= ""} @stuff);
                 unless(defined $done{$string}){
                     # upload
-                    $up_sth->execute($output_tech, $parm, $options, $rec->{"COMMENTS"}, $deactivate, $dispo, $pass, $usl, $lsl, $io, $rel, $url, $lrl, $rio);
+                    $up_sth->execute($output_tech, $parm, $options, $rec->{"COMMENTS"}, $sampling, $deactivate, $dispo, $pass, $usl, $lsl, $io, $rel, $url, $lrl, $rio);
                     $done{$string} = "yep";
                 }
             }

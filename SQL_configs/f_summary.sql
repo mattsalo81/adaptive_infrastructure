@@ -2,7 +2,7 @@ create table f_summary (
     technology			varchar2 (16) 	not null,
     etest_name			varchar2 (32) 	not null,
     parm_type_pcd		varchar2 (3)	check (parm_type_pcd in ('MON', 'WAS', 'REL')),
-    sampling_rate		varchar2 (3)	check (sampling_rate in ('MON', 'WAS', 'REL')),
+    sampling_rate		varchar2 (16)	default 'RANDOM',
     svn				varchar2 (32),
     process_options		varchar2 (128),
     component			varchar2 (128),
@@ -48,7 +48,7 @@ create table f_summary (
                     and reliability_upper >= reliability_lower
                     and reverse_reliability_limit in ('Y', 'N')
     ),
-    
+    constraint fsum_sample check (sampling_rate in ('RANDOM', '5 SITE', '9 SITE')),
     constraint fsum_deac check (deactivate in ('Y', 'N'))
 
 );

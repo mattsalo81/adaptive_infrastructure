@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use Logging;
 
-
+my $number_format = '[-+]?[0-9]*(\.)?[0-9]+([eE][-+]?[0-9]+)?';
 
 # Configuration information
 my %item_types = (
@@ -19,7 +19,7 @@ my %item_types = (
 # Dummy Values
 my %dummy_values = (
     DEACTIVATE                  => 'Y',
-    SAMPLING_RATE               => 'MON',
+    SAMPLING_RATE               => 'RANDOM',
     DISPO                       => undef,
     PASS_CRITERIA_PERCENT       => undef,
     REPROBE_MAP                 => undef,
@@ -269,6 +269,21 @@ sub resolve_limit_table{
     }
     my @resolved_limits = @key_limit{@order};
     return \@resolved_limits;
+}
+
+sub get_spec_entry{
+    my ($self) = @_; 
+    my @entries;
+    my $parm = $self->get("ETEST_NAME");
+    # spec limit first
+    my $was = $self->get("DISPO");
+    if (defined $was && $was eq "Y"){
+        # generate a limit
+        my $lsl;
+    }
+
+
+
 }
 
 1;
