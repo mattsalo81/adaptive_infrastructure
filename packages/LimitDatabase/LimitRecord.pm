@@ -5,6 +5,7 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
 use Logging;
+use POSIX qw(ceil);
 
 my $number_format = '[-+]?[0-9]*(\.)?[0-9]+([eE][-+]?[0-9]+)?';
 
@@ -44,6 +45,11 @@ my %priority = (
     WAFERNO     =>      6,
 );
 
+# Mapping for sampling rates -> number of sites
+my %sampling = (
+    '5 SITE'    => 5,
+    '9 SITE'    => 9,
+);
 
 # fields that can be copied from an f_summary
 my   @fields_that_match_f_summary = qw(Technology etest_name deactivate sampling_rate dispo pass_criteria_percent);
@@ -271,19 +277,69 @@ sub resolve_limit_table{
     return \@resolved_limits;
 }
 
-sub get_spec_entry{
+# determine sampling rate from SAMPLING_RATE field
+sub how_many_sites_to_test{
+    my ($self) = @_;
+    my $sampling = $self->get("SAMPLING_RATE");
+    my $sites = $sampling{$sampling};
+    unless (defined $sites){
+        confess "Unexpected sampling rate $sampling";
+    }
+    return $sites;
+}
+
+# determine number of fails/wafer for a scrap dispo (from sampling rate and pass percentage)
+sub get_num_fails{
+    my ($self) = @_;
+    my $sites = $self->how_many_sites_to_test();
+    my $pass = $self->get("PASS_CRITERIA_PERCENT");
+    my $num_fails = ceil($sites * (1 - $pass));
+}
+
+# get scrap entry for a specfile, return undef or arrayref
+sub get_scrap_entry{
     my ($self) = @_; 
-    my @entries;
+    my $deactivate = $self->get("DEACTIVATE");
+    return undef if (defined $deactivate && $deactivate eq 'Y');
     my $parm = $self->get("ETEST_NAME");
-    # spec limit first
     my $was = $self->get("DISPO");
     if (defined $was && $was eq "Y"){
         # generate a limit
-        my $lsl;
+        my $fail = $self->get_num_fails();
+        my $lsl = $self->get("SPEC_LOWER");
+        my $usl = $self->get("SPEC_UPPER");
+        my $io = $self->get("REVERSE_SPEC_LIMIT");
+        $io = (($io eq "Y") ? 0 : 1);
+        return [$parm, $fail, $lsl, $usl, $io, 6];
     }
+    return undef;
+}
 
+# get reliability entry for a specfile, return undef or arrayref
+sub get_reliability_entry{
+    my ($self) = @_;
+    my $deactivate = $self->get("DEACTIVATE");
+    return undef if (defined $deactivate && $deactivate eq 'Y');
+    my $parm = $self->get("ETEST_NAME");
+    my $rel = $self->get("RELIABILITY");
+    if (defined $rel && $rel eq "Y"){
+        my $lrl = $self->get("RELIABILITY_LOWER");
+        my $url = $self->get("RELIABILITY_UPPER");
+        my $io = $self->get("REVERSE_RELIABILITY_LIMIT");
+        $io = ($io eq "Y") ? 0 : 1;
+        return [$parm, 1, $lrl, $url, $io, 2];
+    }
+    return undef; 
+}
 
-
+# return the comment if the limit is set at the program level or lower
+sub get_specfile_comment{
+    my ($self) = @_;
+    my $item_type = $self->get("ITEM_TYPE");
+    if ($item_type ne "TECHNOLOGY" && $item_type ne "ROUTING"){
+        return $self->get("LIMIT_COMMENTS");
+    }
+    return undef;
 }
 
 1;
