@@ -102,7 +102,7 @@ dies_ok(sub{$lim = LimitRecord->new_from_hash($hash)}, "Creating LimitRecord fro
 
 # limit priorities
 
-my $tech_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"TECHNOLOGY", ETEST_NAME=>"TEST1"});
+my $tech_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"TECHNOLOGY", ETEST_NAME=>"TEST1"});
 my $rout_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"ROUTING", ETEST_NAME=>"TEST2"});
 my $prog_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"PROGRAM", ETEST_NAME=>"TEST2"});
 my $dev_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"DEVICE", ETEST_NAME=>"TEST1"});
@@ -122,6 +122,20 @@ $resolved = LimitRecord->resolve_limit_table([$rout_limit, $prog_limit]);
 ok(lists_identical($resolved, [$prog_limit]), "Correctly resolved routing and program limit");  
 $resolved = LimitRecord->resolve_limit_table([$tech_limit, $rout_limit, $prog_limit, $dev_limit]);
 ok(lists_identical($resolved, [$dev_limit, $prog_limit]), "Correctly resolved four limits on two parameters, in the order that the parameters originally appeared");  
+dies_ok(sub{LimitRecord->resolve_limit_table([$tech_limit, $rout_limit, $prog_limit, $dev_limit, $dev_limit]);}, "Multiple limits on the same item_type level on a parameter");
 
+my $conflict_limit = {
+    TECHNOLOGY  => "TEST_TECH",
+    TEST_AREA   => "PARAMETRIC",
+    ITEM_TYPE   => "TECHNOLOGY",
+    ITEM        => "TECHNOLOGY",
+    ETEST_NAME  => "TEST_PARM",
+};
+
+my $eol_limit = LimitRecord->new_from_hash($conflict_limit);
+$conflict_limit->{"TEST_AREA"} = "METAL2";
+my $m2_limit = LimitRecord->new_from_hash($conflict_limit);
+$resolved = LimitRecord->resolve_limit_table([$m2_limit, $eol_limit]);
+ok(lists_identical($resolved, [$m2_limit, $eol_limit]), "Successfully resolved the m2 and eol limits separately");
 
 

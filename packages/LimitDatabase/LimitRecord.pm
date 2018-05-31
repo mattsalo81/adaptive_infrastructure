@@ -57,8 +57,17 @@ my @limit_fields = qw(technology test_area item_type item etest_name deactivate 
 push @limit_fields, qw(dispo pass_criteria_percent reprobe_map dispo_rule spec_upper spec_lower reverse_spec_limit);
 push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_reliability_limit limit_comments);
 @limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
+
+# accessory information that isn't technically part of the limits_database
+my @accessory_fields = qw(component effective_routing);
+@accessory_fields = map {tr/a-z/A-Z/; $_} @accessory_fields;
+
+# fields that are okay to have
 my %ok_fields;
 @ok_fields{@limit_fields} = @limit_fields;
+@ok_fields{@fields_that_match_f_summary} = @fields_that_match_f_summary;
+@ok_fields{@accessory_fields} = @accessory_fields;
+
 
 # a limit record is for populating/pulling from the limits DB
 
@@ -227,27 +236,38 @@ sub choose_highest_priority{
     }
     return $limit1 if($p1 > $p2);
     return $limit2 if($p1 < $p2);
-    confess "Both limits provided are set at the same item_type level";
+    confess "Both limits provided are set at the same item_type level. Limit1 = " . Dumper($limit1) . "\nLimit2 = " . Dumper($limit2);
 }
 
+# given an arbitrary list of limits, resolves conflicts of limits between limits of different priorities
+# IE, if two limits are given, both of the same technology, test_area, and etest_name, but set at different levels 
+# (say technology and device), the lower priority limit will be removed (technology)
 sub resolve_limit_table{
     my ($class, $limits) = @_;
+    # keep track of the order of the limits 
     my @order;
-    my %etest_name_limit;
+    my %key_limit;
+    Logging::debug("Resolving differend leveled limits");
     foreach my $limit (@{$limits}){
         # get dies on failure, no need to check
+        my $technology = $limit->get("TECHNOLOGY");
+        my $test_area = $limit->get("TEST_AREA");
         my $etest_name = $limit->get("ETEST_NAME");
-        if(defined $etest_name_limit{$etest_name}){
+
+        # generate a unique key for storing the order + current limit
+        my $key = join("__X__", ($technology, $test_area, $etest_name));
+
+        if(defined $key_limit{$key}){
             #resolve the limits
-            Logging::diag("Resolving priority for two limits on $etest_name");
-            $limit = LimitRecord->choose_highest_priority($limit, $etest_name_limit{$etest_name});
+            Logging::diag("Resolving priority for two limits on $key");
+            $limit = LimitRecord->choose_highest_priority($limit, $key_limit{$key});
         }else{
             # add the etest_name to the order
-            push @order, $etest_name;
+            push @order, $key;
         }
-        $etest_name_limit{$etest_name} = $limit;
+        $key_limit{$key} = $limit;
     }
-    my @resolved_limits = @etest_name_limit{@order};
+    my @resolved_limits = @key_limit{@order};
     return \@resolved_limits;
 }
 

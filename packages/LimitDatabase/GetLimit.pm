@@ -6,6 +6,7 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Database::Connect;
+use LimitRecord;
 
 my $limits_sth;
 
@@ -23,7 +24,7 @@ sub get_all_limits{
     while(my $rec = $sth->fetchrow_hashref("NAME_uc")){
         push @limits, LimitRecord->new_from_hash($rec);
     }
-    return \@limits;
+    return LimitRecord->resolve_limit_table(\@limits);
 }
 
 sub get_limits_sth{
