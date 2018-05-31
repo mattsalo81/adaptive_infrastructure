@@ -6,12 +6,12 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Database::Connect;
-use LimitRecord;
+use LimitDatabase::LimitRecord;
 
 my $limits_sth;
 
 sub get_all_limits{
-    my ($tech, $rout, $prog, $dev) = @_;
+    my ($tech, $area, $rout, $prog, $dev) = @_;
     my @limits;
     unless (defined $tech){
         confess "Cannot query limits without technology";
@@ -19,8 +19,17 @@ sub get_all_limits{
     unless (defined $rout){
         confess "Cannot query limits without effective_routing";
     }
+    if(defined $dev and not defined $prog){
+        confess "Cannot resolve limits at the device level without a valid program";
+    }
     my $sth = get_limits_sth();
-    $sth->execute($tech, $rout, $dev, $prog);
+    $sth->bind_param(':tech', $tech);
+    $sth->bind_param(':area', $area);
+    $sth->bind_param(':rout', $rout);
+    $sth->bind_param(':prog', $prog);
+    $sth->bind_param(':dev', $dev);
+
+    $sth->execute();
     while(my $rec = $sth->fetchrow_hashref("NAME_uc")){
         push @limits, LimitRecord->new_from_hash($rec);
     }
@@ -44,18 +53,14 @@ sub get_limits_sth{
                     and pi.etest_name = fp.etest_name
                 inner join limits_database ld
                     on  ld.technology = fp.technology
-                    and ld.etest_name = fp.etest_name
-            where
-                fp.technology = ?
-                and fp.effective_routing = ?
-                and ld.technology = fp.technology
-                and (
+                    and ld.test_area = fp.test_area
+                    and (
                         (
                             ld.item_type = 'DEVICE'
-                            and ld.item = ?
+                            and ld.item = :dev
                         ) or (
                             ld.item_type = 'PROGRAM'
-                            and ld.item = ?
+                            and ld.item = :prog
                         ) or (
                             ld.item_type = 'ROUTING'
                             and ld.item = fp.effective_routing
@@ -64,7 +69,11 @@ sub get_limits_sth{
                             and ld.item = fp.technology
                         )
                     )
-                and ld.etest_name = fp.etest_name
+                    and ld.etest_name = fp.etest_name
+            where
+                fp.technology = :tech
+                and fp.test_area = :area
+                and fp.effective_routing = :rout
             order by pi.component, fp.etest_name
         };
         $limits_sth = $conn->prepare($sql);

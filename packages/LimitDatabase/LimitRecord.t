@@ -103,10 +103,10 @@ dies_ok(sub{$lim = LimitRecord->new_from_hash($hash)}, "Creating LimitRecord fro
 # limit priorities
 
 my $tech_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"TECHNOLOGY", ETEST_NAME=>"TEST1"});
-my $rout_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"ROUTING", ETEST_NAME=>"TEST2"});
-my $prog_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"PROGRAM", ETEST_NAME=>"TEST2"});
-my $dev_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"DEVICE", ETEST_NAME=>"TEST1"});
-my $bad_limit = LimitRecord->new_from_hash({ITEM_TYPE=>"SLDKFJSDF"});
+my $rout_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"ROUTING", ETEST_NAME=>"TEST2"});
+my $prog_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"PROGRAM", ETEST_NAME=>"TEST2"});
+my $dev_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"DEVICE", ETEST_NAME=>"TEST1"});
+my $bad_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"SLDKFJSDF"});
 
 is($dev_limit, LimitRecord->choose_highest_priority($dev_limit, $tech_limit), "Resolving TECH/DEV limits");
 is($dev_limit, LimitRecord->choose_highest_priority($tech_limit, $dev_limit), "Resolving TECH/DEV limits");
@@ -138,4 +138,8 @@ my $m2_limit = LimitRecord->new_from_hash($conflict_limit);
 $resolved = LimitRecord->resolve_limit_table([$m2_limit, $eol_limit]);
 ok(lists_identical($resolved, [$m2_limit, $eol_limit]), "Successfully resolved the m2 and eol limits separately");
 
+$conflict_limit->{"TECHNOLOGY"} = "OTHER_TECH";
+my $m2_other_tech_limit = LimitRecord->new_from_hash($conflict_limit);
+$resolved = LimitRecord->resolve_limit_table([$m2_limit, $m2_other_tech_limit]);
+ok(lists_identical($resolved, [$m2_limit, $m2_other_tech_limit]), "Successfully resolved two limits on different technologies separately");
 
