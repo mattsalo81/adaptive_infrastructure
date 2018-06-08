@@ -7,6 +7,10 @@ use Data::Dumper;
 use Logging;
 use POSIX qw(ceil);
 
+# ============================================================== #
+# GLOBAL DATA AND CONFIGURATION                                  #
+# ============================================================== #
+
 my $number_format = '[-+]?[0-9]*(\.)?[0-9]+([eE][-+]?[0-9]+)?';
 
 # Configuration information
@@ -65,7 +69,7 @@ push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_r
 @limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
 
 # accessory information that isn't technically part of the limits_database
-my @accessory_fields = qw(component effective_routing);
+my @accessory_fields = qw(component effective_routing predecessor);
 @accessory_fields = map {tr/a-z/A-Z/; $_} @accessory_fields;
 
 # fields that are okay to have
@@ -75,6 +79,9 @@ my %ok_fields;
 @ok_fields{@accessory_fields} = @accessory_fields;
 
 
+# ============================================================== #
+# Basic class methods                                            #
+# ============================================================== #
 # a limit record is for populating/pulling from the limits DB
 
 sub new_empty{
@@ -89,55 +96,6 @@ sub new_copy{
     my $copy = LimitRecord->new_empty();
     %{$copy} = %{$ref};
     return $copy;
-}
-
-# put the information from the f_summary record into the limit object
-sub new_copy_from_f_summary{
-    my ($class, $f_summary_record) = @_;
-    my $obj = LimitRecord->new_empty();
-    return copy_matching_f_summary_fields($obj, $f_summary_record);
-}
-
-# copy over matching fields from the f_summary to the limit record
-sub copy_matching_f_summary_fields{
-    my ($self, $f_summary_record) = @_;
-    foreach my $field (@fields_that_match_f_summary){
-        $self->{$field} = $f_summary_record->{$field} if exists $f_summary_record->{$field};
-    }
-    return $self;
-}
-
-# set the Item Type -> used for resolve limits
-sub set_item_type{
-    my ($self, $item_type, $item) = @_;
-    $item_type =~ tr/a-z/A-Z/;
-    unless (defined $item_types{$item_type}){
-        confess "Tried to set a Limit Record to a non-standard item_type <$item_type>"
-    }
-    $self->{"ITEM_TYPE"} = $item_type;
-    $self->{"ITEM"} = $item;
-    return $self;
-}
-
-# override useful fields with dummy values 
-sub dummify{
-    my ($self) = @_;
-    foreach my $field (keys %dummy_values){
-        $self->{$field} = $dummy_values{$field};
-    }
-    return $self;
-}
-
-# create copies of $self at each area provided in the given arrayref
-sub create_copies_at_each_area{
-    my ($self, $areas) = @_;
-    my @copies;
-    foreach my $area (@{$areas}){
-        my $copy = $self->new_copy();
-        $copy->{"TEST_AREA"} = $area;
-        push @copies, $copy;
-    }
-    return \@copies;
 }
 
 # getter method, dies on nonexistant entry
@@ -222,6 +180,92 @@ sub populate_from_hash{
     return $self;
 }
 
+# ============================================================== #
+# Limit record manipulation methods                              #
+# ============================================================== #
+
+# set the Item Type -> used for resolve limits
+sub set_item_type{
+    my ($self, $item_type, $item) = @_;
+    $item_type =~ tr/a-z/A-Z/;
+    unless (defined $item_types{$item_type}){
+        confess "Tried to set a Limit Record to a non-standard item_type <$item_type>"
+    }
+    $self->{"ITEM_TYPE"} = $item_type;
+    $self->{"ITEM"} = $item;
+    return $self;
+}
+
+# put the information from the f_summary record into the limit object
+sub new_copy_from_f_summary{
+    my ($class, $f_summary_record) = @_;
+    my $obj = LimitRecord->new_empty();
+    return copy_matching_f_summary_fields($obj, $f_summary_record);
+}
+
+# copy over matching fields from the f_summary to the limit record
+sub copy_matching_f_summary_fields{
+    my ($self, $f_summary_record) = @_;
+    foreach my $field (@fields_that_match_f_summary){
+        $self->{$field} = $f_summary_record->{$field} if exists $f_summary_record->{$field};
+    }
+    return $self;
+}
+# override useful fields with dummy values 
+sub dummify{
+    my ($self) = @_;
+    foreach my $field (keys %dummy_values){
+        $self->{$field} = $dummy_values{$field};
+    }
+    return $self;
+}
+
+# create copies of $self at each area provided in the given arrayref
+sub create_copies_at_each_area{
+    my ($self, $areas) = @_;
+    my @copies;
+    foreach my $area (@{$areas}){
+        my $copy = $self->new_copy();
+        $copy->{"TEST_AREA"} = $area;
+        push @copies, $copy;
+    }
+    return \@copies;
+}
+
+sub remove_predecessor{
+    my ($self) = @_;
+    delete $self->{"PREDECESSOR"};
+}
+
+sub get_predecessor{
+    my ($self) = @_;
+    return $self->{"PREDECESSOR"};
+}
+
+# links the two limits by priority.  Returns the highest priority limit record
+# with the PREDECESSOR member pointing to the lower priority limit
+# if the PREDECESSOR member is already populated, the method will recursively call itself to link that limit with the
+# new predecessor
+# the result is a linked list of limits through the PREDECESSOR member in decreasing priority order.
+sub link_by_priority{
+    my ($class, $limit1, $limit2) = @_;
+    # order the two limits
+    my $successor = LimitRecord->choose_highest_priority($limit1, $limit2);
+    my $predecessor = ($limit1 eq $successor ? $limit2 : $limit1);
+    
+    # see if new successor has a predecessor 
+    my $current_predecessor = $successor->get_predecessor();
+    if (defined $current_predecessor){
+        # link the old/new predecessor
+        $successor->{"PREDECESSOR"} = LimitRecord->link_by_priority($predecessor, $current_predecessor);
+    }else{
+        # put our predecessor in
+        $successor->{"PREDECESSOR"} = $predecessor;
+    }
+    return $successor;
+}
+
+# returns the higher priority limit
 sub choose_highest_priority{
     my ($class, $limit1, $limit2) = @_;
     my $type1 = $limit1->{"ITEM_TYPE"};
@@ -255,6 +299,7 @@ sub resolve_limit_table{
     my %key_limit;
     Logging::debug("Resolving differend leveled limits");
     foreach my $limit (@{$limits}){
+        $limit->remove_predecessor();
         # get dies on failure, no need to check
         my $technology = $limit->get("TECHNOLOGY");
         my $test_area = $limit->get("TEST_AREA");
@@ -266,7 +311,7 @@ sub resolve_limit_table{
         if(defined $key_limit{$key}){
             #resolve the limits
             Logging::diag("Resolving priority for two limits on $key");
-            $limit = LimitRecord->choose_highest_priority($limit, $key_limit{$key});
+            $limit = LimitRecord->link_by_priority($limit, $key_limit{$key});
         }else{
             # add the etest_name to the order
             push @order, $key;
@@ -276,6 +321,10 @@ sub resolve_limit_table{
     my @resolved_limits = @key_limit{@order};
     return \@resolved_limits;
 }
+
+# ============================================================== #
+# Specfile generation methods                                    #
+# ============================================================== #
 
 # determine sampling rate from SAMPLING_RATE field
 sub how_many_sites_to_test{

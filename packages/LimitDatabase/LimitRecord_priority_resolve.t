@@ -47,10 +47,14 @@ dies_ok(sub{LimitRecord->choose_highest_priority($bad_limit, $prog_limit)}, "lim
 # resolving a table
 my $resolved = LimitRecord->resolve_limit_table([$tech_limit, $dev_limit]);
 ok(lists_identical($resolved, [$dev_limit]), "Correctly resolved tech and device limit");
+is($dev_limit->get_predecessor(), $tech_limit, "Tech limit set as dev limit's predecessor");
 $resolved = LimitRecord->resolve_limit_table([$rout_limit, $prog_limit]);
 ok(lists_identical($resolved, [$prog_limit]), "Correctly resolved routing and program limit");  
+is($prog_limit->get_predecessor(), $rout_limit, "ROUT limit set as prog limit's predecessor");
 $resolved = LimitRecord->resolve_limit_table([$tech_limit, $rout_limit, $prog_limit, $dev_limit]);
 ok(lists_identical($resolved, [$dev_limit, $prog_limit]), "Correctly resolved four limits on two parameters, in the order that the parameters originally appeared");  
+is($dev_limit->get_predecessor(), $tech_limit, "Tech limit set as dev limit's predecessor");
+is($prog_limit->get_predecessor(), $rout_limit, "ROUT limit set as prog limit's predecessor");
 dies_ok(sub{LimitRecord->resolve_limit_table([$tech_limit, $rout_limit, $prog_limit, $dev_limit, $dev_limit]);}, "Multiple limits on the same item_type level on a parameter");
 
 my $conflict_limit = {
