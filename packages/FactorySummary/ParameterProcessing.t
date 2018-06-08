@@ -7,6 +7,7 @@ require Test::Lists;
 use FactorySummary::ParameterProcessing;
 use Carp;
 use SMS::SMSDigest;
+use Data::Dumper;
 
 # used for decoupling process option checks from process option db
 my $test_lambda = sub {
@@ -49,6 +50,7 @@ is($limits->[0]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
 is($limits->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");
 is($limits->[0]->{"ITEM_TYPE"}, "TECHNOLOGY", "Correctly set at technology level");
 is($limits->[0]->{"ITEM"}, 'TEST_GOOD_TECH', "Correctly set to technology");
+ok($limits->[0]->{"LIMIT_COMMENTS"} =~ m/TRUE/, "Limit comment included the process options");
 is(scalar @{$functional}, 1, "Found exactly one functional parameter entry");
 is(scalar keys %{$functional->[0]}, 4, "Found four fields in the functional parameter");
 is($functional->[0]->{"TECHNOLOGY"}, 'TEST_GOOD_TECH', "Technology in functional parameter");
@@ -89,3 +91,13 @@ is($limits->[0]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
 is($limits->[0]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");
 is($limits->[0]->{"ITEM_TYPE"}, "TECHNOLOGY", "Correctly set at technology level");
 is($limits->[0]->{"ITEM"}, 'TEST_GOOD_TECH', "Correctly set to technology");
+ok($limits->[0]->is_dummy(), "Technology limit is dummy limit");
+is($limits->[1]->{"TEST_AREA"}, "PARAMETRIC", "Correctly set to test area");
+is($limits->[1]->{"ETEST_NAME"}, 'DIFF_OPT', "Correctly set to etest name");
+is($limits->[1]->{"ITEM_TYPE"}, "ROUTING", "Correctly set at routing level");
+is($limits->[1]->{"ITEM"}, 'TEST1', "Correctly set to routing");
+ok($limits->[1]->{"LIMIT_COMMENTS"} =~ m/TRUE/, "Limit comment included the process options");
+
+
+
+

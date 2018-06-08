@@ -97,18 +97,9 @@ is($rel, undef, "Is a reliability but is deactivated");
 # comments
 my $comment;
 $limit = LimitRecord->new_from_hash({ITEM_TYPE=>"TECHNOLOGY",LIMIT_COMMENTS=>"WHATEVER"});
-$comment = $limit->get_specfile_comment();
-is($comment, undef, "Comment at the technology level");
+$comment = $limit->get_comment();
+is($comment, 'WHATEVER', "Comment");
 
-$limit->{"ITEM_TYPE"} = "ROUTING";
-$comment = $limit->get_specfile_comment();
-is($comment, undef, "Comment at the ROUTING level");
-
-$limit->{"ITEM_TYPE"} = "PROGRAM";
-$comment = $limit->get_specfile_comment();
-is($comment, "WHATEVER", "Comment at the PROGRAM level");
-
-$limit->{"ITEM_TYPE"} = "DEVICE";
-$comment = $limit->get_specfile_comment();
-is($comment, "WHATEVER", "Comment at the DEVICE level");
-
+$limit->{"LIMIT_COMMENTS"} = undef;
+$comment = $limit->get_comment();
+is($comment, undef, "Comment undef");

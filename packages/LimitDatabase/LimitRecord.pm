@@ -21,6 +21,7 @@ my %item_types = (
     DEVICE            => 1,
 );
 
+my $dummy_comment = "Dummy limit";
 # Dummy Values
 my %dummy_values = (
     DEACTIVATE                  => 'Y',
@@ -36,7 +37,7 @@ my %dummy_values = (
     RELIABILITY_UPPER           => undef,
     RELIABILITY_LOWER           => undef,
     REVERSE_RELIABILITY_LIMIT   => undef,
-    LIMIT_COMMENTS              => "Dummy limit",
+    LIMIT_COMMENTS              => $dummy_comment,
 );
 
 # ITEM_TYPE priorities -> Bigger means more important
@@ -148,6 +149,15 @@ sub merge{
 sub comment{
     my ($self, $comment) = @_;
     $self->{"LIMIT_COMMENTS"} = $comment;
+}
+
+sub is_dummy{
+    my ($self) = @_;
+    my $comment = $self->{"LIMIT_COMMENTS"};
+    if (defined $comment){
+        return $comment eq $dummy_comment;
+    }
+    return 0;
 }
 
 sub get_ordered_keys{
@@ -381,14 +391,9 @@ sub get_reliability_entry{
     return undef; 
 }
 
-# return the comment if the limit is set at the program level or lower
-sub get_specfile_comment{
+sub get_comment{
     my ($self) = @_;
-    my $item_type = $self->get("ITEM_TYPE");
-    if ($item_type ne "TECHNOLOGY" && $item_type ne "ROUTING"){
-        return $self->get("LIMIT_COMMENTS");
-    }
-    return undef;
+    return $self->{"LIMIT_COMMENTS"};
 }
 
 1;

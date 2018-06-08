@@ -60,7 +60,10 @@ sub _process_f_summary_parameter_records{
     # create the technology level record
     my $tech_rec = LimitRecord->new_copy_from_f_summary($records->[0]);
     $tech_rec->set_item_type('TECHNOLOGY', $tech_rec->get('TECHNOLOGY'));
-    $tech_rec->comment("Generated from Factory Summary");
+    my $tech_option = $records->[0]->{"PROCESS_OPTIONS"};
+    $tech_option = "" unless defined $tech_option;
+    $tech_rec->comment("From Factory Summary $tech_option");
+    
     if(scalar @{$records} > 1){
         # records will be set at the effective routing, so dummy this one
         $tech_rec->dummify();
@@ -77,9 +80,11 @@ sub _process_f_summary_parameter_records{
         foreach my $eff_rout (@{$test_areas->{$area}}){
             my @matching_records;
             my $functional;
+            my $options;
             foreach my $record (@{$records}){
                 #if (does_f_summary_record_match_effective_routing_options($eff_rout, $record)){
                 if ($check_match_lambda->($eff_rout, $record)){
+                    $options = $record->{"PROCESS_OPTIONS"};
                     # flag the parameter as functional at a certain area
                     $functional = {
                         EFFECTIVE_ROUTING     =>        $eff_rout,
@@ -98,7 +103,8 @@ sub _process_f_summary_parameter_records{
             my @unresolved_records = map {LimitRecord->new_copy_from_f_summary($_)} @matching_records;
             my $resolved_record = LimitRecord->merge(\@unresolved_records);
             if (defined $resolved_record){
-                $resolved_record->comment("Generated from Factory Summary");
+                $options = "" unless (defined $options);
+                $resolved_record->comment("From Factory Summary $options");
                 $resolved_record->set_item_type('ROUTING', $eff_rout);
                 push @effective_routing_limits, @{$resolved_record->create_copies_at_each_area([$area])};
             }

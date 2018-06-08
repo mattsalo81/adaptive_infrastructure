@@ -10,6 +10,7 @@ use Data::Dumper;
 # new empty
 my $empty = LimitRecord->new_empty();
 is(scalar keys %{$empty}, 0, "Empty hash ref");
+ok(!$empty->is_dummy(), "Empty limit is not a dummy");
 
 
 # getter
@@ -40,6 +41,7 @@ dies_ok(sub {$lim->set_item_type("I AM UNEXPECTED", "oOoOo")}, "Unexpected item 
 $lim->{"DISPO"} = 'Y';
 $lim->dummify();
 is($lim->get("DISPO"), undef, "Dummified a known dummy record");
+ok($lim->is_dummy(), "Dummy limit registers as one");
 
 # copy_matching_f_summary_fields
 my $f_sum = {ETEST_NAME=>"my name",DISPO=>"Y",SOMETHING_ELSE=>"uh oh"};

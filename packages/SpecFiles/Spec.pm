@@ -96,7 +96,9 @@ sub add_comment_entry{
 
 sub add_entry{
     my ($self, $entry) = @_;
-    $$self .= sprintf("$entry_format\n", @{$entry});    
+    my $text = sprintf("$entry_format", @{$entry});
+    $text =~ s/\s*$//;
+    $$self .= $text . "\n";
 }
 
 sub get_text{

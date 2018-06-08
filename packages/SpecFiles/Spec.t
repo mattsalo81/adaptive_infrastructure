@@ -90,14 +90,14 @@ my $expected = q{
 
 
 # PCH_HV5 Component                                        #
-PARM                    1   100         200         1  2 
-PARM2                   2   -100        9E+99       1  6 
+PARM                    1   100         200         1  2
+PARM2                   2   -100        9E+99       1  6
 
 # NCH_HV5 Component                                        #
-NARM                    1   100         200         1  2 
+NARM                    1   100         200         1  2
 # Waived because of reasons                                #
 # NARM2=================2===-100========9E+99=======1==6== #
-NARM2                   2   -150        9E+99       1  6 
+NARM2                   2   -150        9E+99       1  6
 
 };
 
