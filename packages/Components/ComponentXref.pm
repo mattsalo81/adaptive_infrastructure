@@ -10,7 +10,7 @@ use SMS::SMSDigest;
 
 my $lookup_table = 'component_name_translation';
 my $raw_table = 'raw_component_info';
-my $output_table = 'component_info';
+my $output_table = 'device_component_info';
 
 my $device_fully_defined_sth;
 my $device_has_components_sth;
@@ -146,7 +146,7 @@ sub get_device_has_components_sth{
             select
                 count(component)
             from
-                component_info
+                device_component_info
             where
                 TECHNOLOGY = ?
                 and device = ?

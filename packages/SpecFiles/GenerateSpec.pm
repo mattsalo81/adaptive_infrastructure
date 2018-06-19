@@ -9,6 +9,13 @@ use LimitDatabase::GetLimit;
 use LimitDatabase::LimitRecord;
 use SpecFiles::Spec;
 
+sub get_limits_for_spec{
+    my ($technology, $test_area, $effective_routing, $program) = @_;
+    my $limits = GetLimit::get_all_limits($technology, $test_area, $effective_routing, $program, undef);
+
+}
+
+
 sub add_spec_for_limits{
     my ($spec, $limits) = @_;
 
@@ -72,8 +79,5 @@ sub add_predecessor_spec_for_limit{
     }
     return $has_limits;
 }
-
-# so what do I even need to do here?
-# get all the waivers... -> comment?
 
 1;

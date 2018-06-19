@@ -62,13 +62,13 @@ sub get_bits_sth{
             select distinct
                 c2b.bit
             from
-                component_info ci
+                device_component_info dci
                 inner join component_to_bit c2b
-                    on  c2b.technology = ci.technology
-                    and c2b.component = ci.component
+                    on  c2b.technology = dci.technology
+                    and c2b.component = dci.component
             where
-                ci.technology = ?
-                and ci.device = ?
+                dci.technology = ?
+                and dci.device = ?
             order by c2b.bit
         };
         $bits_sth = $conn->prepare($sql);
@@ -85,19 +85,19 @@ sub get_undefined_sth{
         my $conn = Connect::read_only_connection("etest");
         my $sql = q{
             select distinct
-                ci.component
+                dci.component
             from 
-                component_info ci
+                device_component_info dci
             where
-                ci.technology = ?
-                and ci.device = ?
-                and ci.component not in(
+                dci.technology = ?
+                and dci.device = ?
+                and dci.component not in(
                     select distinct
                         c2b.component
                     from 
                         component_to_bit c2b
                     where
-                        c2b.technology = ci.technology
+                        c2b.technology = dci.technology
                 )
                 
         };
