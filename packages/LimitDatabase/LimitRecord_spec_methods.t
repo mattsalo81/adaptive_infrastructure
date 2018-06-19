@@ -103,3 +103,42 @@ is($comment, 'WHATEVER', "Comment");
 $limit->{"LIMIT_COMMENTS"} = undef;
 $comment = $limit->get_comment();
 is($comment, undef, "Comment undef");
+
+# component checking
+my $comp_hash = {COMP1=>"yep", COMP2=>"yep"};
+
+$limit = LimitRecord->new_from_hash({COMPONENT=>undef});
+ok($limit->required_by_component_hash($comp_hash), "undefined component is required");
+
+$limit = LimitRecord->new_from_hash({COMPONENT=>""});
+ok($limit->required_by_component_hash($comp_hash), "empty component is required");
+
+$limit = LimitRecord->new_from_hash({COMPONENT=>"   \t"});
+ok($limit->required_by_component_hash($comp_hash), "whitespace component is required");
+
+$limit = LimitRecord->new_from_hash({COMPONENT=>"COMP3"});
+ok(!$limit->required_by_component_hash($comp_hash), "component not in hash is not required");
+
+$limit = LimitRecord->new_from_hash({COMPONENT=>"COMP1"});
+ok($limit->required_by_component_hash($comp_hash), "component in hash is required");
+
+# component filtering
+my @comps = qw(COMP1 COMP2 COMP3);
+my @unfiltered_limits = (
+    LimitRecord->new_from_hash({COMPONENT=>undef}),
+    LimitRecord->new_from_hash({COMPONENT=>""}),
+    LimitRecord->new_from_hash({COMPONENT=>"   "}),
+    LimitRecord->new_from_hash({COMPONENT=>"COMP4"}),
+    LimitRecord->new_from_hash({COMPONENT=>"COMP5"}),
+    LimitRecord->new_from_hash({COMPONENT=>"COMP5"}),
+    LimitRecord->new_from_hash({COMPONENT=>"COMP1"}),
+    LimitRecord->new_from_hash({COMPONENT=>"COMP2"}),
+);
+my @expected_limits = (@unfiltered_limits[0..2], @unfiltered_limits[6..7]);
+my @filtered_limits = @unfiltered_limits;
+my $num_removed = LimitRecord->filter_limit_table_by_component(\@filtered_limits, \@comps);
+is($num_removed, 3, "Correct number of components removed");
+ok(lists_identical(\@filtered_limits, \@expected_limits), "Correct limits filtered out");
+
+
+

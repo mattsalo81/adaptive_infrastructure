@@ -194,6 +194,19 @@ sub populate_from_hash{
 # Limit record manipulation methods                              #
 # ============================================================== #
 
+# returns true if limit record's component field is not populated/empty, or if 
+# the component is defined in the comp_hash
+# otherwise returns false
+# dies if called before COMPONENT member populated
+sub required_by_component_hash{
+    my ($self, $comp_hash) = @_;
+    my $comp = $self->get("COMPONENT");
+    if((not defined $comp) or $comp =~ m/^\s*$/){
+        return 1;
+    }
+    return defined $comp_hash->{$comp};
+}
+
 # set the Item Type -> used for resolve limits
 sub set_item_type{
     my ($self, $item_type, $item) = @_;
@@ -330,6 +343,33 @@ sub resolve_limit_table{
     }
     my @resolved_limits = @key_limit{@order};
     return \@resolved_limits;
+}
+
+# filters a limit table to the given component list only
+# returns number of components removed
+sub filter_limit_table_by_component{
+    my ($class, $limits, $components) = @_;
+
+    if(scalar @{$components} == 0){
+        return 0;
+    }
+
+    my %comps;
+    @comps{@{$components}} = @{$components};
+
+    my @new_limits;
+    my $removed = 0;
+
+    foreach my $limit (@{$limits}){
+        if($limit->required_by_component_hash(\%comps)){
+            push @new_limits, $limit;
+        }else{
+            $removed++;
+        }
+    }
+
+    @{$limits} = @new_limits;
+    return $removed;
 }
 
 # ============================================================== #
