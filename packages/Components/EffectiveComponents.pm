@@ -13,6 +13,7 @@ use SMS::SMSDigest;
 # includes FMEA parameters in information
 my $components_for_device_sth;
 my $program_has_components_sth;
+my $components_sth;
 
 
 # generates a merged list of components for a list of devices, and adds in the fmea components
@@ -109,6 +110,35 @@ sub get_program_has_components_sth{
         confess "could not get program_has_components_sth";
     }
     return $program_has_components_sth;
+}
+
+sub get_effective_components{
+    my ($tech, $program) = @_;
+    my $sth = get_components_sth();
+    $sth->execute($tech, $program);
+    my $rows = $sth->fetchall_arrayref();
+    my @components = map {$_->[0]} @{$rows};
+    return \@components;
+}
+
+sub get_components_sth{
+    unless (defined $components_sth){
+        my $conn = Connect::read_only_connection("etest");
+        my $sql = q{
+            select 
+                component
+            from
+                effective_component_info
+            where
+                technology = ?
+                and program = ?
+        };
+        $components_sth = $conn->prepare($sql);
+    }
+    unless (defined $components_sth){
+        confess "Could not get components sth";
+    }
+    return $components_sth;
 }
 
 1;

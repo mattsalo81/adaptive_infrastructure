@@ -37,4 +37,7 @@ is(EffectiveComponents::get_number_components_on_program($test_tech, $test_prog1
 is(EffectiveComponents::get_number_components_on_program($test_tech, $test_prog2), 2, "found two components on $test_prog2");
 is(EffectiveComponents::get_number_components_on_program($test_tech, $test_prog3), 0, "found no components on $test_prog3");
 
+$comps = EffectiveComponents::get_effective_components($test_tech, $test_prog1);
+ok(lists_identical($comps, ['COMP1']), "Found known components on test program");
+
 
