@@ -131,33 +131,6 @@ sub get_update_etest_comps_sql{
     return $sql;
 }
 
-sub get_number_components_on_device{
-    my ($technology, $device) = @_;
-    my $sth = get_device_has_components_sth();
-    $sth->execute($technology, $device);
-    # return first value of first record
-    return $sth->fetchrow_arrayref()->[0];
-}
-
-sub get_device_has_components_sth{
-    unless (defined $device_has_components_sth){
-        my $conn = Connect::read_only_connection("etest");
-        my $sql = q{
-            select
-                count(component)
-            from
-                device_component_info
-            where
-                TECHNOLOGY = ?
-                and device = ?
-        };
-        $device_has_components_sth = $conn->prepare($sql);
-    }
-    unless (defined $device_has_components_sth){
-        confess "could not get device_has_components_sth";
-    }
-    return $device_has_components_sth;
-}
 
 
 1;

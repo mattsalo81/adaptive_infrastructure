@@ -5,10 +5,12 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 require Test::Homebrew_Exception;
 require Test::Lists;
 use SMS::SMSDigest;
+use Data::Dumper;
 
 my $known_tech = 'LBC5';
 my $known_device = "M06ECDC65310C1"; # must be active and in known_tech
 my $known_eff_rout = "PARAMETRIC__A72AE3BE-X";
+my $known_prog = "M06CDC65310C0";
 
 my $techs = SMSDigest::get_all_technologies();
 ok(defined($techs), "Got something");
@@ -37,3 +39,6 @@ ok(in_list($known_eff_rout, $eff), "Found $known_eff_rout in active list for $kn
 my $rec = SMSDigest::get_entries_for_tech("$known_tech");
 ok(scalar @{$rec} > 100, "Found at least 100 records for $known_tech");
 is($rec->[0]->{"TECHNOLOGY"}, $known_tech, "NAME_uc hash format used");
+
+$dev = SMSDigest::get_all_devices_for_prog($known_tech, $known_prog);
+ok(in_list($known_device, $dev), "Found known device on known program");

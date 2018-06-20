@@ -18,10 +18,10 @@ unless(scalar @char_lookup == 2**$bits_per_char){
 }
 
 sub get_device_string{
-    my ($technology, $device) = @_;
+    my ($technology, $program) = @_;
     my $string;
     eval{
-        my $bits = Bits::get_bits_for_device($technology, $device);
+        my $bits = Bits::get_bits_for_program($technology, $program);
         $string = convert_bits_to_device_string($bits);
         1;
     } or do {
@@ -29,7 +29,7 @@ sub get_device_string{
         if ($e =~ m/$Bits::not_associated_error<[^>]*>/){
             die "The Following components are not associated to a bit in $technology, : $1";
         }elsif ($e =~ m/$Bits::no_comp_error/){
-            Logging::debug("$technology device $device does not have any component information available");
+            Logging::debug("$technology program $program does not have any component information available");
         }else{  
             confess "Could not get device string because : $e";
         }

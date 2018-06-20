@@ -79,6 +79,25 @@ sub get_all_active_devices_in_tech{
     return \@devices
 }
 
+sub get_all_devices_for_prog{
+    my ($technology, $program) = @_;
+    my $sql = q{
+        select distinct
+            s.device
+        from 
+            daily_sms_extract s
+        where
+            s.technology = ?
+            and s.program = ?
+    };
+    my $conn = Connect::read_only_connection("etest");
+    my $sth = $conn->prepare($sql);
+    $sth->execute($technology, $program) or confess "Could not get list of devices for program";
+    my $devices = $sth->fetchall_arrayref();
+    my @devices = map{$_->[0]} @{$devices};
+    return \@devices
+}
+
 sub get_all_active_devices{
     my $sql = q{select distinct device from daily_wip_extract};
     my $conn = Connect::read_only_connection("etest");
