@@ -50,13 +50,13 @@ how the engine wraps the comment around the max length
 
 });
 my $wrapped = q{
-# ======================================================== #
-#                                                          #
-#     This                    is a very long comment that  #
-# is going to be interesting to see                        #
-# how the engine wraps the comment around the max length   #
-#                                                          #
-# ======================================================== #
+# ============================================================================ #
+#                                                                              #
+#     This                    is a very long comment that is going to be       #
+# interesting to see                                                           #
+# how the engine wraps the comment around the max length                       #
+#                                                                              #
+# ============================================================================ #
 };
 is("\n" . $spec->get_text(), $wrapped, "Wrapped text successfully");
 
@@ -80,23 +80,23 @@ $spec->add_entry(["NARM2", 2, "-150", 9e99, 1, 6]);
 $spec->add_blank_lines(1);
 
 my $expected = q{
-# ======================================================== #
-#                                                          #
-#     Program       : M06ECD65310                          #
-#     Device String : AAAAANwsod8\sjdglk                   #
-#     Waivers       : Yes                                  #
-#                                                          #
-# ======================================================== #
+# ============================================================================ #
+#                                                                              #
+#     Program       : M06ECD65310                                              #
+#     Device String : AAAAANwsod8\sjdglk                                       #
+#     Waivers       : Yes                                                      #
+#                                                                              #
+# ============================================================================ #
 
 
-# PCH_HV5 Component                                        #
+# PCH_HV5 Component                                                            #
 PARM                    1   100         200         1  2
 PARM2                   2   -100        9E+99       1  6
 
-# NCH_HV5 Component                                        #
+# NCH_HV5 Component                                                            #
 NARM                    1   100         200         1  2
-# Waived because of reasons                                #
-# NARM2=================2===-100========9E+99=======1==6== #
+# Waived because of reasons                                                    #
+# NARM2=================2===-100========9E+99=======1==6====================== #
 NARM2                   2   -150        9E+99       1  6
 
 };

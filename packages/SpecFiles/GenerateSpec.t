@@ -26,8 +26,8 @@ my %template = (
 );
 my $limit1 = LimitRecord->new_from_hash(\%template);
 my $expected = q{
-# This is the lowest priority limit                        #
-# PARM1=================3===-10=========10==========1==6== #
+# This is the lowest priority limit                                            #
+# PARM1=================3===-10=========10==========1==6====================== #
 };
 GenerateSpec::add_predecessor_spec_for_limit($spec, $limit1, 0);
 is("\n" . $spec->get_text(), $expected, "Got expected spec result for predecessor limit");
@@ -40,10 +40,10 @@ $template{"PREDECESSOR"} = $limit1;
 my $limit2 = LimitRecord->new_from_hash(\%template);
 
 $expected = q{
-# This is the lowest priority limit                        #
-# PARM1=================3===-10=========10==========1==6== #
-# The lower spec limit was lowered                         #
-# PARM1=================3===-100========10==========1==6== #
+# This is the lowest priority limit                                            #
+# PARM1=================3===-10=========10==========1==6====================== #
+# The lower spec limit was lowered                                             #
+# PARM1=================3===-100========10==========1==6====================== #
 };
 GenerateSpec::add_predecessor_spec_for_limit($spec, $limit2, 0);
 is("\n" . $spec->get_text(), $expected, "Got expected spec result for nested predecessor limit");
@@ -59,13 +59,13 @@ my $limit3 = LimitRecord->new_from_hash(\%template);
 $spec = Spec->new();
 
 $expected = q{
-# This is the lowest priority limit                        #
-# PARM1=================3===-10=========10==========1==6== #
-# The lower spec limit was lowered                         #
-# PARM1=================3===-100========10==========1==6== #
-# We added a reliability range                             #
-# PARM1=================3===-100========10==========1==6== #
-# PARM1=================1===1===========10==========1==2== #
+# This is the lowest priority limit                                            #
+# PARM1=================3===-10=========10==========1==6====================== #
+# The lower spec limit was lowered                                             #
+# PARM1=================3===-100========10==========1==6====================== #
+# We added a reliability range                                                 #
+# PARM1=================3===-100========10==========1==6====================== #
+# PARM1=================1===1===========10==========1==2====================== #
 };
 GenerateSpec::add_predecessor_spec_for_limit($spec, $limit3, 0);
 is("\n" . $spec->get_text(), $expected, "Got expected spec result for nested predecessor limit (reliability)");
@@ -75,11 +75,11 @@ is("\n" . $spec->get_text(), $expected, "Got expected spec result for nested pre
 $spec = Spec->new();
 GenerateSpec::add_spec_for_limit($spec, $limit3);
 $expected = q{
-# This is the lowest priority limit                        #
-# PARM1=================3===-10=========10==========1==6== #
-# The lower spec limit was lowered                         #
-# PARM1=================3===-100========10==========1==6== #
-# We added a reliability range                             #
+# This is the lowest priority limit                                            #
+# PARM1=================3===-10=========10==========1==6====================== #
+# The lower spec limit was lowered                                             #
+# PARM1=================3===-100========10==========1==6====================== #
+# We added a reliability range                                                 #
 PARM1                   3   -100        10          1  6
 PARM1                   1   1           10          1  2
 };
@@ -94,11 +94,11 @@ my $limit4 = LimitRecord->new_from_hash(\%template);
 $spec = Spec->new();
 GenerateSpec::add_spec_for_limit($spec, $limit4);
 $expected = q{
-# This is the lowest priority limit                        #
-# PARM1=================3===-10=========10==========1==6== #
-# The lower spec limit was lowered                         #
-# PARM1=================3===-100========10==========1==6== #
-# No useful limits                                         #
+# This is the lowest priority limit                                            #
+# PARM1=================3===-10=========10==========1==6====================== #
+# The lower spec limit was lowered                                             #
+# PARM1=================3===-100========10==========1==6====================== #
+# No useful limits                                                             #
 };
 is("\n" . $spec->get_text(), $expected, "Got expected spec result for nested limit without dispo/rel");
 
@@ -108,22 +108,22 @@ GenerateSpec::add_spec_for_limits($spec, [$limit1, $limit4, $limit4]);
 $expected = q{
 
 
-#     Starting TESTCOMP Parameters                         #
-# This is the lowest priority limit                        #
+#     Starting TESTCOMP Parameters                                             #
+# This is the lowest priority limit                                            #
 PARM1                   3   -10         10          1  6
 
 
-#     Starting NO COMPONENT Parameters                     #
-# This is the lowest priority limit                        #
-# PARM1=================3===-10=========10==========1==6== #
-# The lower spec limit was lowered                         #
-# PARM1=================3===-100========10==========1==6== #
-# No useful limits                                         #
-# This is the lowest priority limit                        #
-# PARM1=================3===-10=========10==========1==6== #
-# The lower spec limit was lowered                         #
-# PARM1=================3===-100========10==========1==6== #
-# No useful limits                                         #
+#     Starting NO COMPONENT Parameters                                         #
+# This is the lowest priority limit                                            #
+# PARM1=================3===-10=========10==========1==6====================== #
+# The lower spec limit was lowered                                             #
+# PARM1=================3===-100========10==========1==6====================== #
+# No useful limits                                                             #
+# This is the lowest priority limit                                            #
+# PARM1=================3===-10=========10==========1==6====================== #
+# The lower spec limit was lowered                                             #
+# PARM1=================3===-100========10==========1==6====================== #
+# No useful limits                                                             #
 };
 
 is("\n" . $spec->get_text(), $expected, "Got expected spec result for list of three limits with different components");

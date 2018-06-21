@@ -8,7 +8,7 @@ use Logging;
 
 my $comment_start = "# ";
 my $comment_end = " #";
-my $max_width = 60;
+my $max_width = 80;
 my $comment_width = ($max_width - length($comment_start . $comment_end));
 my         $entry_format = '%-22s  %d   %-10G  %-10G  %d  %-2d';
 my $comment_entry_format = '%-20s  %d   %-10G  %-10G  %d  %-2d';
@@ -59,7 +59,7 @@ sub wrap_comment{
         # add blocks to the line until we no longer can
         foreach my $block (@blocks){
             my $block_len = length $block;
-            if ($block =~ m/^\w+$/){
+            if ($block !~ m/^\s+$/){
                 if (length($wrap_line . $non_word_block . $block) <= $comment_width){
                     # add the word (and preceding whitespace) to the line
                     $wrap_line .= $non_word_block . $block;

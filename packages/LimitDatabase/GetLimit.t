@@ -57,3 +57,14 @@ is($limits->[2]->{"DEACTIVATE"}, "N", "Parm3 resolved ACTIVATED");
 is($limits->[3]->{"DEACTIVATE"}, "N", "Parm4 resolved ACTIVATED");
 
 dies_ok(sub{GetLimit::get_all_limits($test_tech, $test_area, $test_rout, undef, $test_dev)}, "Resolving limits at the device level with an undefined program");
+
+my $known_tech = "LBC5";
+my $known_area = "PARAMETRIC";
+my $known_rout = "PARAMETRIC__A72AE3A+-X";
+my $known_prog = "M06BEC65310B0";
+$limits = GetLimit::get_all_limits($known_tech, $known_area, $known_rout, $known_prog, undef);
+ok(scalar @{$limits}, "Found some limits on a real technology");
+
+
+
+

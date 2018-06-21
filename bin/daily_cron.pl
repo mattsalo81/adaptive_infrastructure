@@ -18,3 +18,7 @@ foreach my $tech (@{SMSDigest::get_all_technologies()}){
 }
 ComponentXref::update_component_info();
 ComponentPopulator::update_effective_component_info();
+foreach my $tech (@{SMSDigest::get_all_technologies()}){
+    FactorySummary::Upload::update_technology_info_functional_and_limits($tech);
+}
+
