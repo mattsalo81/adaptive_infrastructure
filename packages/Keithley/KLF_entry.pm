@@ -68,6 +68,11 @@ sub set_bit{
     $self->{"usr2"} = $bit;
 }
 
+sub get_bit{
+    my ($self) = @_;
+    return $self->{"usr2"};
+}
+
 # enables/disables on true/false values
 sub set_test{
     my ($self, $val) = @_;
@@ -119,11 +124,11 @@ sub get_limit_type{
     my $lim;
     if ($type =~ m/^v(al(id)?)?/i){
         $lim = 'VAL';
-    }elsif($lim =~ m/^s(pc|pec)?/i){
+    }elsif($type =~ m/^s(pc|pec)?/i){
         $lim = 'SPC';
-    }elsif($lim =~ m/^c(nt|ontrol)?/i){
+    }elsif($type =~ m/^c(nt|ontrol)?/i){
         $lim = 'CNT';
-    }elsif($lim =~ m/^e(ng(ineering)?)?/i){
+    }elsif($type =~ m/^e(ng(ineering)?)?/i){
         $lim = 'ENG';
     }else{
         confess "unexpected limit type $type";
@@ -151,7 +156,7 @@ sub get_limits{
 
 # toggles the parameter for the MS's screen
 # takes true/false
-sub set_report_on_ms_screen{
+sub set_reporting_on_ms_screen{
     my ($self, $val) = @_;
     if($val){
         $self->{'CAT'} = 't1';
