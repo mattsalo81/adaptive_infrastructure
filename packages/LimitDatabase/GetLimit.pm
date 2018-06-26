@@ -45,7 +45,8 @@ sub get_limits_sth{
                 fp.effective_routing,
                 fp.etest_name,
                 pi.component,
-                ld.*
+                ld.*,
+                cb.bit
             from 
                 functional_parameters fp
                 inner join parameter_info pi
@@ -70,6 +71,9 @@ sub get_limits_sth{
                         )
                     )
                     and ld.etest_name = fp.etest_name
+                left outer join component_to_bit cb
+                    on  cb.technology = fp.technology
+                    and cb.component = pi.component
             where
                 fp.technology = :tech
                 and fp.test_area = :area

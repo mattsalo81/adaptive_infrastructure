@@ -6,6 +6,7 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use POSIX qw(ceil);
+use Keithley::KLFEntry;
 
 # ============================================================== #
 # GLOBAL DATA AND CONFIGURATION                                  #
@@ -54,6 +55,7 @@ my %priority = (
 my %sampling = (
     '5 SITE'    => 5,
     '9 SITE'    => 9,
+    'RANDOM'    => 1,
 );
 
 # fields that can be copied from an f_summary
@@ -70,7 +72,7 @@ push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_r
 @limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
 
 # accessory information that isn't technically part of the limits_database
-my @accessory_fields = qw(component effective_routing predecessor);
+my @accessory_fields = qw(component effective_routing predecessor bit);
 @accessory_fields = map {tr/a-z/A-Z/; $_} @accessory_fields;
 
 # fields that are okay to have
@@ -398,11 +400,10 @@ sub get_num_fails{
 # get scrap entry for a specfile, return undef or arrayref
 sub get_scrap_entry{
     my ($self) = @_; 
-    my $deactivate = $self->get("DEACTIVATE");
-    return undef if (defined $deactivate && $deactivate eq 'Y');
+    return undef if $self->is_disabled();
     my $parm = $self->get("ETEST_NAME");
     my $was = $self->get("DISPO");
-    if (defined $was && $was eq "Y"){
+    if ((defined $was) && $was eq "Y"){
         # generate a limit
         my $fail = $self->get_num_fails();
         my $lsl = $self->get("SPEC_LOWER");
@@ -417,11 +418,10 @@ sub get_scrap_entry{
 # get reliability entry for a specfile, return undef or arrayref
 sub get_reliability_entry{
     my ($self) = @_;
-    my $deactivate = $self->get("DEACTIVATE");
-    return undef if (defined $deactivate && $deactivate eq 'Y');
+    return undef if $self->is_disabled();
     my $parm = $self->get("ETEST_NAME");
     my $rel = $self->get("RELIABILITY");
-    if (defined $rel && $rel eq "Y"){
+    if ((defined $rel) && $rel eq "Y"){
         my $lrl = $self->get("RELIABILITY_LOWER");
         my $url = $self->get("RELIABILITY_UPPER");
         my $io = $self->get("REVERSE_RELIABILITY_LIMIT");
@@ -434,6 +434,59 @@ sub get_reliability_entry{
 sub get_comment{
     my ($self) = @_;
     return $self->{"LIMIT_COMMENTS"};
+}
+
+# KLF generation
+
+sub is_disabled{
+    my ($self) = @_;
+    my $deactivate = $self->get("DEACTIVATE");
+    if(defined $deactivate){
+        return 1 if $deactivate =~ m/^Y$/i; 
+        return 0 if $deactivate =~ m/^N$/i; 
+        die "unexpected deactivate flag '$deactivate'";
+    }
+    return 0;
+}
+
+sub uses_immediate_map{
+    my ($self) = @_;
+    my $pattern = $self->get("REPROBE_MAP");
+    if (defined $pattern and $pattern ne ""){
+        if ($pattern =~ m/^(map|mapping|all|alt|std_alt)$/i){
+            return 1;
+        }
+        confess "unexpected pattern type $pattern";
+    }
+    return 0;
+}
+
+sub get_klf_entry{
+    my ($self) = @_;
+    my $entry = KLFEntry->new($self->get("ETEST_NAME"));
+    $entry->set_bit($self->get("BIT"));
+    $entry->set_test(! $self->is_disabled());
+    $entry->set_num_sites($self->how_many_sites_to_test());
+    my $ll;
+    my $ul;
+    my $was = $self->get_scrap_entry();
+    if (defined $was){
+        $ll = $was->[2];
+        $ul = $was->[3];
+    }    
+    my $rel = $self->get_reliability_entry();
+    if (defined $rel){
+        $ll = $rel->[2];
+        $ul = $rel->[3];
+    }
+    if (defined $ll and defined $ul){
+        $entry->set_limits("SPC", $ll, $ul);
+        $entry->set_reporting_on_ms_screen(1);
+    }
+    if($self->uses_immediate_map()){
+        $entry->enable_mapping();
+    }
+    return $entry;
 }
 
 1;

@@ -1,4 +1,4 @@
-package KLF_entry;
+package KLFEntry;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';

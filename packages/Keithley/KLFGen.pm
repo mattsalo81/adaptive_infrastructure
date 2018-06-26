@@ -28,7 +28,22 @@ sub get_header{
         $line =~ s/^\s*//;
         $text .= $line . "\n" if $line !~ m/^$/;
     }
-    return $text;
+`    return $text;
 }
+
+sub add_limit_record_list{
+    my ($text_ref, $limit_records) = @_;
+    my %added;
+    foreach my $limit (@{$limit_records}){
+        my $parm = $limit->get("ETEST_NAME");
+        $added{$parm} = "yep";
+        $$text_ref .= $limit->get_klf_entry();
+    }
+    return \%added;
+}
+
+
+
+
 
 1;
