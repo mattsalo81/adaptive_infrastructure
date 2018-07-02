@@ -9,6 +9,7 @@ use Switch;
 
 our $delineator = "_";
 our $undef_val = "undef";
+our $undef_tech_e = "No way to generate an effective routing for";
 
 # takes 
 sub make_from_sms_hash{
@@ -23,7 +24,7 @@ sub make_from_sms_hash{
         case 'LBC8LV'   {$effective_routing = LBC8LV($record);}
         case 'HPA07'    {$effective_routing = HPA07($record);}
         case 'F05'      {$effective_routing = F05($record);}
-        else {confess "No way to generate an effective routing for <$tech>, please update <EffectiveRouting::Generate>";}
+        else {confess "$undef_tech_e <$tech>, please update <EffectiveRouting::Generate>";}
     }
     $effective_routing = join($delineator, ($tech, $area, $effective_routing));
     return $effective_routing;
@@ -89,7 +90,7 @@ sub LBC7{
 # code 1 -> # of ML
 # code 2 -> 3 char
 # code 3 -> optional char 4
-sub LBC8_get_codes_from_routing{
+sub LBC8{
     my ($record) = @_;
     my ($three_char, $char_4, $num_ml);
     my $device = get($record, "DEVICE");
@@ -97,7 +98,7 @@ sub LBC8_get_codes_from_routing{
     my $routing = get($record, "ROUTING");
     if ($routing =~ m/DCU/){
         $three_char = substr($device, 4, 3);
-        $four_char = substr($device, 7, 1);
+        $char_4 = substr($device, 7, 1);
         if ($prod_grp =~ m/\-([SDTQP67]LM)/){
             my $xlm = $1;
             $num_ml = 1;
@@ -108,7 +109,7 @@ sub LBC8_get_codes_from_routing{
             $num_ml = 6 if ($xlm =~ /6LM/);
             $num_ml = 7 if ($xlm =~ /7LM/);
         }else{
-            confess("Unable to get number of metal levels for effective routing from " . Dumper($rec) . "\n");
+            confess("Unable to get number of metal levels for effective routing from " . Dumper($record) . "\n");
         }
     }elsif($routing =~ m/^.....([0-9])(...)(.?)$/){
         # 9/10 character routings
@@ -143,7 +144,7 @@ sub LBC8LV{
 
 # code 0 -> Test Area
 # code 1 -> # of ML
-sub F05_get_codes_from_routing{
+sub F05{
     my ($record) = @_;
     my $num_ml;
     my $strategy = get($record, "FE_STRATEGY");

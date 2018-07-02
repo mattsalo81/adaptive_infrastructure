@@ -18,7 +18,7 @@ is($asserts[1], "DUMMY -> DANG", "Found first assertion");
 
 #check that test routing TESTMATT is okay
 my $routing = "A72AF3A+";
-my @comp = sort @{CompositeOptions::get_composite_options_for_routing_and_effective_routing("TEST", $routing, "TESTMATT")};
+my @comp = sort @{CompositeOptions::get_composite_options_for_routing_and_effective_routing("TEST", $routing, "TEST_MATT")};
 my $i = 0;
 is(scalar @comp, 6 , "Correct number of options for basic list");
 is($comp[$i], "DANG", "Correct option $i"); $i++;

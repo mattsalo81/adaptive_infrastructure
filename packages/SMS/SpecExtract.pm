@@ -2,7 +2,7 @@ package SpecExtract;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
-use SMS::EffectiveRouting;
+use EffectiveRouting::Generate;
 use DBI;
 use Database::Connect;
 use Carp;
@@ -80,7 +80,7 @@ sub update_sms_table{
                 $cot = get_COT_from_record($rec);
                 $recipe = make_recipe_from_record($rec);
                 
-                $effective_routing = EffectiveRouting::make_effective_routing($rec);
+                $effective_routing = EffectiveRouting::Generate::make_from_sms_hash($rec);
                 $rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
                 $area = $rec->{"AREA"};
                 # error checking on KPARMS

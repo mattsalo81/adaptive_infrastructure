@@ -6,7 +6,7 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use ProcessOptions::LogpointOptions;
-use ProcessOptions::EffectiveRoutingDecoder;
+use EffectiveRouting::Decoder;
 use Database::Connect;
 use Parse::BooleanExpression;
 
@@ -23,7 +23,7 @@ sub get_primary_options_for_routing_and_effective_routing{
     my ($tech, $routing, $effective_routing) = @_;
     my ($eff_opt, $lpt_opt);
     eval{
-        $eff_opt = EffectiveRoutingDecoder::get_options_for_effective_routing($tech, $effective_routing);
+        $eff_opt = EffectiveRouting::Decoder::get_options_for_effective_routing($effective_routing);
         $lpt_opt = LogpointOptions::get_process_options_from_routing($tech, $routing);
         1;
     } or do {
