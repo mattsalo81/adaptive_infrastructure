@@ -7,6 +7,14 @@ sub in_list{
     return 0;
 }
 
+sub subset{
+    my ($subset, $superset) = @_;
+    foreach my $element (@{$subset}){
+        return 0 unless in_list($element, $superset);
+    }
+    return 1;
+}
+
 sub lists_identical{
     my ($list1, $list2) = @_;
     return 0 unless(scalar @{$list1} == scalar @{$list2});

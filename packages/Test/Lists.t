@@ -12,6 +12,9 @@ my $list4 = ['HAM'];
 ok(in_list('B', $list1), "can find an element that's there");
 ok(!in_list('Bee movie', $list1), "can't find an element that's not there");
 
+ok(subset([1, 2, 3], [-1, 0, 1, 2, 3, 4, 5]), "Identifies a subset of a superset");
+ok(!subset([1, 2, 3, 10], [-1, 0, 1, 2, 3, 4, 5]), "Identifies a non-subset of a superset");
+
 ok(lists_identical($list1, $list1), "can compare two identical lists");
 ok(lists_identical($list1, $list2), "can compare two identical lists, but different references");
 ok(!lists_identical($list1, $list3), "can compare two non-identical lists");

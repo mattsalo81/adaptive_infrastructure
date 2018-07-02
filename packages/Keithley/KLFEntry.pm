@@ -18,7 +18,8 @@ sub new{
     my $self = {
         ID      => $parameter,
         NAM     => $parameter,
-        CAT     => 't0',
+        tw      => 't',
+        ms      => '0',
         AF      => 0,
         AL      => 0,
         VALl    => "-$inf",
@@ -42,7 +43,11 @@ sub new{
 sub get_text{
     my ($self) = @_;
     my $text = "";
-    foreach my $field (qw(ID NAM CAT AF AL)){
+    foreach my $field (qw(ID NAM)){
+        $text .= "$field," . $self->{$field} . "\n" if defined $self->{$field};
+    }
+    $text .= "CAT," . $self->{"tw"} . $self->{"ms"} . "\n";
+    foreach my $field (qw(AF AL)){
         $text .= "$field," . $self->{$field} . "\n" if defined $self->{$field};
     }
     foreach my $limit (qw(VAL SPC CNT ENG)){
@@ -153,21 +158,36 @@ sub get_limits{
 }
 
 
+# toggles the parameter for testware
+# takes true/false
+sub set_testware{
+    my ($self, $val) = @_;
+    if($val){
+        $self->{'tw'} = 't';
+    }else{
+        $self->{'tw'} = '';
+    }
+}
+
+sub is_reporting_to_testware{
+    my ($self) = @_;
+    return $self->{'tw'} =~ m/t/;
+}
 
 # toggles the parameter for the MS's screen
 # takes true/false
 sub set_reporting_on_ms_screen{
     my ($self, $val) = @_;
     if($val){
-        $self->{'CAT'} = 't1';
+        $self->{'ms'} = '1';
     }else{
-        $self->{'CAT'} = 't0';
+        $self->{'ms'} = '0';
     }
 }
 
 sub is_reporting_on_ms_screen{
     my ($self) = @_;
-    return $self->{'CAT'} =~ m/1/;
+    return $self->{'ms'} =~ m/1/;
 }
 
 1;

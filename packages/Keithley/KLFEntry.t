@@ -48,11 +48,21 @@ foreach my $type (qw(v VaL VALId e ENG EnginEEring s SPC SPec C ctl ContROL)){
 }
 
 # reporting
+# ms
 ok(!$l->is_reporting_on_ms_screen(), "starts off not reporting data to ms");
 $l->set_reporting_on_ms_screen(1);
 ok($l->is_reporting_on_ms_screen(), "reporting data to ms");
 $l->set_reporting_on_ms_screen(0);
 ok(!$l->is_reporting_on_ms_screen(), "not reporting data to ms");
+
+# tw
+ok($l->is_reporting_to_testware(), "Starts of reporting to testware");
+$l->set_testware(0);
+ok(!$l->is_reporting_to_testware(), "disabled testware");
+$l->set_testware(1);
+ok($l->is_reporting_to_testware(), "enabled testware");
+
+
 
 
 
