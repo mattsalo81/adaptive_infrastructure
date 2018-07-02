@@ -9,7 +9,7 @@ use SMS::LogpointRequirements;
 use ProcessOptions::Decoder;
 
 my $routing = "A72AF3A+";
-my $eff_rout = "TESTMATT";
+my $eff_rout = "TEST_MATT";
 
 # check the assertions for TEST
 my $asserts = OptionAssertions::get_all_assertions("TEST");
@@ -20,7 +20,7 @@ is($asserts[0], "DANG && WOW", "Found first assertion");
 is($asserts[1], "DUMMY -> DANG", "Found first assertion");
 
 #check that test routing TESTMATT is okay
-my @comp = sort @{CompositeOptions::get_composite_options_for_routing_and_effective_routing("TEST", $routing, "TESTMATT")};
+my @comp = sort @{CompositeOptions::get_composite_options_for_routing_and_effective_routing("TEST", $routing, "TEST_MATT")};
 my $i = 0;
 is(scalar @comp, 6 , "Correct number of options for basic list");
 is($comp[$i], "DANG", "Correct option $i"); $i++;
