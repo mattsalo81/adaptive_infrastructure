@@ -64,8 +64,8 @@ sub update_sms_table{
 
                 # set bound variables
                 $family = $rec->{"FAMILY"};
-                $rec->{"TECH"} = get_technology_from_family($family);
-                $technology = $rec->{"TECH"};
+                $rec->{"TECHNOLOGY"} = get_technology_from_family($family);
+                $technology = $rec->{"TECHNOLOGY"};
                 $coordref = $rec->{"COORDREF"};
                 next unless defined $coordref;
                 $routing = $rec->{"ROUTING"};

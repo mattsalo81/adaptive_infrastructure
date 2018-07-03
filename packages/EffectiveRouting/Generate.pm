@@ -24,7 +24,7 @@ sub make_from_sms_hash{
         case 'LBC8LV'   {$effective_routing = LBC8LV($record);}
         case 'HPA07'    {$effective_routing = HPA07($record);}
         case 'F05'      {$effective_routing = F05($record);}
-        else {confess "$undef_tech_e <$tech>, please update <EffectiveRouting::Generate>";}
+        else {$effective_routing = $undef_val}
     }
     $effective_routing = join($delineator, ($tech, $area, $effective_routing));
     return $effective_routing;

@@ -60,7 +60,7 @@ dies_ok(sub{GetLimit::get_all_limits($test_tech, $test_area, $test_rout, undef, 
 
 my $known_tech = "LBC5";
 my $known_area = "PARAMETRIC";
-my $known_rout = "PARAMETRIC__A72AE3A+-X";
+my $known_rout = "LBC5_PARAMETRIC_3_A+";
 my $known_prog = "M06BEC65310B0";
 $limits = GetLimit::get_all_limits($known_tech, $known_area, $known_rout, $known_prog, undef);
 ok(scalar @{$limits}, "Found some limits on a real technology");
