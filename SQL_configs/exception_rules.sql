@@ -44,4 +44,3 @@ create table exception_rules(
 
 
 
-
