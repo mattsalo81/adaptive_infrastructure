@@ -5,10 +5,15 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
 use Logging;
+use SMS::SMSDigest;
 
 # class to make sorting/indexing sms records faster
+# all records are assumed to be hashrefs with identical keys
+# FastTable has an INDEX member that can be set to som key available to all records
+# the FastTable will group all records by the INDEXed key and store them as an arrayref, pointed to in RECORDS by the value of their INDEXed member
 
 sub new{
+    # <class> [index] <record_arrayref> = @_;
     my $class = shift;
     my $index = "DEVICE";
     # take index if scalar profided
@@ -23,6 +28,18 @@ sub new{
     $self->index_by($index);
 
     $self->add_arrayref($records) if defined $records;
+    return $self;
+}
+
+sub new_extract{
+    my ($class, $index) = @_;
+    my $records = SMSDigest::get_all_records();
+    my $self;
+    if (defined $index) {
+        $self = $class->new($index, $records);
+    } else {
+        $self = $class->new($records);
+    }
     return $self;
 }
 

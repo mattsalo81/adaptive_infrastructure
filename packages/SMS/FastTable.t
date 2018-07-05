@@ -49,6 +49,16 @@ is($t->{"INDEX"}, "DEVICE", "Defaults to indexing by device");
 $t = FastTable->new("ROUTING", []);
 is($t->{"INDEX"}, "ROUTING", "New indexed table by routing");
 
+# extract constructor tests
+$t = FastTable->new_extract();
+ok(scalar keys %{$t->{"RECORDS"}} > 10, "found 10+ indexes in extract");
+is($t->{"INDEX"}, "DEVICE", "Defaults to indexing by device");
+
+$t = FastTable->new_extract("ROUTING");
+ok(scalar keys %{$t->{"RECORDS"}} > 10, "found 10+ indexes in extract");
+is($t->{"INDEX"}, "ROUTING", "Can specify INDEX");
+
+
 # dumping/erasing records
 
 $t = FastTable->new($test_rec);

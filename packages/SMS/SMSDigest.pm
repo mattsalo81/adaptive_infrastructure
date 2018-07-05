@@ -7,6 +7,18 @@ use Data::Dumper;
 use Database::Connect;
 use Logging;
 
+sub get_all_records{
+    my $sql = q{select * from daily_sms_extract};
+    my $conn = Connect::read_only_connection("etest");
+    my $sth = $conn->prepare($sql);
+    $sth->execute() or confess "Could not get the daily_sms_extract";
+    my @records;
+    while (my $rec = $sth->fetchrow_hashref("NAME_uc")){
+        push @records, $rec;
+    }
+    return \@records;
+}
+
 sub get_entries_for_tech{
     my ($tech) = @_;
     my $sql = q{select * from daily_sms_extract where technology = ?}; 
