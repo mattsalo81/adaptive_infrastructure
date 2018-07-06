@@ -14,7 +14,7 @@ our $number_format = '[-+]?[0-9]*(\.)?[0-9]+([eE][-+]?[0-9]+)?';
 my @required_fields = qw(rule_number technology family dev_class prod_grp);
 push @required_fields, qw(routing effective_routing program device process_option);
 push @required_fields, qw(coordref test_lpt test_opn lpt functionality PCD_REV);
-@required_fields = map {tr/a-z/A-Z/} @required_fields;
+@required_fields = map {tr/a-z/A-Z/; $_} @required_fields;
 
 
 # This class uses the SMS/FastTable for filtering, which uses lambda functions to filter records
@@ -22,7 +22,7 @@ push @required_fields, qw(coordref test_lpt test_opn lpt functionality PCD_REV);
 
 
 # each field's filtering subroutine
-my %field_filter_actions = (
+our %field_filter_actions = (
     # FIELD             => [function_type, lambda generator for RuleTable (takes only $self)],
     TECHNOLOGY          => ['INDEX', lambda_generator_generator_explicit_index('TECHNOLOGY')],
     FAMILY              => ['INDEX', lambda_generator_generator_explicit_index('FAMILY')],
@@ -33,12 +33,28 @@ my %field_filter_actions = (
     PROGRAM             => ['INDEX', lambda_generator_generator_explicit_index('PROGRAM')],
     DEVICE              => ['INDEX', lambda_generator_generator_explicit_index('DEVICE')],
     COORDREF            => ['INDEX', lambda_generator_generator_explicit_index('COORDREF')],
-    TEST_LPT            => ['INDEX', lambda_generator_generator_explicit_index('LPT')],
-    TEST_OPN            => ['INDEX', lambda_generator_generator_explicit_index('OPN')],
-    PROCESS_OPTION      => ['INDEX', &lambda_generator_process_options];
-    LPT                 => ['INDEX', &lambda_generator_logpoints];
-#    FUNCTIONALITY       => ['RECORD', undef];
-#    PCD_REV              => ['RECORD', undef];
+    TEST_LPT            => ['INDEX', lambda_generator_generator_explicit_index('TEST_LPT')],
+    TEST_OPN            => ['INDEX', lambda_generator_generator_explicit_index('TEST_OPN')],
+    PROCESS_OPTION      => ['INDEX', \&lambda_generator_process_options],
+    LPT                 => ['INDEX', \&lambda_generator_logpoints],
+    FUNCTIONALITY       => ['RECORD', undef];
+    PCD_REV             => ['RECORD', undef];
+);
+
+our %index_translator = (
+    TECHNOLOGY  => "TECHNOLOGY",
+    FAMILY      => "FAMILY",
+    DEV_CLASS   => "DEV_CLASS",
+    PROD_GRP    => "PROD_GRP",
+    ROUTING     => "ROUTING",
+    EFFECTIVE_ROUTING => "EFFECTIVE_ROUTING",
+    PROGRAM     => "PROGRAM",
+    DEVICE      => "DEVICE",
+    COORDREF    => "COORDREF",
+    TEST_LPT    => "LPT",
+    TEST_OPN    => "OPN",
+    PROCESS_OPTION => "EFFECTIVE_ROUTING",
+    LPT         => "ROUTING",
 );
 
 sub new_empty{
@@ -65,10 +81,13 @@ sub filter_fasttable_by_rule{
         # create a lambda for Fast Table
         my ($filter_type, $lambda_generator) = $field_filter_actions{$rule_key};
         if($filter_type eq "INDEX"){
-            $lambda = $self->$lambda_generator();
+            my $lambda = $self->$lambda_generator();
+            my $index = $index_translator{$rule_key};
+            confess "$rule_key is not defined in index_translator so cannot get equivalent sms-record key" unless defined $index;
+            $ft->index_by($index);
             $ft->filter_indexes($lambda);
         }elsif($filter_type eq "RECORD"){
-            $lambda = $self->$lambda_generator();
+            my $lambda = $self->$lambda_generator();
             $ft->filter_records($lambda);
         }else{
             confess "Don't know how to create a rule for type <$filter_type>";
@@ -93,7 +112,7 @@ sub lambda_generator_generator_explicit_index{
 # takes a rule and returns a lambda function for filtering a fasttable by process options
 sub lambda_generator_process_options{
     my ($self) = @_;
-    my $requirements = $self->{"PROCESS_OPTIONS"};
+    my $requirements = $self->{"PROCESS_OPTION"};
     confess "process option requirements not defined" unless defined $requirements;
     # return true for blank rules
     return sub{ 1 } if $requirements =~ m/^\s*$/;
@@ -103,7 +122,7 @@ sub lambda_generator_process_options{
         my $technology = $record->{"TECHNOLOGY"};
         confess "Could not get technology" unless defined $technology;
         my $effective_routing = $record->{"EFFECTIVE_ROUTING"};
-        confess "Could not get Effective_routing" unless defined $effecitve_routing;
+        confess "Could not get Effective_routing" unless defined $effective_routing;
         return BooleanExpression::does_effective_routing_match_expression_using_database
                         ($technology, $effective_routing, $requirements);
     }

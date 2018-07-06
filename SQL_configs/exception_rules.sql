@@ -16,6 +16,7 @@ create table exception_rules(
              test_opn                   varchar2 (128),
              lpt                        varchar2 (128),
              functionality              varchar2 (128),
+             pcd                        varchar2 (16),
              PCD_REV                    varchar2 (16),
              expiration_date            date,             
              constraint exc_rules_pk PRIMARY KEY (exception_number, rule_number),
@@ -37,7 +38,8 @@ create table exception_rules(
                         test_opn is not null or
                         lpt is not null or
                         functionality is not null or
-                        PCD_REV is not null)
+                        PCD_REV is not null),
+            constraint pcd_rule check (PCD_REV is null or (pcd is not null));
 );             
 
 
