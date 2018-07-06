@@ -58,6 +58,15 @@ $t = FastTable->new_extract("ROUTING");
 ok(scalar keys %{$t->{"RECORDS"}} > 10, "found 10+ indexes in extract");
 is($t->{"INDEX"}, "ROUTING", "Can specify INDEX");
 
+# copy
+$t = FastTable->new("PROGRAM", $test_rec);
+my $c = $t->new_copy();
+ok(have_same_elements($c->get_all_records(), $t->get_all_records()), "Copy has the same elements as master");
+is($c->{"INDEX"}, $t->{"INDEX"}, "Copy is indexed how master was");
+$t->index_by("DEVICE");
+ok($c->{"INDEX"} ne $t->{"INDEX"}, "Copy INDEX is not tied to master INDEX");
+$t->clear_all_records();
+ok(!have_same_elements($c->get_all_records(), $t->get_all_records()), "Copy's records are not tied to Master's records");
 
 # dumping/erasing records
 

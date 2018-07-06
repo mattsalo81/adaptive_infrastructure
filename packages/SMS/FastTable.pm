@@ -43,6 +43,12 @@ sub new_extract{
     return $self;
 }
 
+sub new_copy{
+    my ($orig) = @_;
+    my $self = new(ref($orig), $orig->{"INDEX"}, $orig->get_all_records());
+    return $self;
+}
+
 # adds a list of records to the object, indexed off whatever INDEX is
 sub add_arrayref{
     my ($self, $arrayref) = @_;
