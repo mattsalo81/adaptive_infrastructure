@@ -39,8 +39,8 @@ our %field_filter_actions = (
     TEST_LPT            => ['INDEX', lambda_generator_generator_explicit_index('TEST_LPT')],
     TEST_OPN            => ['INDEX', lambda_generator_generator_explicit_index('TEST_OPN')],
     PROCESS_OPTION      => ['RECORD', \&lambda_generator_process_options],
-    LPT                 => ['INDEX', \&lambda_generator_logpoints],
-    FUNCTIONALITY       => ['RECORD', sub{return sub{1}}],
+    LPT                 => ['INDEX',  \&lambda_generator_logpoints],
+    FUNCTIONALITY       => ['RECORD', \&lambda_generator_functionality],
     #PCD_REV             => ['RECORD', undef],
 );
 
@@ -158,6 +158,14 @@ sub lambda_generator_logpoints{
         confess "Could not get Routing" unless defined $routing;
         return BooleanExpression::does_sms_routing_match_lpt_string($routing, $requirements);
     }
+}
+
+sub lambda_generator_functionality{
+    my ($self) = @_;
+    my $requirements = $self->{"FUNCTIONALITY"};
+    confess "Functionality requriements not defined" unless defined $requirements;
+    return sub {1} if $requirements =~ m/^\s*$/;
+    return sub {0};
 }
 
 # should a rule cut down a fast table or a fast table cut down a rule?

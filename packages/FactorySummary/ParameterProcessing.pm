@@ -8,7 +8,6 @@ use Logging;
 use Database::Connect;
 use LimitDatabase::LimitRecord;
 use Parse::BooleanExpression;
-use SMS::SMSDigest;
 
 # this package is meant to process a block of f-summary records for a particular technology/parameter against SMS records from the digest
 # process_f_summary_parameter_records will return the functional parameters and the entries for the limitsdb

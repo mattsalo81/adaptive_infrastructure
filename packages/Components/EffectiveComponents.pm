@@ -7,7 +7,6 @@ use Data::Dumper;
 use Logging;
 use Database::Connect;
 use Components::FMEA;
-use SMS::SMSDigest;
 
 # for populating and retreiving effective component information
 # includes FMEA parameters in information
