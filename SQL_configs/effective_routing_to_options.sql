@@ -10,3 +10,9 @@ insert into effective_routing_to_options (technology, effective_routing, process
 ('TEST', 'EFF_ROUT_1', 'OPTION2');
 insert into effective_routing_to_options (technology, effective_routing, process_option) values
 ('TEST', 'EFF_ROUT_2', 'OPTION2');
+insert into effective_routing_to_options (technology, effective_routing, process_option) values
+('WAV_TEST', 'TDBROUT1', 'OPT2');
+insert into effective_routing_to_options (technology, effective_routing, process_option) values
+('WAV_TEST', 'TDBROUT2', 'OPT1');
+insert into effective_routing_to_options (technology, effective_routing, process_option) values
+('WAV_TEST', 'TDBROUT3', 'NULL_OPTION');

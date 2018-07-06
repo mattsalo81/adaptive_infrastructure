@@ -13,8 +13,11 @@ our $number_format = '[-+]?[0-9]*(\.)?[0-9]+([eE][-+]?[0-9]+)?';
 # configuration variables
 my @required_fields = qw(rule_number technology family dev_class prod_grp);
 push @required_fields, qw(routing effective_routing program device process_option);
-push @required_fields, qw(coordref test_lpt test_opn lpt functionality PCD_REV);
+push @required_fields, qw(coordref test_lpt test_opn lpt functionality);
 @required_fields = map {tr/a-z/A-Z/; $_} @required_fields;
+
+# fields that are allowed but are not used for filtering
+my %non_rule_fields = (RULE_NUMBER => "yep");
 
 
 # This class uses the SMS/FastTable for filtering, which uses lambda functions to filter records
@@ -35,10 +38,10 @@ our %field_filter_actions = (
     COORDREF            => ['INDEX', lambda_generator_generator_explicit_index('COORDREF')],
     TEST_LPT            => ['INDEX', lambda_generator_generator_explicit_index('TEST_LPT')],
     TEST_OPN            => ['INDEX', lambda_generator_generator_explicit_index('TEST_OPN')],
-    PROCESS_OPTION      => ['INDEX', \&lambda_generator_process_options],
+    PROCESS_OPTION      => ['RECORD', \&lambda_generator_process_options],
     LPT                 => ['INDEX', \&lambda_generator_logpoints],
-    FUNCTIONALITY       => ['RECORD', undef];
-    PCD_REV             => ['RECORD', undef];
+    FUNCTIONALITY       => ['RECORD', sub{return sub{1}}],
+    #PCD_REV             => ['RECORD', undef],
 );
 
 our %index_translator = (
@@ -67,7 +70,7 @@ sub new_empty{
 sub new_from_hash{
     my ($class, $hash) = @_;
     my $self = $class->new_empty();
-    foreach my $field (@required_fields){
+    foreach my $field (@required_fields, keys %{$hash}){
         my $value = $hash->{$field};
         $self->{$field} = "";
         $self->{$field} = $value if defined $value;
@@ -75,11 +78,23 @@ sub new_from_hash{
     return $self;
 }
 
-sub filter_fasttable_by_rule{
+sub validate_rule{
+    my ($self) = @_;
+    # check for extra fields
+    foreach my $rule (keys %{$self}){
+        if ((not defined $field_filter_actions{$rule}) && (not defined $non_rule_fields{$rule})){
+            confess "Extra Rule for $rule that I don't know how to interpret";
+        }
+    }
+}
+
+sub filter_fasttable{
     my ($self, $ft) = @_;
+    $self->validate_rule();
     foreach my $rule_key (keys %field_filter_actions){
         # create a lambda for Fast Table
-        my ($filter_type, $lambda_generator) = $field_filter_actions{$rule_key};
+        my ($filter_type, $lambda_generator) = @{$field_filter_actions{$rule_key}};
+        Logging::diag("Filtering fast table for $rule_key");
         if($filter_type eq "INDEX"){
             my $lambda = $self->$lambda_generator();
             my $index = $index_translator{$rule_key};
@@ -103,8 +118,10 @@ sub lambda_generator_generator_explicit_index{
         my $expression = $self->{$rule_field};
         # lambda
         my $lambda = sub {
-            my ($index_value);
-            return explicit_anchored_regex_with_numeric_comparison($index_value, $expression);
+            my ($index_value) = @_;
+            my $ret = explicit_anchored_regex_with_numeric_comparison($index_value, $expression);
+            Logging::diag("returned $ret on <$index_value> matching expression <$expression>");
+            return $ret;
         }
     };
 }
@@ -137,8 +154,7 @@ sub lambda_generator_logpoints{
     return sub { 1 } if $requirements =~ m/^\s*$/;
     # lambda takes an SMS record
     return sub{
-        my ($record) = @_;
-        my $routing = $record->{"ROUTING"};
+        my ($routing) = @_;
         confess "Could not get Routing" unless defined $routing;
         return BooleanExpression::does_sms_routing_match_lpt_string($routing, $requirements);
     }
@@ -152,8 +168,10 @@ sub lambda_generator_logpoints{
 sub explicit_anchored_regex_with_numeric_comparison{
     my ($test, $expression) = @_;
     confess "Expression undefined" unless defined $expression;
+    confess "Test undefined" unless defined $test;
     $expression =~ s/^\s*//;
     $expression =~ s/\s*$//;
+    return 1 if ($expression eq ".*" || $expression =~ m/^\s*$/);
     if ($expression =~ m{^/(.*)/$}){
         return anchored_regex_with_numeric_comparison($test, $1);
     }else{
@@ -172,8 +190,6 @@ sub anchored_regex_with_numeric_comparison{
     $expression =~ s/\s*$//;
     return 1 if $expression eq "";
     return 1 if $expression eq ".*";
-    $test = "" unless defined $test;
-    
     if ($test =~ m/^$number_format$/ && $expression =~ m{^([<=>][<=>]?|!=)($number_format)$}){
         # numeric comparison
         my ($comparison_operator, $test_value) = ($1, $2);

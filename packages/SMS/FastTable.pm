@@ -89,6 +89,7 @@ sub clear_all_records{
 }
 
 # takes a lambda function that takes an index value as an input
+# should be indexed by proper field before hand
 # for all unique INDEXes:
 #   if lambda returns true, nothing happens
 #   if lambda returns false, that key (and all records associated with it) are deleted from the FastTable

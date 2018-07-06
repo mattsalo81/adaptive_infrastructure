@@ -41,6 +41,10 @@ create table exception_rules(
                         PCD_REV is not null),
             constraint pcd_rule check (PCD_REV is null or (pcd is not null));
 );             
+insert into exception_rules (exception_number, rule_number, active, technology) values 
+(0, 0, 'ACTIVE', 'R_TEST');
+insert into exception_rules (exception_number, rule_number, active, technology) values 
+(0, 1, 'INACTIVE', 'R_TEST');
 
 
 

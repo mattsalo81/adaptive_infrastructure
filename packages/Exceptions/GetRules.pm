@@ -32,9 +32,11 @@ sub get_rules_for_exception{
     my ($exception) = @_;
     my $sth = get_rules_for_exception_sth();
     $sth->execute($exception);
-    
-    
-    
+    my @rules;
+    while (my $rec = $sth->fetchrow_hashref("NAME_uc")){
+        push @rules, $rec;
+    }
+    return \@rules;
 }
 
 sub get_rules_for_exception_sth{
@@ -46,6 +48,7 @@ sub get_rules_for_exception_sth{
               exception_rules
             where
               exception_number = ?
+              and ACTIVE = 'ACTIVE'
             order by
               rule_number
         };
