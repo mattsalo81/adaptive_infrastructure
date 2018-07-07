@@ -45,12 +45,23 @@ sub get_rules_for_exception_sth{
             select
               *
             from
-              exception_rules
+              exception_rules r
             where
-              exception_number = ?
-              and ACTIVE = 'ACTIVE'
+              r.exception_number = ?
+              and r.ACTIVE = 'ACTIVE'
+              and (r.EXPIRATION_DATE is null or r.EXPIRATION_DATE > sysdate)
+              and (r.pcd_rev is null or r.pcd_rev in(
+                  select 
+                    pr.rev 
+                  from 
+                    pcd_rev pr 
+                  where 
+                    pr.pcd = r.pcd
+                    and pr.active = 'CUR'
+                )
+              )
             order by
-              rule_number
+              r.rule_number
         };
         my $conn = Connect::read_only_connection("etest");
         $rules_for_exception_sth = $conn->prepare($sql);

@@ -16,7 +16,7 @@ create table exception_rules(
              test_opn                   varchar2 (128),
              lpt                        varchar2 (128),
              functionality              varchar2 (128),
-             pcd                        varchar2 (16),
+             PCD                        varchar2 (16),
              PCD_REV                    varchar2 (16),
              expiration_date            date,             
              constraint exc_rules_pk PRIMARY KEY (exception_number, rule_number),
@@ -39,13 +39,20 @@ create table exception_rules(
                         lpt is not null or
                         functionality is not null or
                         PCD_REV is not null),
-            constraint pcd_rule check (PCD_REV is null or (pcd is not null));
+            constraint pcd_rule check ((PCD_REV is null) or (pcd is not null))
 );             
 insert into exception_rules (exception_number, rule_number, active, technology) values 
 (0, 0, 'ACTIVE', 'R_TEST');
 insert into exception_rules (exception_number, rule_number, active, technology) values 
 (0, 1, 'INACTIVE', 'R_TEST');
-
+insert into exception_rules (exception_number, rule_number, active, technology, expiration_date) values 
+(1, 0, 'ACTIVE', 'EXP_TEST_OLD', TO_DATE('01/01/2001', 'mm/dd/yyyy'));
+insert into exception_rules (exception_number, rule_number, active, technology, expiration_date) values 
+(1, 1, 'ACTIVE', 'EXP_TEST_VAL', TO_DATE('01/01/2099', 'mm/dd/yyyy'));
+insert into exception_rules (exception_number, rule_number, active, technology, pcd, pcd_rev) values 
+(1, 2, 'ACTIVE', 'PCD_TEST_OLD', 'EXCEPTION_TEST', '0.1');
+insert into exception_rules (exception_number, rule_number, active, technology, pcd, pcd_rev) values 
+(1, 3, 'ACTIVE', 'PCD_TEST_VAL', 'EXCEPTION_TEST', '1.0');
 
 
 
