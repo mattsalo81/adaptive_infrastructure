@@ -10,7 +10,7 @@ use SMS::SMSDigest;
 use Components::ComponentXref;
 use Components::ComponentPopulator;
 use FactorySummary::Upload;
-
+use Exceptions::RuleEngine;
 
 SpecExtract::update_sms_table();
 WipExtract::update_wip_extract();
@@ -22,4 +22,4 @@ ComponentPopulator::update_effective_component_info();
 foreach my $tech (@{SMSDigest::get_all_technologies()}){
     FactorySummary::Upload::update_technology_info_functional_and_limits($tech);
 }
-
+RuleEngine::run();

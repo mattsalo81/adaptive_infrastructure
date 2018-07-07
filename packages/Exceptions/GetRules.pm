@@ -6,6 +6,7 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use Database::Connect;
+use Exceptions::ExceptionRules;
 
 my $rules_for_exception_sth;
 
@@ -34,7 +35,7 @@ sub get_rules_for_exception{
     $sth->execute($exception);
     my @rules;
     while (my $rec = $sth->fetchrow_hashref("NAME_uc")){
-        push @rules, $rec;
+        push @rules, ExceptionRules->new_from_hash($rec);
     }
     return \@rules;
 }

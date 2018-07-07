@@ -17,6 +17,11 @@ ok(defined($everything), "Got all records (or something)");
 my @all_devices = map {$_->{"DEVICE"}} @{$everything};
 ok(in_list($known_device, \@all_devices), "Found $known_device in list of all records");
 
+my $active = SMSDigest::get_all_records();
+ok(defined($active), "Got all active records (or something)");
+@all_devices = map {$_->{"DEVICE"}} @{$active};
+ok(in_list($known_device, \@all_devices), "Found $known_device in list of all active records");
+
 my $techs = SMSDigest::get_all_technologies();
 ok(defined($techs), "Got something");
 ok(in_list($known_tech, $techs), "Found $known_tech, at least");

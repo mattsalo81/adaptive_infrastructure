@@ -33,7 +33,7 @@ sub new{
 
 sub new_extract{
     my ($class, $index) = @_;
-    my $records = SMSDigest::get_all_records();
+    my $records = SMSDigest::get_all_active_records();
     my $self;
     if (defined $index) {
         $self = $class->new($index, $records);

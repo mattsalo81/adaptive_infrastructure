@@ -17,12 +17,31 @@ push @required_fields, qw(coordref test_lpt test_opn lpt functionality);
 @required_fields = map {tr/a-z/A-Z/; $_} @required_fields;
 
 # fields that are allowed but are not used for filtering
-my %non_rule_fields = (RULE_NUMBER => "yep");
+my @non_rule_fields = qw(RULE_NUMBER EXPIRATION_DATE PCD PCD_REV EXCEPTION_NUMBER RULE_NUMBER ACTIVE);
+my %non_rule_fields;
+@non_rule_fields{@non_rule_fields} = @non_rule_fields;
 
 
 # This class uses the SMS/FastTable for filtering, which uses lambda functions to filter records
 # a good portion of this class concerns itself with generating the lambda functions required for each rule
 
+# order to execute rules in
+my @field_filter_order = qw(
+    TEST_LPT
+    TEST_OPN
+    TECHNOLOGY
+    FAMILY
+    DEV_CLASS
+    PROD_GRP
+    ROUTING
+    EFFECTIVE_ROUTING
+    COORDREF
+    PROGRAM
+    DEVICE
+    PROCESS_OPTION
+    LPT
+    FUNCTIONALITY
+);
 
 # each field's filtering subroutine
 our %field_filter_actions = (
@@ -41,8 +60,8 @@ our %field_filter_actions = (
     PROCESS_OPTION      => ['RECORD', \&lambda_generator_process_options],
     LPT                 => ['INDEX',  \&lambda_generator_logpoints],
     FUNCTIONALITY       => ['RECORD', \&lambda_generator_functionality],
-    #PCD_REV             => ['RECORD', undef],
 );
+check_field_filter_action_vs_order();
 
 our %index_translator = (
     TECHNOLOGY  => "TECHNOLOGY",
@@ -91,7 +110,7 @@ sub validate_rule{
 sub filter_fasttable{
     my ($self, $ft) = @_;
     $self->validate_rule();
-    foreach my $rule_key (keys %field_filter_actions){
+    foreach my $rule_key (@field_filter_order){
         # create a lambda for Fast Table
         my ($filter_type, $lambda_generator) = @{$field_filter_actions{$rule_key}};
         Logging::diag("Filtering fast table for $rule_key");
@@ -140,8 +159,18 @@ sub lambda_generator_process_options{
         confess "Could not get technology" unless defined $technology;
         my $effective_routing = $record->{"EFFECTIVE_ROUTING"};
         confess "Could not get Effective_routing" unless defined $effective_routing;
-        return BooleanExpression::does_effective_routing_match_expression_using_database
+        my $success = 0;
+        eval{
+            $success = BooleanExpression::does_effective_routing_match_expression_using_database
                         ($technology, $effective_routing, $requirements);
+            1;
+        } or do {
+            my $e = @_;
+            warn "Could not get process options for <$technology> effective routing <$effective_routing>";
+            Logging::diag("Could not get process options for <$technology> effective routing <$effective_routing> because $e");
+            return 0;
+        };
+        return $success;
     }
 }
 
@@ -230,4 +259,15 @@ sub numeric_comparison{
     confess "Should never get here";
 }
 
+# check if every field defined in the %field_filter_actions is defined in @field_filter_order
+sub check_field_filter_action_vs_order{
+    my %order_tmp;
+    @order_tmp{@field_filter_order} = @field_filter_order;
+    foreach my $order_key(keys %order_tmp){
+        confess "<$order_key> is defined in the field_filter_order, but is not tied to an action in field_filter_action!, configuration issue" unless defined $field_filter_actions{$order_key};
+    }
+    foreach my $action_key(keys %field_filter_actions){
+        confess "<$action_key> is defined in the field_filter_action, but is not given a precedence in field_filter_order!, configuration issue" unless defined $order_tmp{$action_key};
+    }
+}
 1;

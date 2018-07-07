@@ -12,18 +12,19 @@ use SMS::FastTable;
 
 sub run{
     # get all elements from sms
-    my $ft = FastTable::new_extract();
+    my $ft = FastTable->new_extract();
     # start a new transaction
     my $trans = Connect::new_transaction("etest");
     eval{
-        clear_exceptions_table($trans);
+        clear_exception_table($trans);
         my $ins_sth = get_insert_exception_sth($trans);
-        my $exceptions = GetRules::get_all_active_exceptions();
+        my $exceptions = Exceptions::GetRules::get_all_active_exceptions();
         foreach my $exception (@{$exceptions}){
             eval{
-                my $rules = GetRules::get_rules_for_exception($exception);
+                my $rules = Exceptions::GetRules::get_rules_for_exception($exception);
                 my $records = get_matching_records_fasttable($rules, $ft);
                 insert_exceptions($ins_sth, $records, $exception);
+                1;
             } or do {
                 my $e = $@;
                 warn "Could not apply exception $exception because : $e";
