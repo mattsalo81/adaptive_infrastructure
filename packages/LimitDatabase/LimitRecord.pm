@@ -53,7 +53,7 @@ my %priority = (
 );
 
 # Mapping for sampling rates -> number of sites
-my %sampling = (
+our %sampling = (
     '5 SITE'    => 5,
     '9 SITE'    => 9,
     'RANDOM'    => 1,
@@ -184,11 +184,7 @@ sub new_from_hash{
 sub populate_from_hash{
     my ($self, $hashref) = @_;
     foreach my $key (keys %{$hashref}){
-        if (defined $ok_fields{$key}){
-            $self->{$key} = $hashref->{$key};
-        }else{
-            confess "Tried to set a LimitRecord value for key $key, which is not a known key";
-        }
+        $self->set($key, $hashref->{$key});
     }
     return $self;
 }
@@ -225,6 +221,15 @@ sub set_item_type{
 sub set_priority{
     my ($self, $priority) = @_;
     $self->{"PRIORITY"} = $priority;
+}
+
+sub set{
+    my ($self, $thing, $value) = @_;
+    if (defined $ok_fields{$thing}){
+        $self->{$thing} = $value;
+    }else{
+        confess "Tried to set a LimitRecord value for key $thing, which is not a known key";
+    }
 }
 
 # put the information from the f_summary record into the limit object
@@ -410,6 +415,12 @@ sub get_num_fails{
     my $num_fails = ceil($sites * (1 - $pass));
 }
 
+sub scrap_is_reversed{
+    my ($self) = @_;
+    my $io = $self->get("REVERSE_SPEC_LIMIT");
+    return $io eq "Y";
+}
+
 # get scrap entry for a specfile, return undef or arrayref
 sub get_scrap_entry{
     my ($self) = @_; 
@@ -421,11 +432,16 @@ sub get_scrap_entry{
         my $fail = $self->get_num_fails();
         my $lsl = $self->get("SPEC_LOWER");
         my $usl = $self->get("SPEC_UPPER");
-        my $io = $self->get("REVERSE_SPEC_LIMIT");
-        $io = (($io eq "Y") ? 0 : 1);
+        my $io = ($self->scrap_is_reversed() ? 0 : 1);
         return [$parm, $fail, $lsl, $usl, $io, 6];
     }
     return undef;
+}
+
+sub reliability_is_reversed{
+    my ($self) = @_;
+    my $io = $self->get("REVERSE_RELIABILITY_LIMIT");
+    return $io eq "Y";
 }
 
 # get reliability entry for a specfile, return undef or arrayref
@@ -437,8 +453,7 @@ sub get_reliability_entry{
     if ((defined $rel) && $rel eq "Y"){
         my $lrl = $self->get("RELIABILITY_LOWER");
         my $url = $self->get("RELIABILITY_UPPER");
-        my $io = $self->get("REVERSE_RELIABILITY_LIMIT");
-        $io = ($io eq "Y") ? 0 : 1;
+        my $io = ($self->reliability_is_reversed()) ? 0 : 1;
         return [$parm, 1, $lrl, $url, $io, 2];
     }
     return undef; 
