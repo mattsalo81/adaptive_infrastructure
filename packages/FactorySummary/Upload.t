@@ -28,6 +28,7 @@ my $limits =
         ITEM_TYPE       => "TECHNOLOGY",
         ITEM            => "TEST",
         ETEST_NAME      => "TEST",
+        PRIORITY        => 0,
     }, "LimitRecord",
 ];
 

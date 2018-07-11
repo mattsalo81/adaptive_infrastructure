@@ -38,6 +38,7 @@ my %dummy_values = (
     RELIABILITY_UPPER           => undef,
     RELIABILITY_LOWER           => undef,
     REVERSE_RELIABILITY_LIMIT   => undef,
+    PRIORITY                    => 0,
     LIMIT_COMMENTS              => $dummy_comment,
 );
 
@@ -66,7 +67,7 @@ push @fields_that_match_f_summary, qw(reliability reliability_upper reliability_
 
 
 # all fields in the limits_database
-my @limit_fields = qw(technology test_area item_type item etest_name deactivate sampling_rate);
+my @limit_fields = qw(technology test_area item_type item etest_name priority deactivate sampling_rate);
 push @limit_fields, qw(dispo pass_criteria_percent reprobe_map dispo_rule spec_upper spec_lower reverse_spec_limit);
 push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_reliability_limit limit_comments);
 @limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
@@ -225,6 +226,7 @@ sub set_item_type{
 sub new_copy_from_f_summary{
     my ($class, $f_summary_record) = @_;
     my $obj = LimitRecord->new_empty();
+    $obj->{"PRIORITY"} = 0;
     return copy_matching_f_summary_fields($obj, $f_summary_record);
 }
 
@@ -293,6 +295,7 @@ sub link_by_priority{
 # returns the higher priority limit
 sub choose_highest_priority{
     my ($class, $limit1, $limit2) = @_;
+    # choose more specific item_type
     my $type1 = $limit1->{"ITEM_TYPE"};
     my $type2 = $limit2->{"ITEM_TYPE"};
     unless (defined $type1){
@@ -311,7 +314,12 @@ sub choose_highest_priority{
     }
     return $limit1 if($p1 > $p2);
     return $limit2 if($p1 < $p2);
-    confess "Both limits provided are set at the same item_type level. Limit1 = " . Dumper($limit1) . "\nLimit2 = " . Dumper($limit2);
+    # now check actual priority
+    $p1 = $limit1->{"PRIORITY"};
+    $p2 = $limit2->{"PRIORITY"};
+    return $limit1 if($p1 > $p2);
+    return $limit2 if($p1 < $p2);
+    confess "Both limits provided are set at the same item_type level and priority. Limit1 = " . Dumper($limit1) . "\nLimit2 = " . Dumper($limit2);
 }
 
 # given an arbitrary list of limits, resolves conflicts of limits between limits of different priorities
