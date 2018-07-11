@@ -1,0 +1,2 @@
+#!/bin/bash
+sed '/NEW_OPT,BEEN_TO/d;/AT_/d;/NEW_OPT,AFTER_/d;/PLUS_LM$/d;/BASELINE/d'

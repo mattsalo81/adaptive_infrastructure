@@ -8,10 +8,15 @@ use Logging;
 use Database::Connect;
 use LimitDatabase::LimitRecord;
 
-my $limits_sth;
+my %limits_sth;
 
 sub get_all_limits{
     my ($tech, $area, $rout, $prog, $dev) = @_;
+    return get_all_limits_trans(Connect::read_only_connection('etest'), $tech, $area, $rout, $prog, $dev);
+}
+
+sub get_all_limits_trans{
+    my ($trans, $tech, $area, $rout, $prog, $dev) = @_;
     my @limits;
     unless (defined $tech){
         confess "Cannot query limits without technology";
@@ -22,7 +27,7 @@ sub get_all_limits{
     if(defined $dev and not defined $prog){
         confess "Cannot resolve limits at the device level without a valid program";
     }
-    my $sth = get_limits_sth();
+    my $sth = get_limits_sth($trans);
     $sth->bind_param(':tech', $tech);
     $sth->bind_param(':area', $area);
     $sth->bind_param(':rout', $rout);
@@ -37,7 +42,8 @@ sub get_all_limits{
 }
 
 sub get_limits_sth{
-    unless (defined $limits_sth){
+    my ($trans) = @_;
+    unless (defined $limits_sth{"$trans"}){
         my $conn = Connect::read_only_connection("etest");
         my $sql = q{
             select distinct
@@ -80,12 +86,12 @@ sub get_limits_sth{
                 and fp.effective_routing = :rout
             order by pi.component, fp.etest_name
         };
-        $limits_sth = $conn->prepare($sql);
+        $limits_sth{"$trans"} = $conn->prepare($sql);
     }
-    unless (defined $limits_sth){
-        confess "Could not get limits_sth";
+    unless (defined $limits_sth{"$trans"}){
+        confess "Could not get limits_sth for transaction <$trans>";
     }
-    return $limits_sth;
+    return $limits_sth{"$trans"};
 }
 
 1;
