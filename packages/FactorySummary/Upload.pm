@@ -6,6 +6,7 @@ use Carp;
 use Data::Dumper;
 use Logging;
 use FactorySummary::ProcessSummary;
+use LimitDatabase::UpdateLimit;
 
 # define parameters 
 my @parm_info_fields = qw(technology etest_name svn component parm_type_pcd test_type description);
@@ -66,10 +67,9 @@ sub update_limit_list{
     Logging::debug("Clearing Limits database for $tech");
     my $del_sth = $trans->prepare("delete from limits_database where TECHNOLOGY = ?");
     $del_sth->execute($tech);
-    my $ins_sth = get_insert_limit_sth($trans);
     Logging::event("Updating Limit database for $tech");
     foreach my $limit (@{$limit_list}){
-        insert_limit($ins_sth, $limit);
+        UpdateLimit::insert_limit($trans, $limit);
     }
     1;
 }
@@ -98,17 +98,6 @@ sub get_insert_functional_sth{
     return $sth;
 }
 
-sub get_insert_limit_sth{
-    my ($trans) = @_;
-    my $keys = join(", ", LimitRecord->get_ordered_keys());
-    my $values = join(", ", ("?") x scalar LimitRecord->get_ordered_keys());
-    my $sql = qq{
-        insert into limits_database ($keys) values ($values)
-    };
-    my $sth = $trans->prepare($sql);
-    return $sth;
-}
-
 sub get_insert_info_sth{
     my ($trans) = @_;
     my $keys = join(", ", @parm_info_fields);
@@ -123,11 +112,6 @@ sub get_insert_info_sth{
 sub insert_functional{
     my ($sth, $func_hash) = @_;
     $sth->execute(@{$func_hash}{@functional_fields}); 
-}
-
-sub insert_limit{
-    my ($sth, $limit) = @_;
-    $sth->execute($limit->get_ordered_values());
 }
 
 sub insert_info{

@@ -11,7 +11,6 @@ use LimitDatabase::LimitRecord;
 my $trans = Connect::new_transaction("etest");
 ok(defined FactorySummary::Upload::get_insert_info_sth($trans), "got sth for parm info");
 ok(defined FactorySummary::Upload::get_insert_functional_sth($trans), "got sth for functional parms");
-ok(defined FactorySummary::Upload::get_insert_limit_sth($trans), "got sth for limits db");
 
 my $info = [
     {

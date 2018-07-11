@@ -222,6 +222,11 @@ sub set_item_type{
     return $self;
 }
 
+sub set_priority{
+    my ($self, $priority) = @_;
+    $self->{"PRIORITY"} = $priority;
+}
+
 # put the information from the f_summary record into the limit object
 sub new_copy_from_f_summary{
     my ($class, $f_summary_record) = @_;
