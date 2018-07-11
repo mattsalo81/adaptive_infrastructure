@@ -16,3 +16,5 @@ insert into parameter_info (technology, etest_name, parm_type_pcd) values
 ('TEST_TECH', 'PARM3', 'WAS');
 insert into parameter_info (technology, etest_name, parm_type_pcd) values
 ('TEST_TECH', 'PARM4', 'WAS');
+insert into parameter_info (technology, etest_name, parm_type_pcd) values
+('TEST_TECH', 'PARM5', 'WAS');

@@ -13,3 +13,5 @@ insert into functional_parameters (technology, test_area, effective_routing, ete
 ('TEST_TECH', 'TEST_AREA', 'TEST_ROUT', 'PARM3');
 insert into functional_parameters (technology, test_area, effective_routing, etest_name) values
 ('TEST_TECH', 'TEST_AREA', 'TEST_ROUT', 'PARM4');
+insert into functional_parameters (technology, test_area, effective_routing, etest_name) values
+('TEST_TECH', 'TEST_AREA', 'TEST_ROUT', 'PARM5');

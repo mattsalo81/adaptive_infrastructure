@@ -74,7 +74,7 @@ insert into limits_database (technology, test_area, item_type, item, etest_name,
 ('TEST_TECH', 'TEST_AREA', 'DEVICE', 'TEST_DEV', 'PARM4', 'Y');
 
 insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate, priority) values 
-('TEST_TECH', 'TEST_AREA', 'DEVICE', 'TEST_DEV', 'PARM5', 'N', 0);
+('TEST_TECH', 'TEST_AREA', 'TECHNOLOGY', 'TEST_TECH', 'PARM5', 'Y', 0);
 insert into limits_database (technology, test_area, item_type, item, etest_name, deactivate, priority) values 
-('TEST_TECH', 'TEST_AREA', 'DEVICE', 'TEST_DEV', 'PARM5', 'Y', 1);
+('TEST_TECH', 'TEST_AREA', 'TECHNOLOGY', 'TEST_TECH', 'PARM5', 'N', 1);
 
