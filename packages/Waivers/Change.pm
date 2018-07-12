@@ -16,22 +16,22 @@ my %known_things = (
     LSL                         => {
                                         RELAX   => \&RELAX_LSL,
                                         TIGHTEN => \&TIGHTEN_LSL,
-                                        SET     => \&SET_LSL,
+                                        SET     => sub {return set_value($_[1], "SPEC_LOWER", $_[0]->{"VALUE"})},
                                     },
     USL                         => {
                                         RELAX   => \&RELAX_USL,
                                         TIGHTEN => \&TIGHTEN_USL,
-                                        SET     => \&SET_USL,
+                                        SET     => sub {return set_value($_[1], "SPEC_UPPER", $_[0]->{"VALUE"})},
                                     },
     LRL                         => {
                                         RELAX   => \&RELAX_LRL,
                                         TIGHTEN => \&TIGHTEN_LRL,
-                                        SET     => \&SET_LRL,
+                                        SET     => sub {return set_value($_[1], "RELIABILITY_LOWER", $_[0]->{"VALUE"})},
                                     },
     URL                         => {
                                         RELAX   => \&RELAX_URL,
                                         TIGHTEN => \&TIGHTEN_URL,
-                                        SET     => \&SET_URL,
+                                        SET     => sub {return set_value($_[1], "RELIABILITY_UPPER", $_[0]->{"VALUE"})},
                                     },
     PASS_CRITERIA_PERCENT       => {    
                                         RELAX   => sub {return lower_value($_[1], "PASS_CRITERIA_PERCENT", $_[0]->{"VALUE"})},
@@ -56,10 +56,10 @@ my %known_things = (
                                         NO_USE          => sub {return set_value($_[1], "RELIABILITY", "N")},
                                     },
     DISPO_RULE                  => {
-                                        SET     => sub{return set_value($_[1], "DISPO_RULE", $_->{"VALUE"})},
+                                        SET     => sub{return set_value($_[1], "DISPO_RULE", $_[0]->{"VALUE"})},
                                     },
     REPROBE_MAP                 => {
-                                        SET     => sub{return set_value($_[1], "REPROBE_MAP", $_->{"VALUE"})},
+                                        SET     => sub{return set_value($_[1], "REPROBE_MAP", $_[0]->{"VALUE"})},
                                     },
     PARAMETER                   => {
                                         DISABLE => sub{return set_value($_[1], "DEACTIVATE", "Y")},
@@ -115,7 +115,7 @@ sub should_apply{
 sub RELAX_LSL{
     my ($self, $limit) = @_;
     my $value = $self->{"VALUE"};
-    if ($limit->spec_is_reversed()){
+    if ($limit->scrap_is_reversed()){
         return raise_value($limit, "SPEC_LOWER", $value);
     }else{
         return lower_value($limit, "SPEC_LOWER", $value);
@@ -125,24 +125,18 @@ sub RELAX_LSL{
 sub TIGHTEN_LSL{
     my ($self, $limit) = @_;
     my $value = $self->{"VALUE"};
-    if ($limit->spec_is_reversed()){
+    if ($limit->scrap_is_reversed()){
         return lower_value($limit, "SPEC_LOWER", $value);
     }else{
         return raise_value($limit, "SPEC_LOWER", $value);
     }
 }
 
-sub SET_LSL{
-    my ($self, $limit) = @_;
-    my $value = $self->{"VALUE"};
-    return set_value($limit, "SPEC_LOWER", $value);
-}
-
 # UPPER SPEC STUFF
 sub RELAX_USL{
     my ($self, $limit) = @_;
     my $value = $self->{"VALUE"};
-    if ($limit->spec_is_reversed()){
+    if ($limit->scrap_is_reversed()){
         return lower_value($limit, "SPEC_UPPER", $value);
     }else{
         return raise_value($limit, "SPEC_UPPER", $value);
@@ -152,7 +146,7 @@ sub RELAX_USL{
 sub TIGHTEN_USL{
     my ($self, $limit) = @_;
     my $value = $self->{"VALUE"};
-    if ($limit->spec_is_reversed()){
+    if ($limit->scrap_is_reversed()){
         return raise_value($limit, "SPEC_UPPER", $value);
     }else{
         return lower_value($limit, "SPEC_UPPER", $value);
@@ -265,7 +259,7 @@ sub lower_value{
         confess "Value not defined";
     }
     my $old_val = $limit->get($key);
-    if ((not defined $old_val) || $old_val > $value){
+    if ((not defined $old_val) || ($old_val > $value)){
         $limit->set($key, "$value");
         return 1;
     }
@@ -283,6 +277,5 @@ sub set_value{
     }
     return 0;
 }
-
 
 1;

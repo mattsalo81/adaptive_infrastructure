@@ -418,7 +418,7 @@ sub get_num_fails{
 sub scrap_is_reversed{
     my ($self) = @_;
     my $io = $self->get("REVERSE_SPEC_LIMIT");
-    return $io eq "Y";
+    return ((defined $io) && $io eq "Y");
 }
 
 # get scrap entry for a specfile, return undef or arrayref
@@ -441,7 +441,7 @@ sub get_scrap_entry{
 sub reliability_is_reversed{
     my ($self) = @_;
     my $io = $self->get("REVERSE_RELIABILITY_LIMIT");
-    return $io eq "Y";
+    return ((defined $io) && $io eq "Y");
 }
 
 # get reliability entry for a specfile, return undef or arrayref
