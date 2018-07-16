@@ -58,6 +58,9 @@ my %known_things = (
     DISPO_RULE                  => {
                                         SET     => sub{return set_value($_[1], "DISPO_RULE", $_[0]->{"VALUE"})},
                                     },
+    LIMIT_COMMENTS               => { # Never returns a change
+                                        SET     => sub{set_value($_[1], "LIMIT_COMMENTS", $_[0]->{"VALUE"}); return 0},
+                                    },
     REPROBE_MAP                 => {
                                         SET     => sub{return set_value($_[1], "REPROBE_MAP", $_[0]->{"VALUE"})},
                                     },

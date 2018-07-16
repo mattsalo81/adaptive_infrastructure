@@ -132,6 +132,9 @@ my @tests =(
     # DEACTIVATE
     ['DISABLE',    "PARAMETER",      undef,    1,   "DEACTIVATE",    "Y"],
     ['DISABLE',    "PARAMETER",      undef,    0,   "DEACTIVATE",    "Y"],
+    # LIMIT_COMMENTS
+    ['SET',    "LIMIT_COMMENTS",      "HELLO THERE",    0,   "LIMIT_COMMENTS",    "HELLO THERE"],
+    ['SET',    "LIMIT_COMMENTS",      "HELLO THERE",    0,   "LIMIT_COMMENTS",    "HELLO THERE"],
     
     
     
