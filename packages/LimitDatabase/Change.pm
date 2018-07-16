@@ -1,4 +1,4 @@
-package Waivers::Change;
+package LimitDatabase::Change;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';

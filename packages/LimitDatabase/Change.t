@@ -5,8 +5,8 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 require Test::Homebrew_Exception;
 require Test::Lists;
 use Data::Dumper;
-use Waivers::Change;
-use LimitDatabase::LimitRecord;
+use LimitDatabase::Change;
+use LimitDatabase::::LimitRecord;
 
 # LSL tests
 #    action  thing parm, value, change?  extract  exp_val
@@ -141,7 +141,7 @@ my @tests =(
 my $l = LimitRecord->new_from_hash({ETEST_NAME => "PARM"});
 $l->dummify();
 $l->set("DEACTIVATE", "N");
-ok(defined Waivers::Change->new("ACTION", "THING", "PARAMETER", "VALUE"), "constructor");
+ok(defined LimitDatabase::Change->new("ACTION", "THING", "PARAMETER", "VALUE"), "constructor");
 
 my $tnum = 0;
 my $parm = "PARM";
@@ -149,7 +149,7 @@ my $possible_success = 1;
 foreach my $test (@tests){
     my ($action, $thing, $value, $change, $extract, $exp_val) = @{$test};
     $change *= $possible_success;
-    my $c = Waivers::Change->new($action, $thing, $parm, $value);
+    my $c = LimitDatabase::Change->new($action, $thing, $parm, $value);
     my $changed = $c->apply($l);
     ok(!($change xor $changed), "Test $tnum " . ($changed ? "changed" : "did not change") . " when expected " . ($change ? "to change" : "not to change") . " $extract");
     is($l->{$extract}, $exp_val, "Test $tnum expected value of " . (defined $exp_val ? $exp_val : "undef" ));
@@ -167,7 +167,7 @@ foreach my $test (@tests){
     my ($action, $thing, $value, $change, $extract, $exp_val) = @{$test};
     $change *= $possible_success;
     my $old_val = $l->{$extract};
-    my $c = Waivers::Change->new($action, $thing, $parm, $value);
+    my $c = LimitDatabase::Change->new($action, $thing, $parm, $value);
     my $changed = $c->apply($l);
     my $new_val = $l->{$extract};
     ok(!($change xor $changed), "Test $tnum " . ($changed ? "changed" : "did not change") . " when expected " . ($change ? "to change" : "not to change") . " $extract");
@@ -177,9 +177,9 @@ foreach my $test (@tests){
 
 
 # edge cases
-my $c = Waivers::Change->new("AAAaAA", "PARAMETER", "PARM", undef);
+my $c = LimitDatabase::Change->new("AAAaAA", "PARAMETER", "PARM", undef);
 dies_ok(sub{$c->apply($l)}, "Unkown action type");
-$c = Waivers::Change->new("SET", "WONKY", "PARM", undef);
+$c = LimitDatabase::Change->new("SET", "WONKY", "PARM", undef);
 dies_ok(sub{$c->apply($l)}, "Unkown thing type");
 
 
