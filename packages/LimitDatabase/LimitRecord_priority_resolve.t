@@ -31,17 +31,19 @@ dies_ok(sub{LimitRecord->merge([$lim1, $lim2])}, "Cannot resolve differing value
 
 # limit priorities
 
-my $tech_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"TECHNOLOGY", ETEST_NAME=>"TEST1"});
-my $rout_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"ROUTING", ETEST_NAME=>"TEST2"});
-my $prog_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"PROGRAM", ETEST_NAME=>"TEST2"});
-my $dev_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"DEVICE", ETEST_NAME=>"TEST1"});
-my $bad_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"SLDKFJSDF"});
+my $tech_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"TECHNOLOGY", ETEST_NAME=>"TEST1", PRIORITY=>0});
+my $rout_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"ROUTING", ETEST_NAME=>"TEST2", PRIORITY=>0});
+my $prog_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"PROGRAM", ETEST_NAME=>"TEST2", PRIORITY=>0});
+my $prog_limit2 = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"PROGRAM", ETEST_NAME=>"TEST2", PRIORITY=>1});
+my $dev_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"DEVICE", ETEST_NAME=>"TEST1", PRIORITY=>0});
+my $bad_limit = LimitRecord->new_from_hash({TECHNOLOGY=>"T",TEST_AREA=>"A",ITEM_TYPE=>"SLDKFJSDF", PRIORITY=>0});
 
 is($dev_limit, LimitRecord->choose_highest_priority($dev_limit, $tech_limit), "Resolving TECH/DEV limits");
 is($dev_limit, LimitRecord->choose_highest_priority($tech_limit, $dev_limit), "Resolving TECH/DEV limits");
 is($prog_limit, LimitRecord->choose_highest_priority($prog_limit, $tech_limit), "Resolving TECH/PROG limits");
 is($prog_limit, LimitRecord->choose_highest_priority($prog_limit, $rout_limit), "Resolving TECH/ROUT limits");
-dies_ok(sub{LimitRecord->choose_highest_priority($prog_limit, $prog_limit)}, "Two limits at same item level");
+is($prog_limit2, LimitRecord->choose_highest_priority($prog_limit, $prog_limit2), "Resolving priority1 and priority2 limit");
+dies_ok(sub{LimitRecord->choose_highest_priority($prog_limit, $prog_limit)}, "Two limits at same item level + priority");
 dies_ok(sub{LimitRecord->choose_highest_priority($bad_limit, $prog_limit)}, "limit with unexpected item_type");
 
 # resolving a table

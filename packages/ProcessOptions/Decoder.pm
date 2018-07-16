@@ -104,7 +104,7 @@ sub get_options_for_possibly_conflicting_routings_on_effective_routing{
             $init_rout = $routing;
         }else{
             # check if routings do not conflict -> they have identical options
-            unless((scalar @options == scalar @final_options) && (join("", @options) eq join("@final_options"))){
+            unless((scalar @options == scalar @final_options) && (join("", @options) eq join("", @final_options))){
                 confess "Could not resolve conflicts on effective routing <$effective_routing> - <$init_rout> and <$routing> have conflicting process options!";
             }
         }

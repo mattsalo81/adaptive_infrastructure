@@ -38,6 +38,7 @@ my %dummy_values = (
     RELIABILITY_UPPER           => undef,
     RELIABILITY_LOWER           => undef,
     REVERSE_RELIABILITY_LIMIT   => undef,
+    PRIORITY                    => 0,
     LIMIT_COMMENTS              => $dummy_comment,
 );
 
@@ -52,7 +53,7 @@ my %priority = (
 );
 
 # Mapping for sampling rates -> number of sites
-my %sampling = (
+our %sampling = (
     '5 SITE'    => 5,
     '9 SITE'    => 9,
     'RANDOM'    => 1,
@@ -66,7 +67,7 @@ push @fields_that_match_f_summary, qw(reliability reliability_upper reliability_
 
 
 # all fields in the limits_database
-my @limit_fields = qw(technology test_area item_type item etest_name deactivate sampling_rate);
+my @limit_fields = qw(technology test_area item_type item etest_name priority deactivate sampling_rate);
 push @limit_fields, qw(dispo pass_criteria_percent reprobe_map dispo_rule spec_upper spec_lower reverse_spec_limit);
 push @limit_fields, qw(reliability reliability_upper reliability_lower reverse_reliability_limit limit_comments);
 @limit_fields = map {tr/a-z/A-Z/; $_} @limit_fields;
@@ -183,11 +184,7 @@ sub new_from_hash{
 sub populate_from_hash{
     my ($self, $hashref) = @_;
     foreach my $key (keys %{$hashref}){
-        if (defined $ok_fields{$key}){
-            $self->{$key} = $hashref->{$key};
-        }else{
-            confess "Tried to set a LimitRecord value for key $key, which is not a known key";
-        }
+        $self->set($key, $hashref->{$key});
     }
     return $self;
 }
@@ -221,10 +218,25 @@ sub set_item_type{
     return $self;
 }
 
+sub set_priority{
+    my ($self, $priority) = @_;
+    $self->{"PRIORITY"} = $priority;
+}
+
+sub set{
+    my ($self, $thing, $value) = @_;
+    if (defined $ok_fields{$thing}){
+        $self->{$thing} = $value;
+    }else{
+        confess "Tried to set a LimitRecord value for key $thing, which is not a known key";
+    }
+}
+
 # put the information from the f_summary record into the limit object
 sub new_copy_from_f_summary{
     my ($class, $f_summary_record) = @_;
     my $obj = LimitRecord->new_empty();
+    $obj->{"PRIORITY"} = 0;
     return copy_matching_f_summary_fields($obj, $f_summary_record);
 }
 
@@ -293,6 +305,7 @@ sub link_by_priority{
 # returns the higher priority limit
 sub choose_highest_priority{
     my ($class, $limit1, $limit2) = @_;
+    # choose more specific item_type
     my $type1 = $limit1->{"ITEM_TYPE"};
     my $type2 = $limit2->{"ITEM_TYPE"};
     unless (defined $type1){
@@ -311,7 +324,12 @@ sub choose_highest_priority{
     }
     return $limit1 if($p1 > $p2);
     return $limit2 if($p1 < $p2);
-    confess "Both limits provided are set at the same item_type level. Limit1 = " . Dumper($limit1) . "\nLimit2 = " . Dumper($limit2);
+    # now check actual priority
+    $p1 = $limit1->{"PRIORITY"};
+    $p2 = $limit2->{"PRIORITY"};
+    return $limit1 if($p1 > $p2);
+    return $limit2 if($p1 < $p2);
+    confess "Both limits provided are set at the same item_type level and priority. Limit1 = " . Dumper($limit1) . "\nLimit2 = " . Dumper($limit2);
 }
 
 # given an arbitrary list of limits, resolves conflicts of limits between limits of different priorities
@@ -397,6 +415,12 @@ sub get_num_fails{
     my $num_fails = ceil($sites * (1 - $pass));
 }
 
+sub scrap_is_reversed{
+    my ($self) = @_;
+    my $io = $self->get("REVERSE_SPEC_LIMIT");
+    return ((defined $io) && $io eq "Y");
+}
+
 # get scrap entry for a specfile, return undef or arrayref
 sub get_scrap_entry{
     my ($self) = @_; 
@@ -408,11 +432,16 @@ sub get_scrap_entry{
         my $fail = $self->get_num_fails();
         my $lsl = $self->get("SPEC_LOWER");
         my $usl = $self->get("SPEC_UPPER");
-        my $io = $self->get("REVERSE_SPEC_LIMIT");
-        $io = (($io eq "Y") ? 0 : 1);
+        my $io = ($self->scrap_is_reversed() ? 0 : 1);
         return [$parm, $fail, $lsl, $usl, $io, 6];
     }
     return undef;
+}
+
+sub reliability_is_reversed{
+    my ($self) = @_;
+    my $io = $self->get("REVERSE_RELIABILITY_LIMIT");
+    return ((defined $io) && $io eq "Y");
 }
 
 # get reliability entry for a specfile, return undef or arrayref
@@ -424,8 +453,7 @@ sub get_reliability_entry{
     if ((defined $rel) && $rel eq "Y"){
         my $lrl = $self->get("RELIABILITY_LOWER");
         my $url = $self->get("RELIABILITY_UPPER");
-        my $io = $self->get("REVERSE_RELIABILITY_LIMIT");
-        $io = ($io eq "Y") ? 0 : 1;
+        my $io = ($self->reliability_is_reversed()) ? 0 : 1;
         return [$parm, 1, $lrl, $url, $io, 2];
     }
     return undef; 

@@ -30,19 +30,19 @@ sub update_sms_table{
 
         # get SMS data
         Logging::event("Downloading info from SMS and putting it into etest db");
-        my $d_sth = get_device_extract_handle();		
+        my $d_sth = get_device_extract_handle();
         $d_sth->execute();
 
         # prepare upload handle and bind variables
         my $u_sql = qq{
             insert into $table (DEVICE, TECHNOLOGY, FAMILY, COORDREF, ROUTING, 
                         EFFECTIVE_ROUTING, LPT, COT, PROGRAM, 
-                        PROBER_FILE, RECIPE, AREA, OPN, CARD_FAMILY) values 
-                        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        PROBER_FILE, RECIPE, AREA, OPN, CARD_FAMILY, DEV_CLASS, PROD_GRP) values 
+                        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         };
         my $u_sth = $trans->prepare($u_sql);
         my ($device, $technology, $family, $coordref, $routing, $effective_routing, $lpt, 
-            $cot, $program, $prober_file, $recipe, $area, $opn, $card_family);
+            $cot, $program, $prober_file, $recipe, $area, $opn, $card_family, $dev_class, $prod_grp);
         
         my $num = 0;
         # enter the download/scrub/upload loop
@@ -64,8 +64,8 @@ sub update_sms_table{
 
                 # set bound variables
                 $family = $rec->{"FAMILY"};
-                $rec->{"TECH"} = get_technology_from_family($family);
-                $technology = $rec->{"TECH"};
+                $rec->{"TECHNOLOGY"} = get_technology_from_family($family);
+                $technology = $rec->{"TECHNOLOGY"};
                 $coordref = $rec->{"COORDREF"};
                 next unless defined $coordref;
                 $routing = $rec->{"ROUTING"};
@@ -79,6 +79,8 @@ sub update_sms_table{
                 next unless defined $card_family;
                 $cot = get_COT_from_record($rec);
                 $recipe = make_recipe_from_record($rec);
+                $dev_class = $rec->{"CLASS"};
+                $prod_grp = $rec->{"PROD_GRP"};
                 
                 $effective_routing = EffectiveRouting::Generate::make_from_sms_hash($rec);
                 $rec->{"AREA"} = get_area_from_lpt_and_opn($rec->{"LPT"}, $rec->{"OPN"});
@@ -88,7 +90,7 @@ sub update_sms_table{
 
                 # upload
                 $u_sth->execute($device, $technology, $family, $coordref, $routing, $effective_routing, $lpt, 
-                        $cot, $program, $prober_file, $recipe, $area, $opn, $card_family);
+                        $cot, $program, $prober_file, $recipe, $area, $opn, $card_family, $dev_class, $prod_grp);
                 1;
             } or do {
                 my $e = $@;

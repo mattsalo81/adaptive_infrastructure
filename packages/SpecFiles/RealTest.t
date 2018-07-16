@@ -9,7 +9,7 @@ use SpecFiles::GenerateSpec;
 
 my $known_tech = "LBC5";
 my $known_area = "PARAMETRIC";
-my $known_rout = "PARAMETRIC__A72AE3A+-X";
+my $known_rout = "LBC5_PARAMETRIC_3_A+";
 my $known_prog = "M06BEC65310B0";
 my $spec = GenerateSpec::get_spec($known_tech, $known_area, $known_rout, $known_prog);
 my $text = $spec->get_text();

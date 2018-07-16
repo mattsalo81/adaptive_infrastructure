@@ -1,0 +1,9 @@
+this directory contains tools for auditing the transfer of a technology from old adaptive to new adaptive
+
+AUDIT :
+    Component information -> are component lists identical between old/new?
+    t-report/f-summary -> AUTO-TRANSFER? ( audit specfiles )
+    Process Options -> are process options identical between equivalent effective/db routings?
+    spec files -> are spec files being generated identically
+    KLFs -> are KLFs being generated functionally equivalent?
+    

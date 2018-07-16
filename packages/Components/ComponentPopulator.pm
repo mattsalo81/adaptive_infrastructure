@@ -77,10 +77,8 @@ sub update_effective_components_for_tech{
         my $ins_sth = get_insert_effective_components_table_sth($trans);
         my %prog2dev;
         foreach my $record (@$spec_info){
-            my $prog = $record->{"PROGRAM"};
-            my $dev = $record->{"DEVICE"};
-            confess "Program not defined in spec_info table" unless defined $prog;
-            confess "Device not defined in spec_info table" unless defined $dev;
+            my $prog = $record->get("PROGRAM");
+            my $dev = $record->get("DEVICE");
             $prog2dev{$prog} = {} unless defined $prog2dev{$prog};
             $prog2dev{$prog}->{$dev} = "yep";
         }

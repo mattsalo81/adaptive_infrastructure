@@ -9,8 +9,18 @@ use Data::Dumper;
 
 my $known_tech = 'LBC5';
 my $known_device = "M06ECDC65310C1"; # must be active and in known_tech
-my $known_eff_rout = "PARAMETRIC__A72AE3BE-X";
+my $known_eff_rout = "LBC5_PARAMETRIC_3_BE";
 my $known_prog = "M06CDC65310C0";
+
+my $everything = SMSDigest::get_all_records();
+ok(defined($everything), "Got all records (or something)");
+my @all_devices = map {$_->{"DEVICE"}} @{$everything};
+ok(in_list($known_device, \@all_devices), "Found $known_device in list of all records");
+
+my $active = SMSDigest::get_all_records();
+ok(defined($active), "Got all active records (or something)");
+@all_devices = map {$_->{"DEVICE"}} @{$active};
+ok(in_list($known_device, \@all_devices), "Found $known_device in list of all active records");
 
 my $techs = SMSDigest::get_all_technologies();
 ok(defined($techs), "Got something");
