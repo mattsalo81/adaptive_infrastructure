@@ -8,18 +8,52 @@ use Logging;
 use SMS::Consolidate;
 use LimitDatabase::GetLimit;
 use LimitDatabase::UpdateLimit;
+use LimitDatabase::Change;
+use Exceptions::ChangeEngine::GetActions;
+use Exceptions::ChangeEngine::Core;
 
-sub fetch_dev_lpt_opn_for_exception{
-    my ($exception_number) = @_;
+sub process_exceptions{
+    my ($trans, $sms_master, $exception_number, $dev_lpt_opn_list) = @_;
+    my $changes = fetch_changes_for_exception($exception_number);
+    apply_changes_to_dev_lpt_opn($trans, $sms_master, $changes, $dev_lpt_opn_list);
 }
+
+my %change_to_action_map = (
+    ACTION      => 'ACTION',
+    THING       => 'OBJECT',
+    PARM        => 'SUBJECT',
+    VALUE       => 'VALUE',
+);
 
 sub fetch_changes_for_exception{
     my ($exception_number) = @_;
+    Logging::diag("Fetching changes for exception $exception_number");
     # must fetch comment as well?
+    my $actions= Exceptions::ChangeEngine::GetActions::for_limits($exception_number);
+    my @changes;
+    my $found_limit = 0;
+    foreach my $action (@{$actions}){
+        my @keys = @change_to_action_map{qw(ACTION THING PARM VALUE)};
+        my $change = LimitDatabase::Change->new(@{$action}{@keys});
+        if ($change->is_comment()){
+            $found_limit = 1;
+        }
+        push @changes, $change;
+    }
+    unless ($found_limit){
+        push @changes, generate_default_comment_for_exception($exception_number);
+    }
+    return \@changes;
 }
 
-sub fetch_comment_for_exception{
+sub generate_default_comment_for_exception{
     my ($exception_number) = @_;
+    Logging::diag("generating a default comment");
+    my $comment = "Exception $exception_number : ";
+    $comment .= Exceptions::ChangeEngine::Core::get_exception_source($exception_number);
+    chomp($comment);
+    my $change = LimitDatabase::Change->new("SET", "LIMIT_COMMENTS", '/.*/', $comment);
+    return $change;
 }
 
 sub apply_changes_to_dev_lpt_opn{
@@ -28,18 +62,20 @@ sub apply_changes_to_dev_lpt_opn{
     my $device_items = promote_dev_lpt_opn_list_to_device_list($sms_master, $dev_lpt_opn_list);
     foreach my $prog_item (@{$program_items}){
         my ($tech, $area, $rout, $prog, $dev) = @{$prog_item};
+        Logging::debug("modifying limits for $tech, $area, $rout, $prog");
         my $limits = GetLimit::get_all_limits_trans($trans, $tech, $area, $rout, $prog, $dev);
         my $new_limits = apply_changes_to_limits($changes, $limits, "PROGRAM", $prog);
         foreach my $new_l (@{$new_limits}){
-            LimitRecord::UpdateLimit($trans, $new_l);
+            UpdateLimit::update_limit($trans, $new_l);
         }
     }
     foreach my $dev_item (@{$device_items}){
         my ($tech, $area, $rout, $prog, $dev) = @{$dev_item};
+        Logging::debug("modifying limits for $tech, $area, $rout, $prog, $dev");
         my $limits = GetLimit::get_all_limits_trans($trans, $tech, $area, $rout, $prog, $dev);
         my $new_limits = apply_changes_to_limits($changes, $limits, "DEVICE", $dev);
         foreach my $new_l (@{$new_limits}){
-            LimitRecord::UpdateLimit($trans, $new_l);
+            UpdateLimit::update_limit($trans, $new_l);
         }
     }
 }
@@ -64,12 +100,13 @@ sub promote_dev_lpt_opn_list_to_device_list{
 # input limits may be modified
 # returns list of changed limits, set at ITEM TYPE and ITEM
 sub apply_changes_to_limits{
-    my ($changes, $limits, $item_type, $item);
+    my ($changes, $limits, $item_type, $item) = @_;
     my %changed;
     foreach my $limit (@{$limits}){
         foreach my $change (@{$changes}){
             my $changed = $change->apply($limit);
             if ($changed){
+                Logging::diag("Changing limit for " . $limit->get("ETEST_NAME"));
                 # save a reference to each limit that was changed
                 $changed{"$limit"} = $limit;
             }

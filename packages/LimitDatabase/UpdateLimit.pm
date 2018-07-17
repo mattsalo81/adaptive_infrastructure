@@ -10,6 +10,7 @@ use Logging;
 # Handles the PRIORITY field
 sub update_limit{
     my ($trans, $limit) = @_;
+    Logging::diag("updating limit for " . $limit->get("ETEST_NAME"));
     my $priorities = get_priorities_used($trans, $limit);
     my $priority = get_new_priority($priorities);
     $limit->set_priority($priority);

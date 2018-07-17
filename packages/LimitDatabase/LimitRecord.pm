@@ -340,7 +340,7 @@ sub resolve_limit_table{
     # keep track of the order of the limits 
     my @order;
     my %key_limit;
-    Logging::debug("Resolving differend leveled limits");
+    Logging::debug("Resolving different leveled limits");
     foreach my $limit (@{$limits}){
         $limit->remove_predecessor();
         # get dies on failure, no need to check

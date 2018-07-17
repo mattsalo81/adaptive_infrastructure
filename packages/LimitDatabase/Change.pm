@@ -72,6 +72,9 @@ my %known_things = (
 
 sub new{
     my ($class, $action, $thing, $parameter, $value) = @_;
+    confess "ACTION not defined" unless defined $action;
+    confess "THING not defined"  unless defined $thing;
+    confess "PARM not defined"   unless defined $parameter;
     my $self = {
         ACTION  => $action,
         THING   => $thing,
@@ -94,7 +97,7 @@ sub apply{
         }
         my $action = $self->{"ACTION"};
         my $lambda = $actions->{$action};
-        unless ((defined $lambda)){
+        unless (defined $lambda){
             confess "No action lambda available to <$action> a <$thing>";
         };
         my $thing_done = $lambda->($self, $limit);
@@ -279,6 +282,11 @@ sub set_value{
         return 1;
     }
     return 0;
+}
+
+sub is_comment{
+    my ($self) = @_;
+    return ((defined $self->{"THING"}) && $self->{"THING"} eq "LIMIT_COMMENTS");
 }
 
 1;

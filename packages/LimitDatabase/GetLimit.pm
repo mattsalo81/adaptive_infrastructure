@@ -24,9 +24,13 @@ sub get_all_limits_trans{
     unless (defined $rout){
         confess "Cannot query limits without effective_routing";
     }
+    my $msg = "Fetching limits for $tech, $area, $rout";
     if(defined $dev and not defined $prog){
         confess "Cannot resolve limits at the device level without a valid program";
     }
+    $msg .= ", $prog" if defined $prog;
+    $msg .= ", $dev" if defined $dev;
+    Logging::diag($msg);
     my $sth = get_limits_sth($trans);
     $sth->bind_param(':tech', $tech);
     $sth->bind_param(':area', $area);
@@ -38,7 +42,9 @@ sub get_all_limits_trans{
     while(my $rec = $sth->fetchrow_hashref("NAME_uc")){
         push @limits, LimitRecord->new_from_hash($rec);
     }
-    return LimitRecord->resolve_limit_table(\@limits);
+    my $limits = LimitRecord->resolve_limit_table(\@limits); 
+    Logging::diag("Found " . scalar @{$limits} . " Limits");
+    return $limits;
 }
 
 sub get_limits_sth{

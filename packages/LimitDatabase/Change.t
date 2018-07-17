@@ -156,6 +156,11 @@ foreach my $test (@tests){
     my $changed = $c->apply($l);
     ok(!($change xor $changed), "Test $tnum " . ($changed ? "changed" : "did not change") . " when expected " . ($change ? "to change" : "not to change") . " $extract");
     is($l->{$extract}, $exp_val, "Test $tnum expected value of " . (defined $exp_val ? $exp_val : "undef" ));
+    if ($thing eq "LIMIT_COMMENTS"){
+        ok($c->is_comment(), "Is a comment");
+    }else{
+        ok(! $c->is_comment(), "Is not a comment");
+    }
     $tnum++;
 }
 
