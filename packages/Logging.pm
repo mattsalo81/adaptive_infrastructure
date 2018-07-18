@@ -43,23 +43,34 @@ sub set_log{
 
 sub event{
     my ($text) = @_;
-    print_log($text) if $level >= $log_levels{"EVENT"};
+    if($level >= $log_levels{"EVENT"}){
+        my ($package, $filename, $line) = caller;
+        print_log("$package : " . $text);
+    }
 }
 
 sub debug{
     my ($text) = @_;
-    print_log($text) if $level >= $log_levels{"DEBUG"};
+    if($level >= $log_levels{"DEBUG"}){
+        my ($package, $filename, $line) = caller;
+        print_log("$package : " . $text);
+    }
 }
 
 sub diag{
     my ($text) = @_;
-    print_log($text) if $level >= $log_levels{"DIAG"};
+    if($level >= $log_levels{"DIAG"}){
+        my ($package, $filename, $line) = caller;
+        print_log("$package : " . $text);
+    }
 }
 
 sub print_log{
     my ($text) = @_;
     $text .= "\n" unless $text =~ m/\n$/;
-    print $log ($text);
+    my ($sec, $min, $hour, @garbage) = localtime(time);
+    my $timestamp = sprintf("%02d:%02d:%02d", $hour, $min, $sec);
+    print $log ("$timestamp : $text");
 }
 
 sub set_err{

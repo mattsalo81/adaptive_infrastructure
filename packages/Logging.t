@@ -25,4 +25,5 @@ open $temp, $tempfile or die "Could not open tmp file for reading";
 my @text = <$temp>;
 my $text = join "", @text;
 close $temp;
-ok($text =~ m/This should be here\nThis should be here\nERROR\n$/, "basic logging");
+my $stamp_f = '(..:..:.. :)';
+ok($text =~ m/This should be here\n$stamp_f main : This should be here\nERROR\n$/, "basic logging");
