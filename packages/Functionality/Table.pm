@@ -44,7 +44,7 @@ sub populate{
 sub process{
     my ($self, $effective_routing, $sms_routing) = @_;
     my $init_mods = $self->get_unique_modules();
-    $self->remove_invald_lpt_po($effective_routing, $sms_routing);
+    $self->remove_invalid_lpt_po($effective_routing, $sms_routing);
     $self->resolve_precedence();
     my $post_mods = $self->get_unique_modules();
     # look for unresolved modules

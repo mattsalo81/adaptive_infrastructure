@@ -15,7 +15,7 @@ sub evaluate_sms_rec_functionality{
     my $effective_routing = $sms_rec->get("EFFECTIVE_ROUTING");
     my $sms_routing = $sms_rec->get("ROUTING");
     # check coordref/testgroup
-    unless(Functionality::Valid::check_coordref($coordref)){
+    unless(Functionality::Valid::check_coordref($technology, $coordref)){
         confess "Coordref <$coordref> is not valid in the system"
     }
     my ($test_group, $scope, $functionality) = parse_functionality_req($requirement);
@@ -23,7 +23,7 @@ sub evaluate_sms_rec_functionality{
         confess "Test group <$test_group> is not valid on $technology";
     }   
     # build functionality table and check functionality
-    my $t = Funtionality::Table->new();
+    my $t = Functionality::Table->new();
     $t->populate($technology, $coordref, $test_group);
     $t->process($effective_routing, $sms_routing);
     return $t->evaluate_functionality($scope, $functionality);
@@ -41,17 +41,16 @@ sub parse_functionality_req{
         confess "Could not parse functionality requirement <$requirement>";
     }
     
-    my ($test_group, $scope, $functionality) = @_;
- 
-    unless((defined $test_group) && $test_group !~ m/^\s*$/){
-        confess "unkown test_group <$test_group>";
-    }
+    my ($test_group, $scope, $functionality) = @fields;
+    $scope = undef if ((defined $scope) && $scope eq "");
+
+    confess "No test group defined" unless defined $test_group; 
+    confess "unkown test_group <$test_group>" unless $test_group !~ m/^\s*$/;
     unless ((not defined $scope) || $scope =~ m/^(TOP|ANY)$/){
         confess "unknown Scope <$scope>";
     }
-    unless ((defined $functionality) && $functionality =~ m/^(SF|NF|NSF[0-9])$/){
-        confess "unkown Functionality <$functionality>";
-    }
+    confess "No functionality defined" unless defined $functionality;
+    confess "unkown Functionality <$functionality>" unless $functionality =~ m/^(SF|NF|NSF[0-9])$/;
 
     return ($test_group, $scope, $functionality);
     

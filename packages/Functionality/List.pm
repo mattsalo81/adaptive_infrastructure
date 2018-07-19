@@ -51,7 +51,7 @@ sub make_prioritized_list{
 }
 
 
-sub eval_functionality{
+sub evaluate_functionality{
     my ($self, $scope, $functionality) = @_;
 
     # determine if should invert results

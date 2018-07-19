@@ -8,6 +8,7 @@ use Logging;
 use Parse::RecDescent;
 use SMS::LogpointRequirements;
 use ProcessOptions::OptionLookup;
+use Functionality::Core;
 
 # This package contains the logic for interpreting a boolean expression of logpoints or process options
 # expressions can have & (and) | (or) ^ (xor) ! (not) and parenthesis.
@@ -25,6 +26,7 @@ use ProcessOptions::OptionLookup;
 our $current_routing;
 my $current_lpt_lambda;
 my $current_opt_lambda;
+my $current_fnc_lambda;
 my $static_parser;
 
 # Enable warnings within the Parse::RecDescent module.
@@ -36,79 +38,83 @@ my $grammar = q{
 # Terminals (macros that can't expand further)
 #
 
-LPT		: /[0-9]{4}/		# logpoints
-OPT		: /[0-9A-Z_]+/i		# process option
-EQ		: /<(-|=){1,2}>|={1,2}/
-IMP		: /(-|=){1,2}>/
-RIMP		: /<(-|=){1,2}/
-AND		: /[\.\+]|&&?/i
-OR		: /\|\|?/i
-XOR		: /\^/
-NOT		: /[-!~]/
-LEFT_PAREN	: /\(/
-RIGHT_PAREN	: /\)/
+FNC             : /[0-9A-Z_]+:((TOP|ANY):)?!?(SF|NF|NSF[0-9])/i # functionality
+LPT             : /[0-9]{4}/                                    # logpoints
+OPT             : /[0-9A-Z_]+/i                                 # process option
+EQ              : /<(-|=){1,2}>|={1,2}/
+IMP             : /(-|=){1,2}>/
+RIMP            : /<(-|=){1,2}/
+AND             : /[\.\+]|&&?/i
+OR              : /\|\|?/i
+XOR             : /\^/
+NOT             : /[-!~]/
+LEFT_PAREN      : /\(/
+RIGHT_PAREN     : /\)/
 
 # Binary operators 
 
-STD_BIN_OR	: OR
+STD_BIN_OR      : OR
                 { $return = "||"}
-        | XOR
+                | XOR
                 { $return = "xor"}
 
-STD_BIN_AND	: AND
+STD_BIN_AND     : AND
                 { $return = "&&"}
 
 # Unary Operators
-STD_UN_OP	: NOT
+STD_UN_OP       : NOT
                 { $return = "!" }
 
 # Expressions
-STATEMENT	: EXPRESSION EQ EXPRESSION
-        { $return = "$item[1] == $item[3]" }
-        | EXPRESSION IMP EXPRESSION
-        { $return = "BooleanExpression::implies(sub{return ($item[1])}, sub{return ($item[3])})" }
-        | EXPRESSION RIMP EXPRESSION
-        { $return = "BooleanExpression::implies(sub{return ($item[3])}, sub{return ($item[1])})" }
-        | EXPRESSION
-        { $return = "$item[1]" }
+STATEMENT       : EXPRESSION EQ EXPRESSION
+                { $return = "$item[1] == $item[3]" }
+                | EXPRESSION IMP EXPRESSION
+                { $return = "BooleanExpression::implies(sub{return ($item[1])}, sub{return ($item[3])})" }
+                | EXPRESSION RIMP EXPRESSION
+                { $return = "BooleanExpression::implies(sub{return ($item[3])}, sub{return ($item[1])})" }
+                | EXPRESSION
+                { $return = "$item[1]" }
         
-EXPRESSION	: TERM EXPRESSION_E
+EXPRESSION      : TERM EXPRESSION_E
                 { $return = "$item[1] $item[2]"}
 
-EXPRESSION_E	: STD_BIN_OR TERM EXPRESSION_E(s)
+EXPRESSION_E    : STD_BIN_OR TERM EXPRESSION_E(s)
                 { $return = "$item[1] $item[2] " . join(' ', @{$item[3]})}
-        | 
+                | 
                 { $return = ""}
 
-TERM		: FACTOR TERM_E
+TERM            : FACTOR TERM_E
                 { $return = "$item[1] $item[2]"}
 
-TERM_E		: STD_BIN_AND FACTOR TERM_E(s)
+TERM_E          : STD_BIN_AND FACTOR TERM_E(s)
                 { $return = "$item[1] $item[2] " . join(' ', @{$item[3]})}
-        |
+                |
                 { $return = ""}
 
-FACTOR		: LPT
+FACTOR          : LPT
                 { $return = "check_lpt('$item{'LPT'}')"}
-        | OPT
-        { $return = "check_opt('$item{'OPT'}')"}
-        | LEFT_PAREN STATEMENT RIGHT_PAREN
+                | FNC
+                { $return = "check_fnc('$item{'FNC'}')"}
+                | OPT
+                { $return = "check_opt('$item{'OPT'}')"}
+                | LEFT_PAREN STATEMENT RIGHT_PAREN
                 { $return = "( $item[2] )"}
-        | LEFT_PAREN EXPRESSION RIGHT_PAREN
+                | LEFT_PAREN EXPRESSION RIGHT_PAREN
                 { $return = "( $item[2] )"}
-        | STD_UN_OP EXPRESSION
+                | STD_UN_OP EXPRESSION
                 { $return = "$item[1] $item[2]"}
         
 
-startrule	: STATEMENT
+startrule       : STATEMENT
 
 };
 
 # init the parser with the given lambdas (just in case we want to split this singleton into a class)
 sub init{
-    my ($lpt_lambda, $opt_lambda) = @_;
+    my ($lpt_lambda, $opt_lambda, $fnc_lambda) = @_;
     $current_lpt_lambda = $lpt_lambda;
     $current_opt_lambda = $opt_lambda;
+    $current_fnc_lambda = $fnc_lambda;
     $static_parser = Parse::RecDescent->new($grammar) unless defined $static_parser;
     return $static_parser;
 }
@@ -153,6 +159,26 @@ sub check_lpt{
     return undef;
 }
 
+# If the class lambda is defined (static), then pass it the fnc and return the result, otherwise die
+# called by the evaluatable string produced by the parser
+sub check_fnc{
+    my ($fnc) = @_;
+    if(defined $current_fnc_lambda){
+        my $success;
+        eval{
+            $success = $current_fnc_lambda->($fnc);
+            1;
+        }or do{
+            my $e = $@;
+            confess "Ran into error determining if functionality <$fnc> was valid : $e";
+        };
+        return $success;
+    }else{
+        confess "Encountered a functionality <$fnc> but have no way to check if valid";
+    }
+    return undef;
+}
+
 # evaluate process option expression using the process option database
 sub does_effective_routing_match_expression_using_database{
     my ($technology, $routing, $opt_string) = @_;
@@ -162,7 +188,7 @@ sub does_effective_routing_match_expression_using_database{
         return OptionLookup::does_effective_routing_have_option($technology, $routing, $opt);
     };
 
-    return get_result_general($opt_string, undef, $opt_lambda);
+    return get_result_general($opt_string, undef, $opt_lambda, undef);
 }
 
 # evaluate process option expression using a reference option list and a logpoint expression
@@ -184,7 +210,7 @@ sub does_sms_routing_and_options_match_expression{
                 return defined $options{$opt};
         };
 
-    return get_result_general($expression, $lpt_lambda, $opt_lambda);
+    return get_result_general($expression, $lpt_lambda, $opt_lambda, undef);
 
 }
 
@@ -197,7 +223,7 @@ sub does_sms_routing_match_lpt_string{
         return LogpointRequirements::does_routing_use_lpt($routing, $lpt);
     };
 
-    return get_result_general($lpt_string, $lpt_lambda, undef);
+    return get_result_general($lpt_string, $lpt_lambda, undef, undef);
 }
 
 # create the lambda for checking if process option in a list
@@ -212,14 +238,25 @@ sub does_opt_list_match_opt_string{
         return defined $options{$opt};
     };
 
-    return get_result_general($opt_string, undef, $opt_lambda);	
+    return get_result_general($opt_string, undef, $opt_lambda, undef);	
+}
+
+# create the lambda for interfacing with the functionality system
+sub does_sms_record_satisfy_functionality{
+    my ($sms_record, $functionality) = @_;
+    my $fnc_lambda = sub{
+        my ($fnc) = @_;
+        return Functionality::Core::evaluate_sms_rec_functionality($sms_record, $fnc);
+    };
+
+    return get_result_general($functionality, undef, undef, $fnc_lambda);
 }
 
 
 # evaluate expression with provided lambdas (undef means don't allow)
 sub get_result_general{
-    my ($expression, $lpt_lambda, $opt_lambda) = @_;
-    my $parser = init($lpt_lambda, $opt_lambda);
+    my ($expression, $lpt_lambda, $opt_lambda, $fnc_lambda) = @_;
+    my $parser = init($lpt_lambda, $opt_lambda, $fnc_lambda);
     my $eval_text = get_eval($parser, $expression);
     my $value = eval($eval_text);
     my $e = $@;
@@ -236,8 +273,8 @@ sub get_result_general{
 
 # parses the expression to make sure that all characters are accounted for.  Does not execute any code besides the parser
 sub is_valid_expression{
-    my ($lpt_string) = @_;
-    my $copy = $lpt_string;
+    my ($string) = @_;
+    my $copy = $string;
     # store vars
     my @old = ($::RD_ERRORS, $::RD_WARN, $::RD_HINT);
     # silence errors

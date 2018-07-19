@@ -14,7 +14,7 @@ my %memoize_test_group;
 
 sub check_coordref{
     my ($tech, $coordref) = @_;
-    my $key = $coordref;
+    my $key = "$tech $coordref";
     unless (defined $memoize_coordref{$key}){
         Logging::diag("Checking if coordref <$coordref> is defined on tech <$tech>");
         my $sth = get_check_coordref_sth();
