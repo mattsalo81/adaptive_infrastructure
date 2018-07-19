@@ -8,6 +8,11 @@ use Exceptions::ExceptionRules;
 use Data::Dumper;
 use SMS::FastTable;
 use Logging;
+use SMS::SMSSpec;
+
+# we expect errors when using the exception system
+*TMP_STDERR = *STDERR;
+*STDERR = *STDOUT;
 
 my $known_9300_8820_rout = "A100C3L+";
 my $known_9455_8820_rout = "A100C3MP";
@@ -59,7 +64,7 @@ foreach my $record (@test_records){
     for (my $i = 0; $i < scalar @test_format; $i++){
         $rec->{$test_format[$i]} = $record->[$i];
     }
-    push @formatted_records, $rec;
+    push @formatted_records, SMSSpec->new($rec);
 }
         
 # set up test cases
@@ -89,12 +94,14 @@ my @regex_tests_unorganized = (
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF.SIMPLE_RESOLVE:SF'],
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF.SIMPLE_RESOLVE:!SF'],
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MULTI_RESOLVE:SF'],
+# rule 20
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MISSING_RESOLVE:SF'],
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MISSING_RESOLVE:NF'],
 # moderate functionality db
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:SF'],
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:TOP:SF'],
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:NF'],
+# rule 5
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:!NF'],
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:NSF1'],
 ['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRIORITY_RESOLVE:NSF2'],
@@ -192,16 +199,8 @@ for(my $i = 0; $i < scalar @rule_hashes; $i++){
     $rule->filter_fasttable($t);
     Logging::diag(Dumper $t);
     my @got_devices = map {$_->{"DEVICE"}} @{$t->get_all_records()};
-    if ($i < 15){
-        ok(have_same_elements(\@got_devices, $correct_devices[$i]), "Rule Filter Test $i")
-            or diag("matched <'" . join("','", sort @got_devices) . "'> when should have matched <'" . join("','", sort @{$correct_devices[$i]}) . "'>\n");
-    } else {
-        TODO: {
-            local $TODO = "functionality system not built yet";
-            ok(have_same_elements(\@got_devices, $correct_devices[$i]), "Rule Filter Test $i")
-                or diag("matched <'" . join("','", sort @got_devices) . "'> when should have matched <'" . join("','", sort @{$correct_devices[$i]}) . "'>\n");
-        }
-    }
+    ok(have_same_elements(\@got_devices, $correct_devices[$i]), "Rule Filter Test $i")
+        or diag("matched <'" . join("','", sort @got_devices) . "'> when should have matched <'" . join("','", sort @{$correct_devices[$i]}) . "'>\n");
 
 
 }
@@ -210,4 +209,4 @@ for(my $i = 0; $i < scalar @rule_hashes; $i++){
 
 
 
-
+*STDERR = *TMP_STDERR;

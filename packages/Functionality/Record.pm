@@ -31,7 +31,7 @@ sub set{
     if (defined $ok_fields{$key}){
         $self->{$key} = $value;
     }else{
-        confess "<$key> is not an ok field";
+        die "<$key> is not an ok field";
     }
 }
 
@@ -40,7 +40,7 @@ sub get{
     if (exists $self->{$key}){
         return $self->{$key};
     }else{
-        confess "<$key> is not a defined field!";
+        die "<$key> is not a defined field!";
     }
 }
 

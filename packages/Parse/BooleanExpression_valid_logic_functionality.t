@@ -17,3 +17,9 @@ my $sms_rec = SMSSpec->new({
 
 my $t_expression = "SIMPLE_RESOLVE:SF";
 ok(BooleanExpression::does_sms_record_satisfy_functionality($sms_rec, $t_expression), "Simple resolve");
+
+$t_expression = "SIMPLE_RESOLVE:SF <=> SIMPLE_RESOLVE:TOP:SF";
+ok(BooleanExpression::does_sms_record_satisfy_functionality($sms_rec, $t_expression), "Simple resolve with logic");
+
+my $f_expression = "SIMPLE_RESOLVE:SF <=> ! SIMPLE_RESOLVE:TOP:SF";
+ok(!BooleanExpression::does_sms_record_satisfy_functionality($sms_rec, $f_expression), "Simple resolve with logic (fail)");

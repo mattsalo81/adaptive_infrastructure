@@ -52,7 +52,7 @@ sub process{
         my %mods;
         @mods{@{$init_mods}} = @{$init_mods};
         my @unresolved = grep {not defined $mods{$_}} @{$post_mods};
-        confess "Some modules did not resolve : <" . join(">, <", @unresolved) . ">";
+        die "Some modules did not resolve : <" . join(">, <", @unresolved) . ">";
     }
 }
 
@@ -69,13 +69,13 @@ sub get_functionality_list{
         my $functionality = $rec->get("FUNCTIONALITY");
         if ($functionality eq "SF"){
             $list->set_functional();
-        }elsif($functionality eq "NSF"){
+        }elsif($functionality eq "NF"){
             $list->set_nonfunctional();
-        }elsif($functionality =~ m/^SNF[0-9]$/i){
+        }elsif($functionality =~ m/^NSF[0-9]$/i){
             my $priority = $rec->get("PRIORITY");
             $list->add_nonspec($functionality, $priority);
         }else{
-            confess "Unrecognized functionality state <$functionality>";
+            die "Unrecognized functionality state <$functionality>";
         }
     }
     return $list;
@@ -136,7 +136,7 @@ sub validate_modules_resolved{
     my ($self)= @_;
     foreach my $rec (@{$self}){
         unless (defined $rec->get("MODULE")){
-            confess "Undefined Module " . $rec->get("SCRIBE_MODULE");
+            die "Undefined Module " . $rec->get("SCRIBE_MODULE");
         }
     }
 }
@@ -159,7 +159,7 @@ sub resolve_precedence{
         foreach my $rec (@{$mod_instance_hash{$mod}}){
             my $priority = $rec->get_resolve_priority();
             if(defined $match_priority[$priority]){
-                confess "conflicting resolution on modules : " . Dumper($rec) . " and " . Dumper($match_priority[$priority]);
+                die "conflicting resolution on modules : " . Dumper($rec) . " and " . Dumper($match_priority[$priority]);
             }
             $match_priority[$priority] = $rec;
         }

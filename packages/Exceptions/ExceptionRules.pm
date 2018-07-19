@@ -193,8 +193,15 @@ sub lambda_generator_functionality{
     my ($self) = @_;
     my $requirements = $self->{"FUNCTIONALITY"};
     confess "Functionality requriements not defined" unless defined $requirements;
-    return sub {1} if $requirements =~ m/^\s*$/;
-    return sub {0};
+    
+    if ($requirements =~ m/^\s*$/){
+        return sub { 1 };
+    }else{
+        return sub{
+            my ($record) = @_;
+            return BooleanExpression::does_sms_record_satisfy_functionality($record, $requirements);
+        }
+    }
 }
 
 # should a rule cut down a fast table or a fast table cut down a rule?
