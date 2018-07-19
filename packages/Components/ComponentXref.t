@@ -11,6 +11,9 @@ my $test_dev1 = "DEV1";
 my $test_dev2 = "DEV2";
 my $test_dev3 = "I DO NOT EXIST";
 
+ok(ComponentXref::does_technology_have_lookup_table('TEST'), "Found lookup table for TEST");
+ok(!ComponentXref::does_technology_have_lookup_table('TESTasdfjkl'), "Found no lookup table for TESTasdfjkl");
+
 my $comps = ComponentXref::get_undefined_comps('TEST', 'TEST_DEVICE1');
 ok(scalar @{$comps} > 0, "Undefined components on a test device");
 is($comps->[0], 'UNDEFINED_COMP', "Returns list of undefined components for test device");

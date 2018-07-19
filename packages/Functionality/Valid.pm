@@ -9,14 +9,20 @@ use Database::Connect;
 use Data::Dumper;
 
 my $check_coordref_sth;
+my %memoize_coordref;
+my %memoize_test_group;
 
 sub check_coordref{
     my ($tech, $coordref) = @_;
-    Logging::diag("Checking if coordref <$coordref> is defined on tech <$tech>");
-    my $sth = get_check_coordref_sth();
-    $sth->execute($tech, $coordref);
-    my $results = $sth->fetchall_arrayref();
-    return scalar @{$results};
+    my $key = $coordref;
+    unless (defined $memoize_coordref{$key}){
+        Logging::diag("Checking if coordref <$coordref> is defined on tech <$tech>");
+        my $sth = get_check_coordref_sth();
+        $sth->execute($tech, $coordref);
+        my $results = $sth->fetchall_arrayref();
+        $memoize_coordref{$key} = scalar @{$results};
+    }
+    return $memoize_coordref{$key};
 }
 
 sub get_check_coordref_sth{
@@ -45,11 +51,15 @@ my $check_test_group_sth;
 # checks if test group is defined in collectible/functional table
 sub check_test_group{
     my ($technology, $test_group) = @_;
-    Logging::diag("Checking if group <$test_group> is valid on <$technology>");
-    my $sth = get_check_test_group_sth();
-    $sth->execute($technology, $test_group);
-    my $results = $sth->fetchall_arrayref();
-    return scalar @{$results};
+    my $key = "$technology $test_group";        
+    unless(defined $memoize_test_group{$key}){
+        Logging::diag("Checking if group <$test_group> is valid on <$technology>");
+        my $sth = get_check_test_group_sth();
+        $sth->execute($technology, $test_group);
+        my $results = $sth->fetchall_arrayref();
+        $memoize_test_group{$key} = scalar @{$results};
+    }
+    return $memoize_test_group{$key};
 }
 
 sub get_check_test_group_sth{

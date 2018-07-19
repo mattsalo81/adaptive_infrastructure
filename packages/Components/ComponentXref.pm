@@ -131,6 +131,14 @@ sub get_update_etest_comps_sql{
     return $sql;
 }
 
-
+sub does_technology_have_lookup_table{
+    my ($technology) = @_;
+    my $conn = Connect::read_only_connection("etest");
+    my $sql = "select count(raw_name) from $lookup_table where technology = ?";
+    my $sth = $conn->prepare($sql);
+    $sth->execute($technology);
+    my $row = $sth->fetchrow_arrayref();
+    return $row->[0];
+}
 
 1;

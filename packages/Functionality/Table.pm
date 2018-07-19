@@ -7,6 +7,7 @@ use Data::Dumper;
 use Logging;
 use Database::Connect;
 use Functionality::Record;
+use Functionality::List;
 
 my $populate_sth;
 
@@ -38,6 +39,46 @@ sub populate{
         my $c_rec = Functionality::Record->new($rec);
         $self->add_record($c_rec);
     }
+}
+
+sub process{
+    my ($self, $effective_routing, $sms_routing) = @_;
+    my $init_mods = $self->get_unique_modules();
+    $self->remove_invald_lpt_po($effective_routing, $sms_routing);
+    $self->resolve_precedence();
+    my $post_mods = $self->get_unique_modules();
+    # look for unresolved modules
+    unless(scalar @{$init_mods} == scalar @{$post_mods}){
+        my %mods;
+        @mods{@{$init_mods}} = @{$init_mods};
+        my @unresolved = grep {not defined $mods{$_}} @{$post_mods};
+        confess "Some modules did not resolve : <" . join(">, <", @unresolved) . ">";
+    }
+}
+
+sub evaluate_functionality{
+    my ($self, $scope, $functionality) = @_;
+    my $l = $self->get_functionality_list();
+    return $l->evaluate_functionality($scope, $functionality);
+}
+
+sub get_functionality_list{
+    my ($self) = @_;
+    my $list = Functionality::List->new();
+    foreach my $rec (@{$self}){
+        my $functionality = $rec->get("FUNCTIONALITY");
+        if ($functionality eq "SF"){
+            $list->set_functional();
+        }elsif($functionality eq "NSF"){
+            $list->set_nonfunctional();
+        }elsif($functionality =~ m/^SNF[0-9]$/i){
+            my $priority = $rec->get("PRIORITY");
+            $list->add_nonspec($functionality, $priority);
+        }else{
+            confess "Unrecognized functionality state <$functionality>";
+        }
+    }
+    return $list;
 }
 
 sub get_populate_sth{
@@ -88,7 +129,7 @@ sub get_unique_modules{
 
 sub remove_invalid_lpt_po{
     my ($self, $effective_routing, $sms_routing) = @_;
-    @{$self} = grep {$_->satisfies_lpt_and_po($effective_routing, $sms_routing)) @{$self};
+    @{$self} = grep {$_->satisfies_lpt_and_po($effective_routing, $sms_routing)} @{$self};
 }
 
 sub validate_modules_resolved{
@@ -101,9 +142,9 @@ sub validate_modules_resolved{
 }
 
 sub resolve_precedence{
-    my ($functionality_table) = @_;
+    my ($self) = @_;
     Logging::diag("Resolving matching precedence");
-    my %mod_instance_hash
+    my %mod_instance_hash;
     # categorize records by modulexrev instace
     foreach my $rec (@{$self}){
         my $key = $rec->get("SCRIBE_MODULE");
