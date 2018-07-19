@@ -19,8 +19,10 @@ sub update_component_info{
     my $techs = SMSDigest::get_all_technologies();
     my %unsatisfied;
     foreach my $tech (@{$techs}){
-        my $unsatisfied = update_component_info_for_tech($tech);
-        $unsatisfied{$tech} = $unsatisfied;
+        if(does_technology_have_lookup_table($tech)){
+            my $unsatisfied = update_component_info_for_tech($tech);
+            $unsatisfied{$tech} = $unsatisfied;
+        }
     }
     foreach my $tech (keys %unsatisfied){
         my $num_dev = $unsatisfied{$tech};
