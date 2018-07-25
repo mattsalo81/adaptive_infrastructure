@@ -72,8 +72,8 @@ sub get_active_effective_routings_to_routings_for_tech{
             s.effective_routing 
         from 
             daily_sms_extract s
-            inner join daily_wip_extract w
-                on s.device = w.device
+        --    inner join daily_wip_extract w
+        --      on s.device = w.device
         where 
             s.technology = ?
     };
@@ -105,7 +105,7 @@ sub get_options_for_possibly_conflicting_routings_on_effective_routing{
         }else{
             # check if routings do not conflict -> they have identical options
             unless((scalar @options == scalar @final_options) && (join("", @options) eq join("", @final_options))){
-                confess "Could not resolve conflicts on effective routing <$effective_routing> - <$init_rout> and <$routing> have conflicting process options!";
+                die "Could not resolve conflicts on effective routing <$effective_routing> - <$init_rout> and <$routing> have conflicting process options!";
             }
         }
         $i++;

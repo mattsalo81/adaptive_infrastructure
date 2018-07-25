@@ -8,6 +8,8 @@ use Database::Connect;
 use Logging;
 use SMS::SMSSpec;
 
+# common functions for getting info from the sms extracts, easier to keep one copy here than keeping redunant copies everywhere
+
 sub get_all_records{
     my $sql = q{select * from daily_sms_extract};
     my $conn = Connect::read_only_connection("etest");

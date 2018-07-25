@@ -9,6 +9,8 @@ use Logging;
 # this package solves the problem of consolidating multiple records into smaller blocks that accurately summarize the records
 # If you had a list of 1000 device/opn/lpts, can you consolidate that list into device/test_area? program/test_area?  effective_routing/testarea?
 
+# if you're refering to a list of devices all on the same program, could you just as accurately say "every device on this program"?  You'd have to check all the other devices, to see if there are any devices not in your original list.  If there are no other devices on that program, you can consolidate your original list of devices to just "every device on this program".
+
 # this routine takes a master list of all devices/info, a subset of devices, and a list of consolidation fields
 # the consolidation fields correspond to information fields in the master list of devices
 # the subroutine determines if for every particular, unique combination of the consolidation field values, the subset device list contains every device

@@ -13,15 +13,21 @@ use Components::DeviceString;
 use ProcessOptions::OptionLookup;
 
 sub get_spec{
-    my ($technology, $test_area, $effective_routing, $program) = @_;
+    my ($technology, $test_area, $effective_routing, $program, $comp) = @_;
     my $limits = GetLimit::get_all_limits($technology, $test_area, $effective_routing, $program, undef);
     if (scalar @{$limits} == 0){
         confess "Got 0 limits from the database, is something wrong?";
     }
-    my $comps = EffectiveComponents::get_effective_components($technology, $program);
-    if (scalar @{$comps} != 0){
-        my $disabled = LimitRecord->filter_limit_table_by_component($limits, $comps);
-        Logging::diag("Removed $disabled limit(s) based on component list");
+    my $comps = [];
+    if ((defined $comp) && $comp){
+        Logging::diag("Generating spec by COMP");
+        $comps = EffectiveComponents::get_effective_components($technology, $program);
+        if (scalar @{$comps} != 0){
+            my $disabled = LimitRecord->filter_limit_table_by_component($limits, $comps);
+            Logging::diag("Removed $disabled limit(s) based on component list");
+        }
+    }else{
+        Logging::diag("Generating spec by FLOW");
     }
     if (scalar @{$limits} == 0){
         confess "Got 0 limits after filtering by component, is something wrong?";

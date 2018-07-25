@@ -7,6 +7,8 @@ use Data::Dumper;
 use Logging;
 use Database::Connect;
 
+# package for getting the photomasks for a device out of sms, used down the line to get component info from ONEPG
+
 my $photomasks_for_device_sth;
 
 sub get_photomasks_for_device{

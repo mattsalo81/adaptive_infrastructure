@@ -25,5 +25,5 @@ $record->{"DEVICE"} = "M05...";
 $record->{"AREA"} = "METAL2";
 $record->{"ROUTING"} = "A70AI3N";
 $eff = EffectiveRouting::Generate::make_from_sms_hash($record);
-is($eff, "LBC5_METAL2_3_undef", "LBC5 standard + METAL2");
+is($eff, "LBC5_METAL2_3_?N?", "LBC5 standard + METAL2");
 

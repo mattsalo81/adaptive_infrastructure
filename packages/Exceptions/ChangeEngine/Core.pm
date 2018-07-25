@@ -18,13 +18,14 @@ sub run{
     # create transaction/sms tables
     Logging::event("Initializing Change Engine");
     my $trans = Connect::new_transaction("etest");
-    my $sms_master = SMSDigest::get_all_active_records();
+    my $sms_master = SMSDigest::get_all_records();
     eval{
         # get all exception numbers
         my $exceptions = GetExceptions::get_all_exception_numbers();
         foreach my $exception_number (@{$exceptions}){
             run_exception($trans, $exception_number, $sms_master);
         }
+        $trans->commit();
         1;
     } or do {
         my $e = $@;

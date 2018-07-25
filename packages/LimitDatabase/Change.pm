@@ -65,7 +65,7 @@ my %known_things = (
                                         SET     => sub{return set_value($_[1], "REPROBE_MAP", $_[0]->{"VALUE"})},
                                     },
     PARAMETER                   => {
-                                        DISABLE => sub{return set_value($_[1], "DEACTIVATE", "Y")},
+                                        DEACTIVATE => sub{return set_value($_[1], "DEACTIVATE", "Y")},
                                     },
 );
 
@@ -99,7 +99,7 @@ sub apply{
         my $lambda = $actions->{$action};
         unless (defined $lambda){
             confess "No action lambda available to <$action> a <$thing>";
-        };
+        }
         my $thing_done = $lambda->($self, $limit);
         return $thing_done;
     }else{
@@ -113,7 +113,8 @@ sub should_apply{
     my ($self, $limit) = @_;
     my $parameter = $limit->get("ETEST_NAME");
     my $expression = $self->{"PARM"};
-    return ExceptionRules::explicit_anchored_regex_with_numeric_comparison($parameter, $expression);
+    my $success =  ExceptionRules::explicit_anchored_regex_with_numeric_comparison($parameter, $expression);
+    return $success;
 }
 
 # raises a value in a limit record

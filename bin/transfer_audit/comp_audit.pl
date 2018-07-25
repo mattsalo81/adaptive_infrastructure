@@ -10,9 +10,12 @@ my $usage = qq{
     Audits the raw component information between old/new adaptive.
     Needs : New Adaptive Technology
     Needs : old adaptive component lookup
+
+    Usage :      $0 <TECH> <comp_lookup.csv"
 };
 
 my ($tech, $file) = @ARGV;
+die "$usage" unless (defined $tech) && (defined $file);
 
 my $new = get_raw_comp_tech($tech);
 my $old = read_old_dev_2_comp_csv($file);
@@ -87,12 +90,16 @@ sub read_old_dev_2_comp_csv{
         $line =~ s/\s//g;
         my ($dev, $coordref, $set, $d, $cmp, $fle, @comp) = split /,/, $line;
         my %my_comps;
+        my $any_comps = 0;
         for(my $i = 0; $i < scalar @comp; $i++){
             if ($comp[$i]){
                 $my_comps{$components[$i]} = 1;
+                $any_comps = 1;
             }
         }
-        $comp{$dev} = \%my_comps;
+        if($any_comps){
+            $comp{$dev} = \%my_comps;
+        }
     }
     return \%comp;
 }

@@ -18,6 +18,10 @@ $options = EffectiveRouting::Decoder::get_options_for_effective_routing("TEST_un
 is(@{$options}, 1, "Checking correct number of results for test case");
 is(join(",", @{$options}), "HEYO", "correct results");
 
+$options = EffectiveRouting::Decoder::get_options_for_effective_routing("TEST_?MATT?_MATT");
+is(@{$options}, 1, "Checking correct number of results for test case");
+is(join(",", @{$options}), "HEYO", "correct results");
+
 $options = EffectiveRouting::Decoder::get_options_for_effective_routing("TEST_MATT_MATT");
 is(@{$options}, 3, "Checking correct number of results for test case");
 is(join(",", sort @{$options}), "HEYO,SHAZAM,WOW", "Correct results");

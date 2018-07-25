@@ -22,7 +22,7 @@ sub try_all_assertions_against_routing_and_options{
         }
     }
     if (scalar @failed > 0){
-        confess "Routing <$routing> and options <"  . join(", ", @{$options}) . "> failed the following assertions <" . join(", ", @failed) . ">";
+        die "Routing <$routing> and options <"  . join(", ", @{$options}) . "> failed the following assertions <" . join(", ", @failed) . ">";
     }
     return 1;
 }

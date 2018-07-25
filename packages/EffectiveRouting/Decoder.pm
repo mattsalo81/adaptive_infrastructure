@@ -19,7 +19,8 @@ sub get_codes_from_routing{
     my ($effective_routing) = @_;
     my $codes = [];
     my ($technology, @codes) = split(/$EffectiveRouting::Generate::delineator/, $effective_routing);
-    @codes = map {$_ eq $EffectiveRouting::Generate::undef_val ? undef : $_ } @codes;
+    @codes = map {$_ eq "undef" ? undef : $_ } @codes;
+    @codes = map {defined($_) && m/^\?(.*)\?$/ ? undef : $_ } @codes;
     return ($technology, \@codes);
 }
 

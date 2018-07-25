@@ -84,7 +84,6 @@ sub promote_dev_lpt_opn_list_to_program_list{
     my ($sms_master, $dev_lpt_opn_list) = @_;
     my ($unmatched_prog, $consol_prog) = SMS::Consolidate::consolidate($sms_master, $dev_lpt_opn_list, [qw(TECHNOLOGY AREA EFFECTIVE_ROUTING PROGRAM)]);
     my @items = map {[(@{$_}, undef)]} @{$consol_prog};
-    print Dumper();
     return \@items;
 }
 

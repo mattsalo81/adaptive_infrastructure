@@ -9,7 +9,7 @@ use Logging;
 use Database::Connect;
 
 # Old package used to split up logpoint requirement strings + check sms for different routings
-# package is still used to check sms for logpoints/routings, but the logic to interpret logpoints is handled by the recursive descent module
+# package is still used to check sms for logpoints/routings, but the logic to interpret logpoint strings is handled by the recursive descent module
 
 
 my %lpt_table;

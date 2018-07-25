@@ -6,6 +6,8 @@ use Carp;
 use Data::Dumper;
 use Logging;
 
+# basic class to provide a unique_id and getter method.  Don't change the structure from a hash because lots of code accesses members directly
+
 sub new{
     my ($class, $hash) = @_;
     my $self = {%{$hash}};

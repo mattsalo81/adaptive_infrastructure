@@ -9,8 +9,9 @@ use SMS::SMSDigest;
 
 # class to make sorting/indexing sms records faster
 # all records are assumed to be hashrefs with identical keys
-# FastTable has an INDEX member that can be set to som key available to all records
+# FastTable has an INDEX member that can be set to some key available to all records
 # the FastTable will group all records by the INDEXed key and store them as an arrayref, pointed to in RECORDS by the value of their INDEXed member
+# dump the structure if you need a better look at it
 
 sub new{
     # <class> [index] <record_arrayref> = @_;
@@ -33,7 +34,7 @@ sub new{
 
 sub new_extract{
     my ($class, $index) = @_;
-    my $records = SMSDigest::get_all_active_records();
+    my $records = SMSDigest::get_all_records();
     my $self;
     if (defined $index) {
         $self = $class->new($index, $records);

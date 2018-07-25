@@ -130,8 +130,8 @@ my @tests =(
     ['SET',     'REPROBE_MAP',      'undef',    1,   "REPROBE_MAP",    'undef'],
     ['SET',     'REPROBE_MAP',      'undef',    0,   "REPROBE_MAP",    'undef'],
     # DEACTIVATE
-    ['DISABLE',    "PARAMETER",      undef,    1,   "DEACTIVATE",    "Y"],
-    ['DISABLE',    "PARAMETER",      undef,    0,   "DEACTIVATE",    "Y"],
+    ['DEACTIVATE',    "PARAMETER",      undef,    1,   "DEACTIVATE",    "Y"],
+    ['DEACTIVATE',    "PARAMETER",      undef,    0,   "DEACTIVATE",    "Y"],
     # LIMIT_COMMENTS
     ['SET',    "LIMIT_COMMENTS",      "HELLO THERE",    0,   "LIMIT_COMMENTS",    "HELLO THERE"],
     ['SET',    "LIMIT_COMMENTS",      "HELLO THERE",    0,   "LIMIT_COMMENTS",    "HELLO THERE"],
@@ -147,14 +147,12 @@ $l->set("DEACTIVATE", "N");
 ok(defined LimitDatabase::Change->new("ACTION", "THING", "PARAMETER", "VALUE"), "constructor");
 
 my $tnum = 0;
-my $parm = "PARM";
-my $possible_success = 1;
+my $parm = "/PARM/";
 foreach my $test (@tests){
     my ($action, $thing, $value, $change, $extract, $exp_val) = @{$test};
-    $change *= $possible_success;
     my $c = LimitDatabase::Change->new($action, $thing, $parm, $value);
     my $changed = $c->apply($l);
-    ok(!($change xor $changed), "Test $tnum " . ($changed ? "changed" : "did not change") . " when expected " . ($change ? "to change" : "not to change") . " $extract");
+    is($changed, $change, "Test $tnum " . ($changed ? "changed" : "did not change") . " when expected " . ($change ? "to change" : "not to change") . " $extract") or diag(Dumper $l . Dumper $c);
     is($l->{$extract}, $exp_val, "Test $tnum expected value of " . (defined $exp_val ? $exp_val : "undef" ));
     if ($thing eq "LIMIT_COMMENTS"){
         ok($c->is_comment(), "Is a comment");
@@ -170,15 +168,14 @@ $l->dummify();
 $l->set("DEACTIVATE", "N");
 
 $parm = "DIFF_PARM";
-$possible_success = 0;
 foreach my $test (@tests){
     my ($action, $thing, $value, $change, $extract, $exp_val) = @{$test};
-    $change *= $possible_success;
+    $change = 0;
     my $old_val = $l->{$extract};
     my $c = LimitDatabase::Change->new($action, $thing, $parm, $value);
     my $changed = $c->apply($l);
     my $new_val = $l->{$extract};
-    ok(!($change xor $changed), "Test $tnum " . ($changed ? "changed" : "did not change") . " when expected " . ($change ? "to change" : "not to change") . " $extract");
+    ok(!($change xor $changed), "Test $tnum " . ($changed ? "changed" : "did not change") . " when expected " . ($change ? "to change" : "not to change") . " $extract") or diag(Dumper ($l) . Dumper ($c));
     is($old_val, $new_val, "$extract value of " . (defined $old_val ? $old_val : "undef") . " did not change (" . (defined $new_val ? $new_val : "undef") . ")");
     $tnum++;
 }
