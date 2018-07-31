@@ -118,6 +118,9 @@ sub add_spec_for_limit{
         # entries
         $spec->add_entry($scrap) if defined $scrap;
         $spec->add_entry($rel) if defined $rel;
+        if ((not defined $scrap) && (not defined $rel)){
+            $spec->comment($limit->get("ETEST_NAME") . " has no limits");
+        }
     }
 }
 
@@ -145,6 +148,9 @@ sub add_predecessor_spec_for_limit{
         # entries
         $spec->add_comment_entry($scrap) if defined $scrap;
         $spec->add_comment_entry($rel) if defined $rel;
+        if ((not defined $scrap) && (not defined $rel)){
+            $spec->comment($limit->get("ETEST_NAME") . " has no limits");
+        }
     }
     return $has_limits;
 }

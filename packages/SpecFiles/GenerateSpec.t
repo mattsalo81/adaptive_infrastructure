@@ -99,6 +99,7 @@ $expected = q{
 # The lower spec limit was lowered                                             #
 # PARM1=================3===-100========10==========1==6====================== #
 # No useful limits                                                             #
+# PARM1 has no limits                                                          #
 };
 is("\n" . $spec->get_text(), $expected, "Got expected spec result for nested limit without dispo/rel");
 
@@ -119,11 +120,13 @@ PARM1                   3   -10         10          1  6
 # The lower spec limit was lowered                                             #
 # PARM1=================3===-100========10==========1==6====================== #
 # No useful limits                                                             #
+# PARM1 has no limits                                                          #
 # This is the lowest priority limit                                            #
 # PARM1=================3===-10=========10==========1==6====================== #
 # The lower spec limit was lowered                                             #
 # PARM1=================3===-100========10==========1==6====================== #
 # No useful limits                                                             #
+# PARM1 has no limits                                                          #
 };
 
 is("\n" . $spec->get_text(), $expected, "Got expected spec result for list of three limits with different components");
