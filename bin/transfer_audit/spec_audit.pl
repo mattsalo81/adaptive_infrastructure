@@ -6,8 +6,14 @@ use Logging;
 use SMS::SMSDigest;
 use SpecFiles::GenerateSpec;
 
-my ($parm, $num, $lsl, $usl, $io, $dispo) = (0,1,2,3,4,5);
-my $inf = 9e9;
+my ($parm, $num, $lsl, $usl, $io, $dispo) = (0..5);
+my $dir  = 'spec_audit';
+my $tmp = "/tmp/$dir";
+
+unlink glob "$tmp/*" if -d $tmp;
+unlink $tmp if -d $tmp;
+`mkdir $tmp`;
+
 
 my %skip;
 if (open my $override, "./overrides"){
@@ -24,17 +30,23 @@ if (open my $override, "./overrides"){
 main();
 
 sub main{
-    my ($technology) = @ARGV;
+    my ($technology, $comp, $compare_dir) = @ARGV;
     unless (defined $technology){
-        die "Usage :      $0 <technology>\n\n";
+        die qq{
+            Usage :      $0 <technology> [comp] [compare_dir]
+            <technology> is the new adaptive technology flag
+            [comp] is 0 or 1 for cutting down specs by components, default is 1
+            [compare_dir] is the directory of old specfiles (must be PROGRAM.spec) -> defaults to current PROD files
+        };
     }
-    my $specfile_info = load_spec($technology);
+    $comp = 1 unless defined $comp;
+    my $specfile_info = load_spec($technology, $comp, $compare_dir);
     analyze_differences($specfile_info);
     
 }
 
 sub load_spec{
-    my ($technology) = @_;
+    my ($technology, $comp, $compare_dir) = @_;
     my $records = SMSDigest::get_entries_for_tech($technology);
     my %hash;
     foreach my $rec (@{$records}){
@@ -46,10 +58,20 @@ sub load_spec{
         my $effr = $rec->get("EFFECTIVE_ROUTING");
         my $area = $rec->get("AREA");
         my $key = "$dev $lpt $opn $prog";
+        next if $prog =~ m/^M05/;
+        next if $area ne "PARAMETRIC";
         eval{
-            my $specfile = "/usr1/testware/scraptest/$prog/$prog.spec";
+            my $specfile;
+            if(defined $compare_dir){
+                $specfile = "$compare_dir/$prog.spec";
+            }else{
+                $specfile = "/usr1/testware/scraptest/$prog/$prog.spec";
+            }
             my $old = load_specfile($specfile);
-            my $new_spec = GenerateSpec::get_spec($tech, $area, $effr, $prog);
+            my $new_spec = GenerateSpec::get_spec($tech, $area, $effr, $prog, $comp);
+            open my $fh, "> $tmp/$prog.spec" or die "could not create new spec <$tmp/$prog.spec>";
+            print $fh $$new_spec;
+            close $fh;
             my $new = read_spec($$new_spec);
             $hash{$key} = [$old, $new];
             1;
@@ -81,8 +103,9 @@ sub analyze_differences{
             next if defined $skip{$program . "-" . "*"     };
             next if defined $skip{"*"      . "-" . $parm_id};
             next if defined $skip{$program . "-" . $parm_id};
-            my ($o, $n) = (defined $old->{$parm_id}, defined $new->{$parm_id});
-            if (!$o &&  $n){
+            my $o = defined $old->{$parm_id};
+            my $n = defined $new->{$parm_id};
+            if ((!$o) && ($n)){
                 $turned_on{$parm_id} = [] unless defined $turned_on{$parm_id};
                 push @{$turned_on{$parm_id}}, $program;
                 $program_issues{$program} = [] unless defined $program_issues{$program};	
@@ -94,6 +117,13 @@ sub analyze_differences{
                $program_issues{$program} = [] unless defined $program_issues{$program};
                push @{$program_issues{$program}}, "$parm_id turned_off_in_flow_specfile";
             }       # flag as turned on
+            if ($o && $n){
+                my $o_l = sprintf("%s %d %g %g %d %d", @{$old->{$parm_id}});
+                my $n_l = sprintf("%s %d %g %g %d %d", @{$new->{$parm_id}});
+                if (($o_l ne $n_l) && (($old->{$parm_id}->[2] != $new->{$parm_id}->[2]) || ($old->{$parm_id}->[3] != $new->{$parm_id}->[3]))){
+                    print "$program Limits don't match <$o_l> <$n_l>\n";
+                }
+            }
         }
     }
     print "program,num_issues,issue\n";
@@ -122,7 +152,8 @@ sub analyze_differences{
 
     %programs_turned = ();	
         foreach my $prog_list (values %turned_on){
-                @programs_turned{@{$prog_list}} = @{$prog_list};
+                my @prog_list = map {s/.* //; $_} @{$prog_list};
+                @programs_turned{@{$prog_list}} = @prog_list;
         }
     @master_program = sort keys %programs_turned;
     print "\n"x 5 . "parm,num_turned_on," . join(',', @master_program) . "\n";
@@ -138,7 +169,8 @@ sub analyze_differences{
     
     %programs_turned = ();
         foreach my $prog_list (values %turned_off){
-                @programs_turned{@{$prog_list}} = @{$prog_list};
+                my @prog_list = map {s/.* //; $_} @{$prog_list};
+                @programs_turned{@{$prog_list}} = @prog_list;
         }
     @master_program = sort keys %programs_turned;
     print "\n"x 5 . "parm,num_turned_off," . join(',', @master_program) . "\n";

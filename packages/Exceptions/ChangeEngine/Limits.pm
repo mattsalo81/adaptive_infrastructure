@@ -60,6 +60,7 @@ sub apply_changes_to_dev_lpt_opn{
     my ($trans, $sms_master, $changes, $dev_lpt_opn_list) = @_;
     my $program_items = promote_dev_lpt_opn_list_to_program_list($sms_master, $dev_lpt_opn_list);
     my $device_items = promote_dev_lpt_opn_list_to_device_list($sms_master, $dev_lpt_opn_list);
+    # apply to all things at the program level
     foreach my $prog_item (@{$program_items}){
         my ($tech, $area, $rout, $prog, $dev) = @{$prog_item};
         Logging::debug("modifying limits for $tech, $area, $rout, $prog");
@@ -69,6 +70,7 @@ sub apply_changes_to_dev_lpt_opn{
             UpdateLimit::update_limit($trans, $new_l);
         }
     }
+    # apply to all things at the device level
     foreach my $dev_item (@{$device_items}){
         my ($tech, $area, $rout, $prog, $dev) = @{$dev_item};
         Logging::debug("modifying limits for $tech, $area, $rout, $prog, $dev");
@@ -82,8 +84,26 @@ sub apply_changes_to_dev_lpt_opn{
 
 sub promote_dev_lpt_opn_list_to_program_list{
     my ($sms_master, $dev_lpt_opn_list) = @_;
-    my ($unmatched_prog, $consol_prog) = SMS::Consolidate::consolidate($sms_master, $dev_lpt_opn_list, [qw(TECHNOLOGY AREA EFFECTIVE_ROUTING PROGRAM)]);
-    my @items = map {[(@{$_}, undef)]} @{$consol_prog};
+    # limits must be consistant at the program level, but must also be set in the limits database at the effective routing level
+    # resolve the exceptions at the program level
+    my ($unmatched_prog, $consol_prog) = SMS::Consolidate::consolidate($sms_master, $dev_lpt_opn_list, [qw(TECHNOLOGY AREA PROGRAM)]);
+    my %prog = map {($_->[2], $_->[2])} @{$consol_prog};
+    # resolve the exceptions at the effective_routing/program level
+    my ($unmatched_rout_prog, $consol_rout_prog) = SMS::Consolidate::consolidate($sms_master, $dev_lpt_opn_list, [qw(TECHNOLOGY AREA EFFECTIVE_ROUTING PROGRAM)]);
+    my %rout_prog = map {($_->[3], $_->[3])} @{$consol_rout_prog};
+    # remove any programs that are only partially satisfied at the program level (some effective routings but not others)
+    foreach my $program (keys %rout_prog){
+        unless (defined $prog{$program}){
+            warn "program <$program> is satisfied for some effective routings, but not others.  Probably some conflicting process options";
+            # remove any partially satisfied programs
+            @{$consol_rout_prog} = grep {$_->[3] ne $program} @{$consol_rout_prog};
+        }
+    }
+    # print unsatisfied programs
+    if (scalar @{$unmatched_prog} > 0){
+        warn "The following device, lpt, opn could not have a waiver applied at the program level : " . Dumper $unmatched_prog;
+    }
+    my @items = map {[(@{$_}, undef)]} @{$consol_rout_prog};
     return \@items;
 }
 

@@ -48,7 +48,7 @@ foreach my $device (keys %all){
 sub get_raw_comp_tech{
     my ($tech) = @_;
     my $conn = Connect::read_only_connection("etest");
-    my $sql = q{select device, component from raw_component_info where technology = ?};
+    my $sql = q{select device, component from device_component_info where technology = ?};
     my $sth = $conn->prepare($sql);
     $sth->execute($tech);
     my %comp;

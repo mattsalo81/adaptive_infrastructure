@@ -10,6 +10,17 @@ use Database::Connect;
 
 my ($tech, $sms_csv, $po_table) = @ARGV;
 
+my $usage = qq{
+
+Usage : $0 <TECHNOLOGY> <old_adaptive_active_device_csv> <old_adaptive_rtg_options> 
+
+compares options among equivalent effectivedb routings.  output can be piped through filter_out_known_opts
+to get rid of new opts
+
+};
+
+die $usage unless ((defined $tech) && (defined $sms_csv) && (defined $po_table));
+
 my $dev2eff = get_device_to_eff_rout($tech);
 my $dev2rout = get_device_to_db_routing($sms_csv);
 my $eff2opt = get_eff_rout_to_opt($tech);
