@@ -21,17 +21,33 @@ sub make_klf_for_wpf_and_limits{
     my ($wpf_name, $limit_records, $effective_routing) = @_;
     my $parms = get_parameters_from_prod_wpfs([$wpf_name]);
     my $klf = get_header($effective_routing, "Generated from Keithley::KLFGen for wpf $wpf_name");
-    my $added = add_limit_record_list(\$klf, $limit_records);
-
-    # add a dummy, disabled limit for everything not in the provided limit records.
-    # limit records may already be filtered by functionality -> may not just be what's missed.
-    foreach my $parm (keys %{$parms}){
-        unless (defined $added->{$parm}){
-            my $entry = KLFEntry->new($parm);
-            $entry->set_test(0);
-            $klf .= $entry->get_text();
-        }
+    
+    # sort limits by parameter
+    my %limits;
+    foreach my $limit (@{$limit_records}){
+        my $parm = $limit->get("ETEST_NAME");
+        $limits{$parm} = $limit;
     }
+   
+    # add an entry for each test id in the wpf 
+    foreach my $id (sort keys %{$parms}){
+        my $parm = $parms->{$id};
+        my $entry;
+        # generate an entry
+        if (defined $limits{$parm}){
+            # generate entry from the record
+            my $limit = $limits{$parm};
+            $entry = $limit->get_klf_entry();
+        }else{
+            # generate dummy
+            $entry = KLFEntry->new($parm);
+            $entry->set_test(0);
+        }
+        # set id name
+        $entry->set_test_name($id);
+        $klf .= $entry->get_text();
+    }
+    
     return $klf;
 }
 
@@ -58,17 +74,6 @@ sub get_header{
     return $text;
 }
 
-sub add_limit_record_list{
-    my ($text_ref, $limit_records) = @_;
-    my %added;
-    foreach my $limit (@{$limit_records}){
-        my $parm = $limit->get("ETEST_NAME");
-        $added{$parm} = "yep";
-        $$text_ref .= $limit->get_klf_entry()->get_text();
-    }
-    return \%added;
-}
-
 sub get_parameters_from_prod_wpfs{
     my ($wpfs) = @_;
     my %parms;
@@ -89,7 +94,8 @@ sub get_parameters_from_prod_wpfs{
             my $ktm_text = Archive::read_prod($ktm_arch);
             my $ktm = Parse::KTM->new($ktm_text);
             my $parms = $ktm->get_parameters();
-            @parms{@{$parms}} = @{$parms};
+            my $subsite = $ktm->get_subsite();
+            @parms{map {$subsite . "x$_"} @{$parms}} = @{$parms};
         }
         1;
     } or do {

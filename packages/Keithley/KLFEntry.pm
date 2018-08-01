@@ -60,6 +60,11 @@ sub get_text{
     return $text;
 }
 
+sub set_test_name{
+    my ($self, $tid) = @_;
+    $self->{"NAM"} = $tid;
+}
+
 # turns on immediate mapping
 sub enable_mapping{
     my ($self) = @_;

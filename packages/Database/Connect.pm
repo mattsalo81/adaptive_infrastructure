@@ -29,7 +29,10 @@ sub read_only_connection{
         unless (defined $connections{$name}){
             confess "Could not connect to <$name>";
         }
+        # set read only
         $connections{$name}->{"ReadOnly"} = 1;
+        # set simple interface for CLOBS and BLOBS
+        $connections{$name}->{"LongReadLen"} = 2*1024*1024; # 2 MB max size
     }
     return $connections{$name};
 }

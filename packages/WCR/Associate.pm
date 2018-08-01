@@ -1,4 +1,4 @@
-package Associate;
+package WCR::Associate;
 use warnings;
 use strict;
 use lib '/dm5/ki/adaptive_infrastructure/packages';
@@ -8,13 +8,16 @@ use Logging;
 use Database::Connect;
 use DBI;
 
-# associates all coordrefs to their waferconfigs. 
-my $get_wcf_sth;
-our $could_not_find_wcf_error = "Could not find a wcf for";
 
-sub get_wcf_for_coordref{
+# associates all coordrefs to their waferconfigs. 
+my $find_wcf_sth;
+our $could_not_find_wcf_error = "Could not find a wcf for";
+our $no_wcf_e = "No wcf defined in lookup for";
+my $get_wcf_sth;
+
+sub find_wcf_for_coordref{
     my ($coordref) = @_;
-    unless (defined $get_wcf_sth){
+    unless (defined $find_wcf_sth){
         Logging::diag("preparing statement handle to find attachments of wcrepo\n");
         my $wcrepo = Connect::read_only_connection("wcrepo");
         my $sql = q{
@@ -25,16 +28,15 @@ sub get_wcf_for_coordref{
             where 
                 WCF like 'DMOS5%'
                 and regexp_like(UPPER(attachment_name), ?)
-                and UPPER(Attachment_sourcetype) in ('CHIPOPT','CHIPOPT2003')
             };
-        $get_wcf_sth = $wcrepo->prepare($sql);
+        $find_wcf_sth = $wcrepo->prepare($sql);
     }
     Logging::diag("Looking for <$coordref> in attachments of wcrepo\n");
     my $search = $coordref;
     $search =~ tr/a-z/A-Z/;	
     $search = "^${search}(\$|[^[:alnum:]])";
-    $get_wcf_sth->execute($search);
-    my $matches = $get_wcf_sth->fetchall_arrayref();
+    $find_wcf_sth->execute($search);
+    my $matches = $find_wcf_sth->fetchall_arrayref();
     if(scalar @{$matches} == 0){
         confess "$could_not_find_wcf_error <$coordref>\n";
     }else{
@@ -85,7 +87,7 @@ sub update_lookup_table{
     my $trans = Connect::new_transaction("etest");
     eval{
         # clear old table
-        my $delete_sql = q{delete from coordref2wcrepo where 1=1};
+        my $delete_sql = q{delete from coordref2wcrepo};
         $trans->prepare($delete_sql)->execute();
         $download_sth->execute();
         
@@ -95,18 +97,18 @@ sub update_lookup_table{
     
         # start populating the lookup
         my $coordrefs = $download_sth->fetchall_arrayref();
-        foreach my $rec(@{$coordrefs}){
-            Logging::diag("Processing coordref " . $rec->[0]);
+        foreach my $coordref(map {$_->[0]} @{$coordrefs}){
+            Logging::diag("Processing coordref <$coordref>");
             eval{
-                my $wcf = get_wcf_for_coordref($rec->[0]);
-                $up_sth->execute($rec->[0], $wcf);	
+                my $wcf = find_wcf_for_coordref($coordref);
+                $up_sth->execute($coordref, $wcf);	
                 1;
             } or do{
                 my $e = $@;
                 if ($e =~ m/$could_not_find_wcf_error/){
-                    Logging::error("no wcf found for <" . $rec->[0] . ">\n");
+                    Logging::error("no wcf found for <$coordref>\n");
                 }else{
-                    confess "Could not find a wcf for <" . $rec->[0] . "> because : $e";
+                    confess "Could not find a wcf for <$coordref> because : $e";
                 }
             };
         }
@@ -119,7 +121,31 @@ sub update_lookup_table{
     }
 }
 
+sub get_wcf{
+    my ($coordref) = @_;
+    my $sth = get_wcf_sth();
+    $sth->execute($coordref);
+    my $row = $sth->fetchrow_arrayref();
+    if (defined $row){
+        return $row->[0];
+    }else{
+        confess "$no_wcf_e <$coordref>";
+    }
+    
+}
 
-
+sub get_wcf_sth{
+    unless(defined $get_wcf_sth){
+        my $conn = Connect::read_only_connection('etest');
+        my $sql = q{
+            select waferconfigfile from coordref2wcrepo where coordref = ?
+        };
+        $get_wcf_sth = $conn->prepare($sql);
+    }
+    unless(defined $get_wcf_sth){
+        confess "Could not get get_wcf_sth";
+    }
+    return $get_wcf_sth;
+}
 
 1;

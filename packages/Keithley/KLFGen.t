@@ -14,11 +14,11 @@ my $known_parm_lb = 500;
 my $known_tech = "LBC5";
 my $known_wpf = "dmos5_LBC5X_MLM_r06.wpf";
 my $known_area = "PARAMETRIC";
-my $known_rout = "PARAMETRIC__A72AE3CD-X";
+my $known_rout = "LBC5_PARAMETRIC_3_CD";
 my $known_prog = "M06CDC65310C0";
 
 my $parm_hash = KLFGen::get_parameters_from_prod_wpfs($known_wpfs);
-my $parms = [keys %{$parm_hash}];
+my $parms = [values %{$parm_hash}];
 ok(scalar @{$parms} > $known_parm_lb, "Found at least $known_parm_lb parameters on known wpfs");
 ok(subset($known_parms, $parms), "parameters found contained a subset of known parameters");
 

@@ -79,7 +79,8 @@ sub get_matching_records_fasttable{
 
 sub clear_exception_table{
     my ($trans) = @_;
-    my $sql = q{delete from exceptions};
+    # skip the two testing exceptions
+    my $sql = q{delete from exceptions where exception_number > 1};
     my $sth = $trans->prepare($sql);
     $sth->execute();
 }

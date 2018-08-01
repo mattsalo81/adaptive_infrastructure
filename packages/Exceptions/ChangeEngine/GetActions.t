@@ -6,6 +6,9 @@ require Test::Homebrew_Exception;
 require Test::Lists;
 use Exceptions::ChangeEngine::GetActions;
 
+my $old_stderr = *STDERR;
+*STDERR = *STDOUT;
+
 my $sth =  Exceptions::ChangeEngine::GetActions::get_limits_sth();
 ok(defined $sth, "get statement handle");
 
@@ -20,3 +23,5 @@ for(my $i = 0; $i < $exp_num; $i++){
     my $num = $known_action_numbers->[$i];
     is($action->{"ACTION_NUMBER"}, $num, "retreive $num action");
 }
+
+*STDERR = $old_stderr;
