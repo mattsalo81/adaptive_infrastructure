@@ -59,7 +59,7 @@ sub get_all_components_for_device{
         my $comps = CompCount::get_components_for_chip($chip);
         @onepg_chip_comps{@{$comps}} = ($manual) x scalar @{$comps};
         $comps = get_manual_components_for_design($chip);
-        @etest_chip_comps{@{$comps}} = ($manual) x scalar @{$comps};
+        @etest_chip_comps{@{$comps}} = ('Y') x scalar @{$comps};
     }
     Logging::diag("ONEPG Components from chip lists : " . Dumper \%onepg_chip_comps);
     Logging::diag("Manual Components from chip lists : " . Dumper \%etest_chip_comps);
