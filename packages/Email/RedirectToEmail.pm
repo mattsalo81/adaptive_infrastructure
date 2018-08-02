@@ -7,7 +7,11 @@ use Data::Dumper;
 use Email::TiedStream;
 use Logging;
 
-my @emails = ('m-salo@ti.com');
+my @emails = ('d5pgtechs@list.ti.com');
+# CALL ME IN YOUR SCRIPT TO CHANGE THE DESTINATION
+sub set_emails{
+    @emails = @_;
+}
 
 print "Using RedirectToEmail.pm.  if anything on STDERR is read, STDOUT and STDERR will be sent to " . join(", ", @emails) . "\n";
 

@@ -13,6 +13,8 @@ use FactorySummary::Upload;
 use Exceptions::RuleEngine;
 use Exceptions::ChangeEngine::Core;
 
+RedirectToEmail::set_emails('d5pgtechs@list.ti.com');
+
 SpecExtract::update_sms_table();
 WipExtract::update_wip_extract();
 foreach my $tech (@{SMSDigest::get_all_technologies()}){
