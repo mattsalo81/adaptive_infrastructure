@@ -99,6 +99,15 @@ sub get_undefined_sth{
                     where
                         c2b.technology = eci.technology
                 )
+                and eci.component in (
+                    select distinct 
+                        pi.component
+                    from
+                        parameter_info pi
+                    where
+                        pi.technology = eci.technology
+                        and pi.component is not null
+                )
                 
         };
         $undefined_sth = $conn->prepare($sql);

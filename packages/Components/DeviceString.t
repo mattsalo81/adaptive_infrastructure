@@ -10,7 +10,7 @@ my $test_tech = "TEST";
 my $test_dev = "PROG2";
 my $test_undef_dev = "PROG3";
 my $test_string = "AAADA";
-my $test_undef_comp = "NOT REAL COMP";
+my $test_undef_comp = "FUNCTIONAL COMP";
 
 # val2char
 

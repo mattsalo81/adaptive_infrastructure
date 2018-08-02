@@ -34,7 +34,7 @@ my $test_prog3 = "I DO NOT EXIST";
 #check if sth defined
 ok(EffectiveComponents::get_program_has_components_sth(), "got statement handle for component");
 is(EffectiveComponents::get_number_components_on_program($test_tech, $test_prog1), 1, "found one component on $test_prog1");
-is(EffectiveComponents::get_number_components_on_program($test_tech, $test_prog2), 2, "found two components on $test_prog2");
+is(EffectiveComponents::get_number_components_on_program($test_tech, $test_prog2), 3, "found three components on $test_prog2");
 is(EffectiveComponents::get_number_components_on_program($test_tech, $test_prog3), 0, "found no components on $test_prog3");
 
 $comps = EffectiveComponents::get_effective_components($test_tech, $test_prog1);

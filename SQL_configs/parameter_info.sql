@@ -18,3 +18,19 @@ insert into parameter_info (technology, etest_name, parm_type_pcd) values
 ('TEST_TECH', 'PARM4', 'WAS');
 insert into parameter_info (technology, etest_name, parm_type_pcd) values
 ('TEST_TECH', 'PARM5', 'WAS');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST_TECH1', 'PARM', 'WAS', 'TEST_COMP');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST', 'PARM1', 'WAS', 'COMP1');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST', 'PARM2', 'WAS', 'COMP2');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST', 'PARM3', 'WAS', 'COMP3');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST', 'PARM4', 'WAS', 'COMP4');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST', 'PARM5', 'WAS', 'COMP5');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST', 'PARM6', 'WAS', 'COMP6');
+insert into parameter_info (technology, etest_name, parm_type_pcd, component) values
+('TEST', 'PARM7', 'WAS', 'FUNCTIONAL COMP');

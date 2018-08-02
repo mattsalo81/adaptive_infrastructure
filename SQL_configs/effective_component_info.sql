@@ -11,10 +11,12 @@ insert into effective_component_info (technology, program, component) values
 insert into effective_component_info (technology, program, component) values
 ('TEST', 'PROG2', 'COMP3');
 insert into effective_component_info (technology, program, component) values
+('TEST', 'PROG2', 'NON FUNCTIONAL COMP');
+insert into effective_component_info (technology, program, component) values
 ('TEST', 'PROG3', 'COMP4');
 insert into effective_component_info (technology, program, component) values
 ('TEST', 'PROG3', 'COMP5');
 insert into effective_component_info (technology, program, component) values
 ('TEST', 'PROG3', 'COMP6');
 insert into effective_component_info (technology, program, component) values
-('TEST', 'PROG3', 'NOT REAL COMP');
+('TEST', 'PROG3', 'FUNCTIONAL COMP');

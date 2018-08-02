@@ -22,7 +22,7 @@ ok(lists_identical(Bits::remove_zero_or_negative_bits([]), []), "Zero width arra
 my $test_tech = 'TEST';
 my $test_program_known = 'PROG2';
 my $test_program_unknown = "PROG3";
-my $unknown = ['NOT REAL COMP'];
+my $unknown = ['FUNCTIONAL COMP'];
 my $bit_list = [22, 23];
 
 my $undefined = Bits::get_undefined_components_on_program($test_tech, $test_program_known);
