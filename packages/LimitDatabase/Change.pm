@@ -66,6 +66,7 @@ my %known_things = (
                                     },
     PARAMETER                   => {
                                         DEACTIVATE => sub{return set_value($_[1], "DEACTIVATE", "Y")},
+                                        ACTIVATE   => sub{return set_value($_[1], "DEACTIVATE", "N")},
                                     },
 );
 

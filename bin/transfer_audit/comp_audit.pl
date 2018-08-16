@@ -7,7 +7,8 @@ use Logging;
 use Database::Connect;
 
 my $usage = qq{
-    Audits the raw component information between old/new adaptive.
+    Audits the device component information between old/new adaptive.
+    Uses RAW components from old adaptive and DEVICE info from new adaptive
     Needs : New Adaptive Technology
     Needs : old adaptive component lookup
 
@@ -17,7 +18,7 @@ my $usage = qq{
 my ($tech, $file) = @ARGV;
 die "$usage" unless (defined $tech) && (defined $file);
 
-my $new = get_raw_comp_tech($tech);
+my $new = get_dev_comp_tech($tech);
 my $old = read_old_dev_2_comp_csv($file);
 my @all_dup = keys %{$new}, keys %{$old};
 my %all;
@@ -45,7 +46,7 @@ foreach my $device (keys %all){
 
 
 
-sub get_raw_comp_tech{
+sub get_dev_comp_tech{
     my ($tech) = @_;
     my $conn = Connect::read_only_connection("etest");
     my $sql = q{select device, component from device_component_info where technology = ?};
