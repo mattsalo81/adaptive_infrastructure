@@ -46,8 +46,8 @@ sub convert{
                 my $sampling = "RANDOM";
                 if (defined ($rec->{"REL"}) && $rec->{"REL"} ne "N"){
                     unless(defined($rec->{"U_SPEC"}) && defined($rec->{"L_SPEC"})){
-                        print Dumper $rec;
-                        die "Something not defined";
+                        $rec->{"L_SPEC"} = -9e99;
+                        $rec->{"U_SPEC"} = 9e99;
                     }
                     $rel = "Y";
                     $url = sprintf("%G", $rec->{"U_SPEC"});
@@ -56,8 +56,8 @@ sub convert{
                     $sampling = "9 SITE";
                 } elsif (defined ($rec->{"WAS"}) && $rec->{"WAS"} ne "N"){
                     unless(defined($rec->{"U_SPEC"}) && defined($rec->{"L_SPEC"})){
-                        print Dumper $rec;
-                        die "Something not defined";
+                        $rec->{"L_SPEC"} =-9E99;
+                        $rec->{"U_SPEC"} = 9E99;
                     }
                     $dispo = "Y";
                     $pass = ".75";

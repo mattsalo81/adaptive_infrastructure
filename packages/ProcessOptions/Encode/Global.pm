@@ -41,6 +41,11 @@ sub get_codes{
     return $codes;
 }
 
+
+# take a string in the form of :
+# "CODE1 OPT1 OPT2 OPT3"
+# "CODE2 OPT1 OPT4 OPT3"
+# and convert it into a hash of arrays, where key of the hash is the CODE and the value is the list of options for that code
 sub parse_old_txt_format{
     my ($text) = @_;
     my @lines = split(/\n+/, $text);
