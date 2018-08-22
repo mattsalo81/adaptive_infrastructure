@@ -109,13 +109,13 @@ sub analyze_differences{
                 $turned_on{$parm_id} = [] unless defined $turned_on{$parm_id};
                 push @{$turned_on{$parm_id}}, $program;
                 $program_issues{$program} = [] unless defined $program_issues{$program};	
-                push @{$program_issues{$program}}, "$parm_id turned_on_in_component_specfile";
+                push @{$program_issues{$program}}, "$parm_id turned_on_in_specfile";
             }  	# flag as turned on	
             if ( $o && !$n){
                $turned_off{$parm_id} = [] unless defined $turned_off{$parm_id};
                push @{$turned_off{$parm_id}}, $program;
                $program_issues{$program} = [] unless defined $program_issues{$program};
-               push @{$program_issues{$program}}, "$parm_id turned_off_in_flow_specfile";
+               push @{$program_issues{$program}}, "$parm_id turned_off_in_specfile";
             }       # flag as turned on
             if ($o && $n){
                 my $o_l = sprintf("%s %d %g %g %d %d", @{$old->{$parm_id}});

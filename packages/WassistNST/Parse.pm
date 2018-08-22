@@ -54,66 +54,50 @@ sub parse_nst{
                     confess "dimension array for <$module> is not what I expected\n";
                 }
                 # assert that we have the info we need
-                my $mod = parametric_module_info->new($module);
+                my $mod = WassistNST::Module->new($module);
                 unless (defined $pad1_info && defined $mod_info){
                     confess "Could not find pad1 or ll info for <$module>\n";
                 }
                 
                 # import module location
-                $mod->set_ll_x_mm($mod_info->[0] * $scale);
-                $mod->set_ll_y_mm($mod_info->[1] * $scale);
+                my @array_loc = ($mod_info->[0] * $scale, $mod_info->[1] * $scale);
                 
                 # import orientation
                 my $orient = $mod_info->[2]->{'orient'};
-                unless (defined $orient and defined $parametric_module_info::numeric_orientations{$orient}){
+                unless (defined $orient and defined $WassistNST::Module::numeric_orientations{$orient}){
                     confess "nonexistant or unexpected orientation for module <$module>\n";
                 }
-                $mod->set_orientation($parametric_module_info::numeric_orientations{$orient});
+                $mod->set("ORIENTATION", $WassistNST::Module::numeric_orientations{$orient});
                 
                 # import pad information
-                $mod->set_pad1_x_mm($pad1_info->[0] * $scale);
-                $mod->set_pad1_y_mm($pad1_info->[1] * $scale);
-                $mod->set_name($pad1_info->[2]->{"cell"});
+                $mod->set("COORD_TYPE", "PAD1");
+                $mod->set("X", $pad1_info->[0] * $scale);
+                $mod->set("Y", $pad1_info->[1] * $scale);
+                $mod->set("NAME", $pad1_info->[2]->{"cell"});
         
                 # revision -> either its own field, and also appended to the name, or have to find it from the raw name
                 my $rev = $pad1_info->[2]->{"revision"};
                 if (defined $rev){
                     #update revision
                     $rev =~ s/_//g;
-                    $mod->set_revision($rev);
+                    $mod->set("REVISION", $rev);
                     #remove revision from name if it exists...
                     my $name = $mod->get_name();
                     if ($name =~ m/^(.*)$rev$/i){
-                        $mod->set_name($1);
+                        $mod->set("NAME", $1);
                     }
                 }else{
                     # it may be in the raw name...	
-                    my $trash_mod = parametric_module_info->new($mod->get_raw_name());
-                    my $maybe_has_rev = $trash_mod->get_name();
-                    my $maybe_no_rev = $mod->get_name();
+                    my $trash_mod = WassistNST::Module->new($mod->get("RAW_NAME"));
+                    my $maybe_has_rev = $trash_mod->get("NAME");
+                    my $maybe_no_rev = $mod->get("NAME");
                     if ($maybe_has_rev =~ m/^.*$maybe_no_rev([A-Z])$/i){
-                        $mod->set_revision($1);
-                    }else{
-                        # could not figure out from raw name/name overlap, consult the table
-                        my ($new_raw_name, $new_raw_rev) = wassist_config::get_name_and_rev_from_raw_name($mod->get_raw_name());
-                        my ($new_name, $new_rev) = wassist_config::get_name_and_rev_from_raw_name($mod->get_name());
-                        my $trash_mod = parametric_module_info->new($mod->get_raw_name());
-                        my ($new_scrubbed_name, $new_scrubbed_rev) = wassist_config::get_name_and_rev_from_raw_name($trash_mod->get_name());
-                        if (defined $new_name && defined $new_rev){
-                            $mod->set_name($new_name);
-                            $mod->set_revision($new_rev);
-                        }elsif(defined $new_raw_name && defined $new_raw_rev){
-                            $mod->set_name($new_raw_name);
-                            $mod->set_revision($new_raw_rev);
-                        }elsif(defined $new_scrubbed_name && defined $new_scrubbed_rev){
-                            $mod->set_name($new_scrubbed_name);
-                            $mod->set_revision($new_scrubbed_rev);
-                        }else{
-                            push @failed_revision_extracts, "<" . $mod->get_name() . "> or <" . $mod->get_raw_name() ."> or <" . $trash_mod->get_name() . ">";
-                        }
-                    }
+                        $mod->set("REVISION", $1);
                 }
                 push @{$mod_list_ref}, $mod;
+                $mod = WassistNST::Module->new_copy($mod);
+                $mod->set("COORD_TYPE", "ARRAY");
+                $mod
             }
         }
     }
