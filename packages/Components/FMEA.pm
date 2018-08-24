@@ -8,6 +8,7 @@ use Logging;
 use Database::Connect;
 
 my $fmea_comps_sth;
+# may benefit from memoization
 
 sub get_fmea_comps{
     my ($tech) = @_;

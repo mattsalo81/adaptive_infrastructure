@@ -9,12 +9,25 @@ use Database::Connect;
 
 my $autoz_sth;
 
+sub is_autoz_module_sms_rec{
+    my ($sms_rec, $test_module) = @_;
+    my $tech = $sms_rec->get("TECHNOLOGY");
+    my $area = $sms_rec->get("AREA");
+    return is_autoz_module($tech, $area, $test_module);
+}
+
 sub is_autoz_module{
     my ($technology, $test_area, $test_module) = @_;
     my $sth = get_autoz_sth();
     $sth->execute($technology, $test_area, $test_module);
-    my $records = $sth->fetchall_arrayref();
-    return (scalar @{$records} > 0);
+    my $rec = $sth->fetchrow_arrayref();
+    unless(defined $rec){
+        confess "Alignment module <$test_module> for <$technology> at <$test_area> is not defined in database";
+    }
+    my $autoz = $rec->[0];
+    return 1 if $autoz eq 'Y';
+    return 0 if $autoz eq 'N';
+    confess "unexpected autoz value <$autoz> (expect 'Y'/'N')";
 }
 
 sub get_autoz_sth{
@@ -22,9 +35,9 @@ sub get_autoz_sth{
         my $conn = Connect::read_only_connection('etest');
         my $sql = q{
             select
-                test_module
+                autoz
             from
-                autoz_modules
+                alignment_modules
             where
                 technology = ?
                 and test_area = ?

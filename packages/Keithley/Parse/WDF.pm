@@ -45,8 +45,7 @@ sub get_new_text{
     $text .= "$eosites\n";
     $text .= "Site,Single,Single\n";
     # unpack the subsites
-    my $a_mod = $self->{"alignment_module"};
-    confess "No alignment module found" unless defined $a_mod;
+    my $a_mod = $self->get_alignment_mod();
     # alignment module
     $text .= "$a_mod,0,0\n";
     # alphabetical standard modules
@@ -135,6 +134,20 @@ sub add_mod{
     }else{
         $self->{"modules"}->{$mod} = [$x, $y];
     }
+}
+
+sub get_alignment_mod{
+    my ($self) = @_;
+    my $a_mod = $self->{"alignment_module"};
+    confess "No alignment module found" unless defined $a_mod;
+    return $a_mod
+}
+
+sub get_real_modules{
+    my ($self) = @_;
+    my @mods = ($self->get_alignment_mod());
+    push @mods, keys %{$self->{"modules"}};
+    return \@mods;
 }
 
 sub add_dummy{

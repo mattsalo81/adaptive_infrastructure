@@ -13,6 +13,9 @@ my $wdf = Parse::WDF->new($wdf_text);
 $wdf->{"TEXT"} = "";
 my $new_text = $wdf->get_new_text();
 is($new_text, $wdf_text, "WDF parsed/loaded/printed without modification and without aid of original text");
+is($wdf->get_alignment_mod(), "lbc5_scm_mod00", "get alignment mod");
+ok(have_same_elements($wdf->get_real_modules(), [qw(lbc5_scm_mod00 lbc5_scm_esd01 lbc5_scm_exmod2)]), "Get all real modules");
+
 
 sub get_text{
     return q{#Keithley Wafer Description File
@@ -59,3 +62,5 @@ lbc5_wlr2v,0.005,0.005
 lbc5_wlr_mod02,0.005,0.005
 <EOSUBSITES>};
 }
+
+

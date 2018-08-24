@@ -5,25 +5,9 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
 use Logging;
-use Components::DeviceString;
-
-sub get_recipe_for_sms_record{
-    my ($sms_rec, $type) = @_;
-    my $recipe = $sms_rec->get("RECIPE");
-    my $base_wdf = $sms_rec->get("PROBER_FILE");
-    my $wdf = WDFGen::make_wdf_name($base_wdf, $type);
-    my $cpf = CPFGen::get_cpf_name($sms_rec);
-    my $autoz = WDFGen::is_autoz($sms_rec);
-    my $klf = $sms_rec->get("PROGRAM");
-    my $device_string = DeviceString::get_device_string($sms_rec->get("TECHNOLOGY"), $sms_rec->get("PROGRAM"));
-    my $text = get_text($recipe, $cpf_base, $autoz, $klf, $device_string);
-    return $text;
-}
 
 sub get_text{
-    my ($recipe, $cpf_base, $autoz, $wdf, $klf, $device_string) = @_;
-    my $cpf = make_cpf_name($cpf_base, $autoz);
-    $recipe = clean_filename($recipe, "krf");
+    my ($recipe, $cpf, $wdf, $klf, $device_string) = @_;
     $cpf = clean_filename($cpf, "cpf");
     $wdf = clean_filename($wdf, "wdf");
     $klf = clean_filename($klf, "klf");
