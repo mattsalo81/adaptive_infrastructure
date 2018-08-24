@@ -11,15 +11,15 @@ use Keithley::File;
 use LimitDatabase::GetLimit;
 
 sub make_klf_for_wpf{
-    my ($wpf_name, $tech, $area, $eff_rout, $prog) = @_;
+    my ($wpf_name, $tech, $area, $eff_rout, $prog, $use_archive) = @_;
     my $limits = GetLimit::get_all_limits($tech, $area, $eff_rout, $prog, undef);
-    my $klf = make_klf_for_wpf_and_limits($wpf_name, $limits, $eff_rout);
+    my $klf = make_klf_for_wpf_and_limits($wpf_name, $limits, $eff_rout, $use_archive);
     return $klf;
 }
 
 sub make_klf_for_wpf_and_limits{
-    my ($wpf_name, $limit_records, $effective_routing) = @_;
-    my $parms = get_parameters_from_prod_wpfs([$wpf_name]);
+    my ($wpf_name, $limit_records, $effective_routing, $use_archive) = @_;
+    my $parms = get_parameters_from_wpfs([$wpf_name], $use_archive);
     my $klf = get_header($effective_routing, "Generated from Keithley::KLFGen for wpf $wpf_name");
     
     # sort limits by parameter
@@ -74,22 +74,22 @@ sub get_header{
     return $text;
 }
 
-sub get_parameters_from_prod_wpfs{
-    my ($wpfs) = @_;
+sub get_parameters_from_wpfs{
+    my ($wpfs, $use_archive) = @_;
     my %parms;
     my $current_file;
     eval{
         my %ktms;
         foreach my $wpf_name (@{$wpfs}){
             $current_file = $wpf_name;
-            my $wpf_text = Keithley::File::get_text($wpf_name);
+            my $wpf_text = Keithley::File::get_text($wpf_name, $use_archive);
             my $wpf = Parse::WPF->new($wpf_text);
             my $ktms = $wpf->get_all_ktms();
             @ktms{@{$ktms}} = @{$ktms};
         }
         foreach my $ktm_name (keys %ktms){
             $current_file = $ktm_name;
-            my $ktm_text = Keithley::File::get_text($ktm_name);
+            my $ktm_text = Keithley::File::get_text($ktm_name, $use_archive);
             my $ktm = Parse::KTM->new($ktm_text);
             my $parms = $ktm->get_parameters();
             my $subsite = $ktm->get_subsite();
