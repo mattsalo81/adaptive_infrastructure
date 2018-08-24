@@ -6,6 +6,11 @@ use Carp;
 use Data::Dumper;
 use Logging;
 
+# package manages Archived files.  Files can be requested by name
+# using get_text and the PROD versions will be retreived from the archive
+#
+# Files SAVED to the archive are put into a temporary directory, and at script end are installed into the archive
+
 my %filetype_lookup = (
     ktm         => "ktm",
     uap         => "uap",
@@ -17,12 +22,27 @@ my %filetype_lookup = (
     gdf         => "gdf",
 );
 
+# Configure
+my $tmp_dir = "/tmp/.adaptive_infrastructure__Keithley__Archive";
+mkdir $tmp_dir unless (-d $tmp_dir);
+
 my $rcs_ext = ",v";
 unless (defined $ENV{"KI_ARCHIVE"}){
     confess "KI_ARCHIVE environment variable is not set!";
 }
 
+my %file_types_to_install;
+
 our $no_file_error = "File could not be found";
+
+# subroutines
+
+sub get_text{
+    my ($file) = @_;
+    my $prod = get_std_rcs_file($file);
+    my $text = read_prod($prod);
+    return $text;
+}
 
 sub read_prod{
     my ($file_path) = @_;
@@ -55,6 +75,34 @@ sub get_std_rcs_file{
         confess "$no_file_error <$std>";
     }
     return $std;
+}
+
+# puts the file in the tmp directory
+sub queue_archival{
+    my ($file, $text) = @_;
+    Logging::debug("Queuing <$file> for archival");
+    configure_tmp();
+    my $tmp_file = "$tmp_dir/$file";
+    open my $fh, "> $tmp_file" or confess "Could not save copy of file (to archive) in <$tmp_file>";
+    print $fh $text;
+    close $fh;
+}
+
+# empties the tmp directory if nothing's been added yet
+sub configure_tmp{
+    if(scalar keys %file_types_to_install == 0){
+        unlink(glob("$tmp_dir/*"));
+    }
+}
+
+# installs all file types added to the tmp directory
+sub install_all{
+    foreach my $file_type (keys %file_types_to_install){
+        Logging::event("Installing <$file_type> type files...");
+        system("krm_mass_coci.pl '$tmp_dir' '$file_type' 'Automated Recipe Generator' -auto > /dev/null");
+        delete $file_types_to_install{$file_type};
+        unlink(glob("$tmp_dir/*.$file_type"));
+    }
 }
 
 1;

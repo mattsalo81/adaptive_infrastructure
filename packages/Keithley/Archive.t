@@ -15,3 +15,10 @@ ok((defined $text && $text =~ m/UAP/), "Got known RCS file");
 my $std;
 $std = Archive::get_std_rcs_file($known_ktm);
 ok($std =~ m/\/ktm\/$known_ktm,v/, "found what appears to be the rcs file of a known ktm");
+
+# saving
+my $file = "test.cpf";
+$text = 'Hello, World!';
+ok(! -f "/tmp/adaptive_infrastructure__Keithley__Archive", "tmp file does not exist");
+Archive::queue_archival($file, $text);
+ok(-f "/tmp/.adaptive_infrastructure__Keithley__Archive/$file", "tmp file exists");

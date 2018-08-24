@@ -19,6 +19,10 @@ my %recipe_to_wdf_type = (
     "ALL"       =>      "ALL",
 );
 
+sub generate_recipe{
+    my ($sms_rec, $archive) = @_;
+}
+
 sub _parse_wdf_and_get_cpf_info{
     my ($sms_rec, $recipe_type, $orig_wdf_text) = @_;
     # start by getting information from wdf
@@ -33,12 +37,16 @@ sub _parse_wdf_and_get_cpf_info{
     }else{
         $cpf .= "_NOAUTO.cpf";
     } 
-    # get info out of CPF?
-
     return ($wdf_obj, $mod_list, $cpf);
 }
 
-sub _parse_cpf_wpf_ktm_info
+# open cpf, get wpf
+# open cpf, get ktms
+# open ktms, get subsites for WDF generation
+# give wpf to KLF generator
+# generate specfile for FILE
+# create KRF
+# updated WDF
 
     # make recipe name
     my $krf_name = $sms_rec->get("RECIPE");

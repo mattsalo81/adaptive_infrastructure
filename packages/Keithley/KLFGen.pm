@@ -7,7 +7,7 @@ use Data::Dumper;
 use Logging;
 use Keithley::Parse::WPF;
 use Keithley::Parse::KTM;
-use Keithley::Archive;
+use Keithley::File;
 use LimitDatabase::GetLimit;
 
 sub make_klf_for_wpf{
@@ -82,16 +82,14 @@ sub get_parameters_from_prod_wpfs{
         my %ktms;
         foreach my $wpf_name (@{$wpfs}){
             $current_file = $wpf_name;
-            my $wpf_arch = Archive::get_std_rcs_file($wpf_name);
-            my $wpf_text = Archive::read_prod($wpf_arch);
+            my $wpf_text = Keithley::File::get_text($wpf_name);
             my $wpf = Parse::WPF->new($wpf_text);
             my $ktms = $wpf->get_all_ktms();
             @ktms{@{$ktms}} = @{$ktms};
         }
         foreach my $ktm_name (keys %ktms){
             $current_file = $ktm_name;
-            my $ktm_arch = Archive::get_std_rcs_file($ktm_name);
-            my $ktm_text = Archive::read_prod($ktm_arch);
+            my $ktm_text = Keithley::File::get_text($ktm_name);
             my $ktm = Parse::KTM->new($ktm_text);
             my $parms = $ktm->get_parameters();
             my $subsite = $ktm->get_subsite();
