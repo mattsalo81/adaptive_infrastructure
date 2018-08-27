@@ -29,6 +29,7 @@ my %non_rule_fields;
 my @field_filter_order = qw(
     TEST_LPT
     TEST_OPN
+    COT
     TECHNOLOGY
     FAMILY
     DEV_CLASS
@@ -57,6 +58,7 @@ our %field_filter_actions = (
     COORDREF            => ['INDEX', lambda_generator_generator_explicit_index('COORDREF')],
     TEST_LPT            => ['INDEX', lambda_generator_generator_explicit_index('TEST_LPT')],
     TEST_OPN            => ['INDEX', lambda_generator_generator_explicit_index('TEST_OPN')],
+    COT                 => ['INDEX', lambda_generator_generator_explicit_index('COT')],
     PROCESS_OPTION      => ['RECORD', \&lambda_generator_process_options],
     LPT                 => ['INDEX',  \&lambda_generator_logpoints],
     FUNCTIONALITY       => ['RECORD', \&lambda_generator_functionality],
@@ -75,6 +77,7 @@ our %index_translator = (
     COORDREF    => "COORDREF",
     TEST_LPT    => "LPT",
     TEST_OPN    => "OPN",
+    COT         => "COT",
     PROCESS_OPTION => "EFFECTIVE_ROUTING",
     LPT         => "ROUTING",
 );

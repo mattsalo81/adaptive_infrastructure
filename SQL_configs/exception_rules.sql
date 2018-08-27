@@ -18,6 +18,7 @@ create table exception_rules(
              functionality              varchar2 (128),
              PCD                        varchar2 (16),
              PCD_REV                    varchar2 (16),
+             COT                        varchar2 (128),
              expiration_date            date,             
              constraint exc_rules_pk PRIMARY KEY (exception_number, rule_number),
              constraint exc_rules_fk FOREIGN KEY (exception_number) REFERENCES exception_sources (exception_number),
@@ -38,7 +39,8 @@ create table exception_rules(
                         test_opn is not null or
                         lpt is not null or
                         functionality is not null or
-                        PCD_REV is not null),
+                        PCD_REV is not null or
+                        COT is not null),
             constraint pcd_rule check ((PCD_REV is null) or (pcd is not null))
 );             
 insert into exception_rules (exception_number, rule_number, active, technology) values 

@@ -41,20 +41,20 @@ foreach my $field (keys %ExceptionRules::field_filter_actions){
 }
 
 # set up test records
-my @test_format = qw(TECHNOLOGY FAMILY DEV_CLASS ROUTING COORDREF PROGRAM LPT DEVICE PROD_GRP EFFECTIVE_ROUTING OPN);
+my @test_format = qw(TECHNOLOGY FAMILY DEV_CLASS ROUTING COORDREF PROGRAM LPT DEVICE PROD_GRP EFFECTIVE_ROUTING OPN COT);
 my @test_records = (
-    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG0', 9300, 'TEST_DEV_0', 'TPGRP0', 'TDBROUT1', '8820'],
-    ['WAV_TEST', 'TFAM2', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG1', 9300, 'TEST_DEV_1', 'TPGRP1', 'TDBROUT1', '8820'],
-    ['WAV_TEST', 'TFAM1', 'TCLASS2', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG2', 9300, 'TEST_DEV_2', 'TPGRP1', 'TDBROUT1', '8820'],
-    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9455_8820_rout", 'TCOORD1', 'TEST_PROG3', 9300, 'TEST_DEV_3', 'TPGRP1', 'TDBROUT1', '8820'],
-    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD2', 'TEST_PROG4', 9300, 'TEST_DEV_4', 'TPGRP1', 'TDBROUT1', '8820'],
-    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG5', 9455, 'TEST_DEV_5', 'TPGRP1', 'TDBROUT1', '8820'],
-    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG6', 9300, 'TEST_DEV_6', 'TPGRP2', 'TDBROUT1', '8820'],
-    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG7', 9300, 'TEST_DEV_7', 'TPGRP1', 'TDBROUT2', '8820'],
-    ['WAV_TEST', 'TFAM2', 'TCLASS2', "$known_9455_8820_rout", 'TCOORD2', 'TEST_PROG7', 9455, 'TEST_DEV_8', 'TPGRP2', 'TDBROUT2', '8820'],
-    ['WAV_TEST', 'TFAM3', 'TCLASS3', "$known_6152_8827_9300_8820_rout", 'TCOORD3', 'TEST_PROG8', 0000, 'TEST_DEV_9', 'TPGRP3', 'TDBROUT3', '8823'],
-    ['WAV_TEST', 'TFAM3', 'TCLASS3', "$known_6152_8827_9300_8820_rout", 'TCOORD4', 'TEST_PROG8', 0000, 'TEST_DEV_10','TPGRP3', 'TDBROUT3', '8820'],
-    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD5', 'TEST_PROG7', 9300, 'TEST_DEV_11','TPGRP1', 'TDBROUT2', '8823'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG0', 9300, 'TEST_DEV_0', 'TPGRP0', 'TDBROUT1', '8820', 'N'],
+    ['WAV_TEST', 'TFAM2', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG1', 9300, 'TEST_DEV_1', 'TPGRP1', 'TDBROUT1', '8820', 'N'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS2', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG2', 9300, 'TEST_DEV_2', 'TPGRP1', 'TDBROUT1', '8820', 'N'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9455_8820_rout", 'TCOORD1', 'TEST_PROG3', 9300, 'TEST_DEV_3', 'TPGRP1', 'TDBROUT1', '8820', 'N'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD2', 'TEST_PROG4', 9300, 'TEST_DEV_4', 'TPGRP1', 'TDBROUT1', '8820', 'N'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG5', 9455, 'TEST_DEV_5', 'TPGRP1', 'TDBROUT1', '8820', 'N'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG6', 9300, 'TEST_DEV_6', 'TPGRP2', 'TDBROUT1', '8820', 'N'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD1', 'TEST_PROG7', 9300, 'TEST_DEV_7', 'TPGRP1', 'TDBROUT2', '8820', 'N'],
+    ['WAV_TEST', 'TFAM2', 'TCLASS2', "$known_9455_8820_rout", 'TCOORD2', 'TEST_PROG7', 9455, 'TEST_DEV_8', 'TPGRP2', 'TDBROUT2', '8820', 'N'],
+    ['WAV_TEST', 'TFAM3', 'TCLASS3', "$known_6152_8827_9300_8820_rout", 'TCOORD3', 'TEST_PROG8', 0000, 'TEST_DEV_9', 'TPGRP3', 'TDBROUT3', '8823', 'N'],
+    ['WAV_TEST', 'TFAM3', 'TCLASS3', "$known_6152_8827_9300_8820_rout", 'TCOORD4', 'TEST_PROG8', 0000, 'TEST_DEV_10','TPGRP3', 'TDBROUT3', '8820', 'N'],
+    ['WAV_TEST', 'TFAM1', 'TCLASS1', "$known_9300_8820_rout", 'TCOORD5', 'TEST_PROG7', 9300, 'TEST_DEV_11','TPGRP1', 'TDBROUT2', '8823', 'Y'],
 );
 
 my @formatted_records;
@@ -68,61 +68,58 @@ foreach my $record (@test_records){
 }
         
 # set up test cases
-my @rule_format = qw(FAMILY DEV_CLASS ROUTING COORDREF PROGRAM TEST_LPT DEVICE PROD_GRP EFFECTIVE_ROUTING PROCESS_OPTION LPT TECHNOLOGY FUNCTIONALITY);
+my @rule_format = qw(FAMILY DEV_CLASS ROUTING COORDREF PROGRAM TEST_LPT DEVICE PROD_GRP EFFECTIVE_ROUTING PROCESS_OPTION LPT TECHNOLOGY FUNCTIONALITY COT);
 my @regex_tests_unorganized = (
-['TFAM1',  'TCLASS1',  "$known_9300_8820_rout",  'TCOORD1',        'TEST_PROG0',  9300,  'TEST_DEV_0',  'TPGRP0',  'TDBROUT1',  '',            '',            '',          ''],
-['TFAM2',  'TCLASS2',  "$known_9455_8820_rout",  'TCOORD2',        'TEST_PROG7',  9455,  'TEST_DEV_8',  'TPGRP2',  'TDBROUT2',  '',            '',            '',          ''],
-['TFAM2',  '',         '',             '',               '',            '',    '',            '',        '',          '',            '',            '',          ''],
-['',       'TCLASS2',  '',             '',               '',            '',    '',            '',        '',          '',            '',            '',          ''],
-['',       '',         "$known_9455_8820_rout",  '',               '',            '',    '',            '',        '',          '',            '',            '',          ''],
-['',       '',         '',             'TCOORD2',        '',            '',    '',            '',        '',          '',            '',            '',          ''],
-['',       '',         '',             '',               'TEST_PROG7',  '',    '',            '',        '',          '',            '',            '',          ''],
-['',       '',         '',             '',               '',            9455,  '',            '',        '',          '',            '',            '',          ''],
-['',       '',         '',             '',               '',            '',    '/.*[246]/',   '',        '',          '',            '',            '',          ''],
-['',       '',         '',             '',               '',            '',    '',            'TPGRP2',  '',          '',            '',            '',          ''],
-# rule 10
-['',       '',         '',             '',               '',            '',    '',            '',        'TDBROUT2',  '',            '',            '',          ''],
+['TFAM1',  'TCLASS1',  "$known_9300_8820_rout",  'TCOORD1',        'TEST_PROG0',  9300,  'TEST_DEV_0',  'TPGRP0',  'TDBROUT1',  '',            '',            '',          '', ''],
+['TFAM2',  'TCLASS2',  "$known_9455_8820_rout",  'TCOORD2',        'TEST_PROG7',  9455,  'TEST_DEV_8',  'TPGRP2',  'TDBROUT2',  '',            '',            '',          '', ''],
+['TFAM2',  '',         '',             '',               '',            '',    '',            '',        '',          '',            '',            '',          '', ''],
+['',       'TCLASS2',  '',             '',               '',            '',    '',            '',        '',          '',            '',            '',          '', ''],
+['',       '',         "$known_9455_8820_rout",  '',               '',            '',    '',            '',        '',          '',            '',            '',          '', ''],
+['',       '',         '',             'TCOORD2',        '',            '',    '',            '',        '',          '',            '',            '',          '', ''],
+['',       '',         '',             '',               'TEST_PROG7',  '',    '',            '',        '',          '',            '',            '',          '', ''],
+['',       '',         '',             '',               '',            9455,  '',            '',        '',          '',            '',            '',          '', ''],
+['',       '',         '',             '',               '',            '',    '/.*[246]/',   '',        '',          '',            '',            '',          '', ''],
+['',       '',         '',             '',               '',            '',    '',            'TPGRP2',  '',          '',            '',            '',          '', ''],
+['',       '',         '',             '',               '',            '',    '',            '',        'TDBROUT2',  '',            '',            '',          '', ''],
+['',       '',         '',             '',               '',            '',    '',            '',        '',          '',            '',            '',          '', 'Y'],
 # process options and logpoint tests
-['',       '',         '',             '',               '',            '',    '',            '',        '',          'opt1.!OPT2',  '',            '',          ''],
-['',       '',         '',             '',               '',            '',    '',            '',        '',          '',            '9300',        '',          ''],
-['',       '',         '',             '',               '',            '',    '',            '',        '',          '',            '!9455',       '',          ''],
-['',       '',         '',             '',               '',            '',    '',            '',        '',          '',            '9300 -> 6152',  '',          ''],
+['',       '',         '',             '',               '',            '',    '',            '',        '',          'opt1.!OPT2',  '',            '',          '', ''],
+['',       '',         '',             '',               '',            '',    '',            '',        '',          '',            '9300',        '',          '', ''],
+['',       '',         '',             '',               '',            '',    '',            '',        '',          '',            '!9455',       '',          '', ''],
+['',       '',         '',             '',               '',            '',    '',            '',        '',          '',            '9300 -> 6152',  '',          '', ''],
 # basic functionality db tests here
-# rule 15
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:!SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF.SIMPLE_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF.SIMPLE_RESOLVE:!SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MULTI_RESOLVE:SF'],
-# rule 20
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MISSING_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MISSING_RESOLVE:NF'],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:!SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF.SIMPLE_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:SF.SIMPLE_RESOLVE:!SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MULTI_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MISSING_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'MISSING_RESOLVE:NF', ''],
 # moderate functionality db
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:TOP:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:NF'],
-# rule 5
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:!NF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:NSF1'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRIORITY_RESOLVE:NSF2'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRIORITY_RESOLVE:NSF1'],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:TOP:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:NF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:!NF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRECEDENCE_RESOLVE:ANY:NSF1', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRIORITY_RESOLVE:NSF2', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PRIORITY_RESOLVE:NSF1', ''],
 # advanced functionality db
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PROCESS_OPTION_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PROCESS_OPTION_RESOLVE:NF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'LOGPOINT_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'LOGPOINT_RESOLVE:NF'],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PROCESS_OPTION_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'PROCESS_OPTION_RESOLVE:NF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'LOGPOINT_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'LOGPOINT_RESOLVE:NF', ''],
 # fringe cases in functionaly db
-['',       '',         '',             '/TCOORD4/',      '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:!SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'TYP0_TEST:NF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'TYP0_TEST:!NF'],
-['',       '',         '',             '/TCOORD[123]/',  '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'UNDEFINED_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[123]/',  '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'UNDEFINED_RESOLVE:!SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'INCOMPLETE_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'INCOMPLETE_RESOLVE:!SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'CONFLICT_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'CONFLICT_RESOLVE:!SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'GAP_RESOLVE:SF'],
-['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'GAP_RESOLVE:!SF'],
+['',       '',         '',             '/TCOORD4/',      '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'SIMPLE_RESOLVE:!SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'TYP0_TEST:NF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'TYP0_TEST:!NF', ''],
+['',       '',         '',             '/TCOORD[123]/',  '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'UNDEFINED_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[123]/',  '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'UNDEFINED_RESOLVE:!SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'INCOMPLETE_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'INCOMPLETE_RESOLVE:!SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'CONFLICT_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'CONFLICT_RESOLVE:!SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'GAP_RESOLVE:SF', ''],
+['',       '',         '',             '/TCOORD[12]/',   '',            '',    '',            '',        '',          '',            '',            'WAV_TEST',  'GAP_RESOLVE:!SF', ''],
 );
 my @rule_hashes;
 foreach my $rule_array (@regex_tests_unorganized){
@@ -145,8 +142,8 @@ my @correct_devices = (
     ['TEST_DEV_5','TEST_DEV_8'],
     ['TEST_DEV_2','TEST_DEV_4','TEST_DEV_6'],
     ['TEST_DEV_6','TEST_DEV_8'],
-    # Rule 10
     ['TEST_DEV_7','TEST_DEV_8', 'TEST_DEV_11'],
+    ['TEST_DEV_11'],
     # process options and logpoint solutions
     ['TEST_DEV_7','TEST_DEV_8', 'TEST_DEV_11'],
     ['TEST_DEV_0','TEST_DEV_1','TEST_DEV_2','TEST_DEV_4','TEST_DEV_5','TEST_DEV_6','TEST_DEV_7','TEST_DEV_9','TEST_DEV_10','TEST_DEV_11'],

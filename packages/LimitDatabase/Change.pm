@@ -39,9 +39,10 @@ my %known_things = (
                                         SET     => sub {return set_value($_[1], "PASS_CRITERIA_PERCENT", $_[0]->{"VALUE"})},
                                     },
     SAMPLING_RATE               => {
-                                        RELAX   => \&RELAX_SAMPLING_RATE,
-                                        TIGHTEN => \&TIGHTEN_SAMPLING_RATE,
-                                        SET     => sub {return set_value($_[1], "SAMPLING_RATE", $_[0]->{"VALUE"})},
+                                        RELAX           => \&RELAX_SAMPLING_RATE,
+                                        TIGHTEN         => \&TIGHTEN_SAMPLING_RATE,
+                                        FORBID_5_SITE   => \&FORBID_5_SITE,
+                                        SET             => sub {return set_value($_[1], "SAMPLING_RATE", $_[0]->{"VALUE"})},
                                     },
     SPEC                        => {
                                         SET_REVERSED    => sub {return set_value($_[1], "REVERSE_SPEC_LIMIT", "Y")},
@@ -282,6 +283,14 @@ sub set_value{
     if (((defined $old_val) xor (defined $value)) || ((defined $value) && (defined $old_val) && $old_val ne $value)){
         $limit->set($key, "$value");
         return 1;
+    }
+    return 0;
+}
+
+sub FORBID_5_SITE{
+    my ($self, $limit) = @_;
+    if ($limit->get("SAMPLING_RATE") eq "5 SITE"){
+        return set_value($limit, "SAMPLING_RATE", "9 SITE");
     }
     return 0;
 }
