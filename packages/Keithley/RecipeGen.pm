@@ -20,15 +20,17 @@ my %recipe_to_wdf_type = (
 );
 
 sub generate_recipe{
-    my ($sms_rec, $archive) = @_;
-}
+    my ($sms_rec, $recipe_type, $use_archive) = @_;
 
-sub _parse_wdf_and_get_cpf_info{
-    my ($sms_rec, $recipe_type, $orig_wdf_text) = @_;
+    # Create WDF name and Get text
+    my $wdf_name = make_wdf_name($sms_rec, $recipe_type);
+    my $orig_wdf_text = Keithley::File::get_text($wdf_name, $use_archive);
+    
     # start by getting information from wdf
     my $wdf_obj = Parse::WDF->new($orig_wdf_text);
     my $mod_list = $wdf_obj->get_real_modules();
     my $alignment_mod = $wdf_obj->get_alignment_mod();
+
     # get CPF/autoz using WDF info
     my $cpf_base = Keithley::CPFSel::get_cpf_for_sms_record_and_mods($sms_rec, $mod_list);
     my $cpf = $cpf_base;
@@ -37,7 +39,8 @@ sub _parse_wdf_and_get_cpf_info{
     }else{
         $cpf .= "_NOAUTO.cpf";
     } 
-    return ($wdf_obj, $mod_list, $cpf);
+
+    
 }
 
 # open cpf, get wpf
@@ -62,17 +65,22 @@ sub _parse_wdf_and_get_cpf_info{
     return ($krf_name, $krf_text, $klf_name, $klf_text, $wdf_name, $wdf_text, $spec_name, $spec_text);
 }
 
-sub make_recipe_local{
-    # gets local files, creates/updates local files (must be checked in manually)
-    # get local files/read in
+sub make_wdf_name{
+    my ($sms_rec, $recipe_type) = @_;
+    my $proberfile = $sms_rec->get("PROBERFILE");
+    my $wdf_type = $recipe_to_wdf_type{$recipe_type};
+    unless (defined $wdf_type){
+        confess "Could not get a valid WDF type for recipe type <$recipe_type>";
+    }
+    return $proberfile . $wdf_type . ".wdf";
 }
 
-sub make_recipe_prod_archive{
-    # gets archived files, checks any new things in
-    # get prod files, read in
+sub make_krf_name{
+    my ($sms_rec, $recipe_type) = @_;
+    my $recipe = $sms_rec->get("RECIPE");
+    my $krf = $recipe . "$recipe_type" . ".krf";
+    return $krf;
 }
-
-sub make_recipe_name
 
 
 1;
