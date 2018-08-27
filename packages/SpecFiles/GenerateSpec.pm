@@ -12,6 +12,15 @@ use Components::EffectiveComponents;
 use Components::DeviceString;
 use ProcessOptions::OptionLookup;
 
+sub get_spec_sms{
+    my ($sms_rec, $comp) = @_;
+    my $technology = $sms_rec->get("TECHNOLOGY");
+    my $test_area = $sms_rec->get("AREA");
+    my $effective_routing = $sms_rec->get("EFFECTIVE_ROUTING");
+    my $program = $sms_rec->get("PROGRAM");
+    return get_spec($technology, $test_area, $effective_routing, $program, $comp);
+}
+
 sub get_spec{
     my ($technology, $test_area, $effective_routing, $program, $comp) = @_;
     my $limits = GetLimit::get_all_limits($technology, $test_area, $effective_routing, $program, undef);

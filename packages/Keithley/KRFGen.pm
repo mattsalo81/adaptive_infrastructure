@@ -8,6 +8,7 @@ use Logging;
 
 sub get_text{
     my ($recipe, $cpf, $wdf, $klf, $device_string) = @_;
+    $recipe = clean_filename($recipe, "krf");
     $cpf = clean_filename($cpf, "cpf");
     $wdf = clean_filename($wdf, "wdf");
     $klf = clean_filename($klf, "klf");
@@ -34,13 +35,7 @@ sub get_text{
     return $text;
 }
 
-sub make_cpf_name{
-    my ($cpf_base, $autoz) = @_;
-    $cpf_base =~ s/_AUTO//;
-    $cpf_base = clean_filename($cpf_base, 'cpf');
-    return $cpf_base . ($autoz ? "_AUTO" : "");    
-}
-
+# removes directory info and file extension
 sub clean_filename{
     my ($filename, $fext) = @_;
     $filename =~ s#.*/##;

@@ -178,4 +178,15 @@ sub add_shot{
     $self->{"sites"}->{$site} = [$x, $y];    
 }
 
+sub add_missing_modules{
+    my ($self, $mods) = @_;
+    my $real_mods = $self->get_real_modules();
+    my %real_mods;
+    @real_mods{@{$real_mods}} = @{$real_mods};
+    foreach my $mod (@{$mods}){
+        unless(defined $real_mods{$mod}){
+            $self->add_dummy($mod);
+        }
+    }
+}
 1;

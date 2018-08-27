@@ -10,6 +10,15 @@ use Keithley::Parse::KTM;
 use Keithley::File;
 use LimitDatabase::GetLimit;
 
+sub make_klf{
+    my ($sms_rec, $wpf_name, $use_archive) = @_;
+    my $tech = $sms_rec->get("TECHNOLOGY");
+    my $area = $sms_rec->get("AREA");
+    my $eff_rout = $sms_rec->get("EFFECTIVE_ROUTING");
+    my $prog = $sms_rec->get("PROGRAM");
+    return make_klf_for_wpf($wpf_name, $tech, $area, $eff_rout, $prog, $use_archive);
+}
+
 sub make_klf_for_wpf{
     my ($wpf_name, $tech, $area, $eff_rout, $prog, $use_archive) = @_;
     my $limits = GetLimit::get_all_limits($tech, $area, $eff_rout, $prog, undef);

@@ -15,6 +15,11 @@ my $new_text = $wdf->get_new_text();
 is($new_text, $wdf_text, "WDF parsed/loaded/printed without modification and without aid of original text");
 is($wdf->get_alignment_mod(), "lbc5_scm_mod00", "get alignment mod");
 ok(have_same_elements($wdf->get_real_modules(), [qw(lbc5_scm_mod00 lbc5_scm_esd01 lbc5_scm_exmod2)]), "Get all real modules");
+my @all_mods = qw(lbc5_scm_mod00 lbc5_scm_esd01 some_dummy_mod);
+$wdf->add_missing_modules(\@all_mods);
+ok($wdf->get_new_text !~ m/lbc5_scm_mod00,0.005,0.005/, "Real module not added as dummy");
+ok($wdf->get_new_text =~ m/some_dummy_mod,0.005,0.005/, "Missing module added as dummy");
+
 
 
 sub get_text{
