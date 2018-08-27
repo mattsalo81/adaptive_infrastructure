@@ -13,6 +13,40 @@ my $wdf = Parse::WDF->new($wdf_text);
 $wdf->{"TEXT"} = "";
 my $new_text = $wdf->get_new_text();
 is($new_text, $wdf_text, "WDF parsed/loaded/printed without modification and without aid of original text");
+
+# reformat wdf as std 9 site with inner 5 was and STD_ALT (which it already is)
+my $inner5 = 1;
+my $std_alt = 1;
+$wdf->make_9_site($inner5, $std_alt);
+$new_text = $wdf->get_new_text();
+is($new_text, $wdf_text, "9 site pattern did not change original text");
+
+# reformat wdf as std 9 site with OUTER 5 was and STD_ALT
+$inner5 = 0;
+$wdf->make_9_site($inner5, $std_alt);
+$new_text = $wdf->get_new_text();
+ok($new_text ne $wdf_text, "outer 5, 9 site pattern did change original text");
+ok($new_text =~ m/STD.*REL.*WAS/s, "REL pattern appears before WAS Pattern");
+ok($new_text =~ m/STD.*\n5,.*REL.*\n2,.*WAS/s, "Site 2 is a reliability site and 5 is STD");
+
+# reformat wdf as std 9 site with INNER 5 was an NO std_alt
+$std_alt = 0;
+$wdf->make_9_site($inner5, $std_alt);
+$new_text = $wdf->get_new_text();
+ok($new_text ne $wdf_text, "outer5/no stdalt, 9 site pattern did change original text");
+ok($new_text !~ m/STD_ALT/, "STD_ALT appears nowhere in text");
+ok($new_text !~ m/\n10,/, "site 10 appears nowhere in text");
+
+# reformat wdf as an ALLsite
+$wdf->make_all_site();
+$new_text = $wdf->get_new_text();
+ok($new_text ne $wdf_text, "all site pattern did change original text");
+ok($new_text !~ m/WAS/, "WAS appears nowhere in text");
+ok($new_text !~ m/REL/, "REL appears nowhere in text");
+ok($new_text !~ m/STD_ALT/, "STD_ALT appears nowhere in text");
+ok($new_text =~ m/\n10,/, "site 10 appears in text");
+
+# look at the module information
 is($wdf->get_alignment_mod(), "lbc5_scm_mod00", "get alignment mod");
 ok(have_same_elements($wdf->get_real_modules(), [qw(lbc5_scm_mod00 lbc5_scm_esd01 lbc5_scm_exmod2)]), "Get all real modules");
 my @all_mods = qw(lbc5_scm_mod00 lbc5_scm_esd01 some_dummy_mod);

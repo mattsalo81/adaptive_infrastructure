@@ -10,6 +10,8 @@ my $eoh = '<EOH>';
 my $eosites = '<EOSITES>';
 my $eosubsites = '<EOSUBSITES>';
 my $dummy_coord = 0.005;
+# always first if present
+my $std_pattern = "STD";
 
 sub new{
     my ($class, $text) = @_;
@@ -62,6 +64,7 @@ sub get_new_text{
 }
 
 # order by lowest site number used
+# enforce STD first if present
 sub get_pattern_order{
     my ($self) = @_;
     my $patterns = $self->{"patterns"};
@@ -77,7 +80,13 @@ sub get_pattern_order{
         confess "Found pattern with no sites!" unless defined $min;
         $pattern_min_site{$pattern} = $min;
     }
-    my @sorted = sort {$pattern_min_site{$a} <=> $pattern_min_site{$b}} keys %pattern_min_site;
+    my @sorted;
+    # extract std_pattern and push to front, if there
+    if(defined $pattern_min_site{$std_pattern}){
+        push @sorted, $std_pattern;
+        delete $pattern_min_site{$std_pattern};
+    }
+    push @sorted, sort {$pattern_min_site{$a} <=> $pattern_min_site{$b}} keys %pattern_min_site;
     return \@sorted;
 }
 
@@ -189,4 +198,69 @@ sub add_missing_modules{
         }
     }
 }
+
+# configures the sites into a single STD pattern
+sub make_all_site{
+    my ($self) = @_;
+    $self->clear_patterns();
+    $self->make_pattern_for_sites("STD", $self->get_sites_not_in_pattern());
+}
+
+# configures the sites into a 9 site pattern with STD/WAS/REL pattern
+# $use_inner_5_was determines if the WAS sites should be the inner/outer 5 sites
+# $use_std_alt (if true) adds the remaining sites (10+) to the STD_ALT pattern
+sub make_9_site{
+    my ($self, $use_inner_5_was, $use_std_alt) = @_;
+    $self->clear_patterns();
+    if($use_inner_5_was){
+        $self->make_pattern_for_sites("STD", 1);
+        $self->make_pattern_for_sites("WAS", 2, 3, 4, 5);
+        $self->make_pattern_for_sites("REL", 6, 7, 8, 9);
+    }else{ # use outer 5
+        $self->make_pattern_for_sites("STD", 5);
+        $self->make_pattern_for_sites("REL", 1, 2, 3, 4);
+        $self->make_pattern_for_sites("WAS", 6, 7, 8, 9);
+    }
+    # create pattern with remaining sites
+    if($use_std_alt){
+        $self->make_pattern_for_sites("STD_ALT", $self->get_sites_not_in_pattern());
+    }
+}
+
+# deletes current patterns
+sub clear_patterns{
+    my ($self) = @_;
+    $self->{'patterns'} = {};
+}
+
+# references the sites attribute to get coordinates for site
+# takes a list of site ids, creates/adds a pattern to the patterns attribute
+sub make_pattern_for_sites{
+    my ($self, $pattern_name, @sites) = @_;
+    my %pattern;
+    foreach my $site (@sites){
+        my $location = $self->{"sites"}->{$site};
+        confess "Site <$site> is not defined" unless defined $location;
+        $pattern{$site} = $location;
+    }
+    $self->{"patterns"}->{$pattern_name} = \%pattern;
+}
+
+sub get_sites_not_in_pattern{
+    my ($self) = @_;
+    # get all currently patterned sites
+    my %patterned;
+    foreach my $pattern (keys %{$self->{'patterns'}}){
+        foreach my $site (keys %{$self->{'patterns'}->{$pattern}}){
+            $patterned{$site} = 1;
+        }
+    }
+    # get all unpatterned
+    my @unpatterned;
+    foreach my $site (keys %{$self->{'sites'}}){
+        push @unpatterned, $site unless defined $patterned{$site};
+    }
+    return @unpatterned;
+}
+
 1;

@@ -1,884 +1,164 @@
-# ============================================================================ #
-#                                                                              #
-#         Specfile Generated from database with waivers applied                #
-#         =====================================================                #
-#                                                                              #
-#         Factory         :       DMOS5                                        #
-#         Technology      :       LBC5                                         #
-#         Test Area       :       PARAMETRIC                                   #
-#         Eff. Routing    :       LBC5_PARAMETRIC_3_AA                         #
-#         Program         :       M06X605108B1                                 #
-#         Date            :       2018/07/23 13:46:08                          #
-#                                                                              #
-#         Process Options :                                                    #
-#         =================                                                    #
-#         (Current, may have changed since Factory Summary generated)          #
-#                                                                              #
-#           * 1PLUS_LM                                                         #
-#           * 2PLUS_LM                                                         #
-#           * 3PLUS_LM                                                         #
-#           * AFTER_GATE                                                       #
-#           * AFTER_METAL1                                                     #
-#           * AFTER_METAL2                                                     #
-#           * AT_PARAMETRIC                                                    #
-#           * BASELINE                                                         #
-#           * BEEN_TO_GATE                                                     #
-#           * BEEN_TO_METAL1                                                   #
-#           * BEEN_TO_METAL2                                                   #
-#           * BEEN_TO_PARAMETRIC                                               #
-#           * NADJUST                                                          #
-#           * NPOLYBLK                                                         #
-#           * PBL                                                              #
-#           * POR                                                              #
-#           * THINTOX                                                          #
-#           * TLM                                                              #
-#                                                                              #
-# ============================================================================ #
-
-
-#     Starting BIDI25_12SCR Parameters                                         #
-# From Factory Summary BASELINE                                                #
-E_B25BVN                2   -19         -14         1  6
-# From Factory Summary !SLM                                                    #
-E_B25BVP_MLM            2   30.5        45.5        1  6
-
-
-#     Starting BIDI35_15SCR_IEC Parameters                                     #
-# From Factory Summary !SLM                                                    #
-E_B35BVN                2   -22         -18         1  6
-# From Factory Summary !SLM                                                    #
-E_B35BVP                2   37          47          1  6
-
-
-#     Starting BIDI45_25SCR Parameters                                         #
-# From Factory Summary BASELINE                                                #
-E_B45BVN                2   -40         -32         1  6
-# From Factory Summary !SLM                                                    #
-E_B45BVP_MLM            2   45.5        60.5        1  6
-
-
-#     Starting CAP_DNWP1 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-C_P1DNW                 2   1.07        1.19        1  6
-# From Factory Summary BASELINE                                                #
-GOI_HNTB                1   26          9E+99       1  2
-
-
-#     Starting CAP_M1M2 Parameters                                             #
-# From Factory Summary !SLM                                                    #
-C_M2M1                  2   0.034       0.091       1  6
-
-
-#     Starting CAP_M2M3 Parameters                                             #
-# From Factory Summary TLM                                                     #
-C_M3M2                  2   0.034       0.091       1  6
-
-
-#     Starting CAP_P1M1 Parameters                                             #
-# From Factory Summary BASELINE                                                #
-C_M1P1                  2   0.039       0.086       1  6
-
-
-#     Starting CAP_SNWP1 Parameters                                            #
-# From Factory Summary THINTOX                                                 #
-C_P1SNW1                2   3.96        4.44        1  6
-# From Factory Summary THINTOX                                                 #
-GOI_3NT                 1   7.5         9E+99       1  2
-
-
-#     Starting DIO_ESDSCR_HV4 Parameters                                       #
-# From Factory Summary BASELINE                                                #
-JE70_BV                 2   76          88          1  6
-# From Factory Summary BASELINE                                                #
-JE70_VFH                2   0.78        0.82        1  6
-
-
-#     Starting DIO_LDMHS_HV2 Parameters                                        #
-
-
-#     Starting DIO_PAD1 Parameters                                             #
-# From Factory Summary BASELINE                                                #
-J_PAD_BV                2   86          110         1  6
-
-
-#     Starting DIO_P_HV3 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-J_HP_BV2                2   63          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-J_HP_VF2                2   0.695       0.725       1  6
-
-
-#     Starting DIO_P_HV5 Parameters                                            #
-# From Factory Summary !SLM.PBL                                                #
-J_80_BV2                2   85          150         1  6
-# From Factory Summary !SLM.PBL                                                #
-J_80_VF2                2   0.62        0.67        1  6
-
-
-#     Starting DIO_Z_LV1 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-JZENLBV1                2   5.3         6.3         1  6
-# From Factory Summary BASELINE                                                #
-JZENLLK                 2   -9E+99      9E+99       1  6
-# From Factory Summary BASELINE                                                #
-JZENLVF1                2   -9E+99      9E+99       1  6
-
-
-#     Starting DIO_Z_MV1 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-JZENMBV1                2   11.1        12.1        1  6
-# From Factory Summary BASELINE                                                #
-JZENMVF1                2   -9E+99      9E+99       1  6
-
-
-#     Starting EEPROM Parameters                                               #
-# From Factory Summary THINTOX                                                 #
-EP_IDE1                 2   3.75E-05    7.75E-05    1  6
-# From Factory Summary THINTOX                                                 #
-EP_VTP                  2   4.9         5.9         1  6
-
-
-#     Starting NCH_ANA_LV1 Parameters                                          #
-
-
-#     Starting NCH_DEA2_LV3 Parameters                                         #
-# From Factory Summary !SLM                                                    #
-X12N2BVD                2   16          22          1  6
-# From Factory Summary !SLM                                                    #
-X12N2RDS                2   340         392         1  6
-# From Factory Summary !SLM                                                    #
-X12N2VTL                2   0.58        0.82        1  6
-
-
-#     Starting NCH_DEA_HV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-X60N_BVD                2   75          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-X60N_RDS                2   200         410         1  6
-# From Factory Summary BASELINE                                                #
-X60N_VTL                2   0.49        0.71        1  6
-
-
-#     Starting NCH_DEA_HV5 Parameters                                          #
-# From Factory Summary !SLM                                                    #
-X80N_BVD                2   96          124         1  6
-# From Factory Summary !SLM                                                    #
-X80N_RDS                2   750         950         1  6
-# From Factory Summary !SLM                                                    #
-X80N_VTL                2   0.45        0.75        1  6
-
-
-#     Starting NCH_DEA_ISO_LV3 Parameters                                      #
-# From Factory Summary BASELINE                                                #
-X12NIBVD                2   16.5        25          1  6
-# From Factory Summary BASELINE                                                #
-X12NIR12                2   760         900         1  6
-# From Factory Summary BASELINE                                                #
-X12NIVTL                2   1.8         3.2         1  6
-
-
-#     Starting NCH_DEA_LV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-X12N_BVD                2   16.5        25          1  6
-# From Factory Summary BASELINE                                                #
-X12N_R12                2   365         435         1  6
-# From Factory Summary BASELINE                                                #
-X12N_VTL                2   0.64        0.88        1  6
-
-
-#     Starting NCH_DEA_MV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-X30N_BVD                2   65          77          1  6
-# From Factory Summary BASELINE                                                #
-X30N_RDS                2   215         277         1  6
-# From Factory Summary BASELINE                                                #
-X30N_VTL                2   0.49        0.71        1  6
-
-
-#     Starting NCH_LDMHSNA_HV1B Parameters                                     #
-
-
-#     Starting NCH_LDMHSNA_HV2B Parameters                                     #
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D55HNBVD                2   60          87          1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D55HNRDS                2   160         263         1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D55HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHSNA_HV3 Parameters                                      #
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D60HNBVD                2   69          92          1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D60HNRDS                2   215         285         1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D60HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHSNA_HV3B Parameters                                     #
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D65HNBVD                2   68.5        96          1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D65HNRDS                2   233         317         1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D65HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHSNA_MV3B Parameters                                     #
-# From Factory Summary !SLM.NADJUST                                            #
-D35HNBVD                2   37          47          1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D35HNRDS                2   82          102         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D35HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_HV1 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D40H_BVD                2   44          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-D40H_RDS                2   100         153         1  6
-# From Factory Summary BASELINE                                                #
-D40H_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_HV1B Parameters                                       #
-
-
-#     Starting NCH_LDMHS_HV2 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D50H_BVD                2   54          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-D50H_RDS                2   100         175         1  6
-# From Factory Summary BASELINE                                                #
-D50H_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_HV2B Parameters                                       #
-# From Factory Summary !SLM.PBL                                                #
-D55H_BVD                2   60          87          1  6
-# From Factory Summary !SLM.PBL                                                #
-D55H_RDS                2   234         294         1  6
-# From Factory Summary !SLM.PBL                                                #
-D55H_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_HV3 Parameters                                        #
-# From Factory Summary !SLM.PBL                                                #
-D60H_BVD                2   69          92          1  6
-# From Factory Summary !SLM.PBL                                                #
-D60H_RDS                2   252         318         1  6
-# From Factory Summary !SLM.PBL                                                #
-D60H_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_HV3B Parameters                                       #
-# From Factory Summary !SLM.PBL                                                #
-D65H_BVD                2   68.5        96          1  6
-# From Factory Summary !SLM.PBL                                                #
-D65H_RDS                2   273         353         1  6
-# From Factory Summary !SLM.PBL                                                #
-D65H_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_MV2 Parameters                                        #
-
-
-#     Starting NCH_LDMHS_MV3 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D30H_BVD                2   36          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-D30H_RDS                2   60          122         1  6
-# From Factory Summary BASELINE                                                #
-D30H_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_MV3B Parameters                                       #
-
-
-#     Starting NCH_LDMHS_NA_HV1 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D40HNBVD                2   44          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D40HNRDS                2   60          126         1  6
-# From Factory Summary NADJUST                                                 #
-D40HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_NA_HV2 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D50HNBVD                2   54          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D50HNRDS                2   80          145         1  6
-# From Factory Summary NADJUST                                                 #
-D50HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_NA_MV2 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D22HNBVD                2   28          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D22HNRDS                2   30          83          1  6
-# From Factory Summary NADJUST                                                 #
-D22HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMHS_NA_MV3 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D30HNBVD                2   35          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D30HNRDS                2   40          95          1  6
-# From Factory Summary NADJUST                                                 #
-D30HNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMISONA_MV2 Parameters                                     #
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D20IBISS                2   -9E+99      9E+99       1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D20INBVD                2   28          44          1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D20INRDS                2   102         142         1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D20INVTL                2   0.85        1.65        1  6
-
-
-#     Starting NCH_LDMISONA_MV3 Parameters                                     #
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D30INBVD                2   40          55          1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D30INRDS                2   115         165         1  6
-# From Factory Summary !SLM.PBL.NADJUST                                        #
-D30INVTL                2   0.85        1.65        1  6
-
-
-#     Starting NCH_LDMISO_MV3 Parameters                                       #
-# From Factory Summary !SLM.PBL                                                #
-D30I_BVD                2   40          55          1  6
-# From Factory Summary !SLM.PBL                                                #
-D30I_RDS                2   151         201         1  6
-# From Factory Summary !SLM.PBL                                                #
-D30I_VTL                2   0.85        1.65        1  6
-
-
-#     Starting NCH_LDMLSNA_HV1B Parameters                                     #
-# From Factory Summary !SLM.NADJUST                                            #
-D45LNBVD                2   57          83          1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D45LNRDS                2   106         130         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D45LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLSNA_HV2B Parameters                                     #
-# From Factory Summary !SLM.NADJUST                                            #
-D55LNBVD                2   60          90          1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D55LNRDS                2   121         147         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D55LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLSNA_HV3B Parameters                                     #
-# From Factory Summary !SLM.NADJUST                                            #
-D65LNBVD                2   68.5        120         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D65LNRDS                2   210         270         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D65LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLSNA_HV5 Parameters                                      #
-# From Factory Summary !SLM.NADJUST                                            #
-D80LNBVD                2   86          120         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D80LNRDS                2   221         291         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D80LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLSNA_MV3B Parameters                                     #
-# From Factory Summary !SLM.NADJUST                                            #
-D35LNBVD                2   40          56          1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D35LNRDS                2   85          105         1  6
-# From Factory Summary !SLM.NADJUST                                            #
-D35LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_HV1 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D40L_BVD                2   52          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-D40L_RDS                2   100         146         1  6
-# From Factory Summary BASELINE                                                #
-D40L_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_HV2 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D50L_BVD                2   61          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-D50L_RDS                2   100         167.5       1  6
-# From Factory Summary BASELINE                                                #
-D50L_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_HV2B Parameters                                       #
-# From Factory Summary !SLM                                                    #
-D55L_BVD                2   60          90          1  6
-# From Factory Summary !SLM                                                    #
-D55L_RDS                2   145         173         1  6
-# From Factory Summary !SLM                                                    #
-D55L_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_HV3 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D60L_BVD                2   73          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-D60L_RDS                2   100         185         1  6
-# From Factory Summary BASELINE                                                #
-D60L_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_HV3B Parameters                                       #
-# From Factory Summary !SLM                                                    #
-D65L_BVD                2   68.5        120         1  6
-# From Factory Summary !SLM                                                    #
-D65L_RDS                2   240         310         1  6
-# From Factory Summary !SLM                                                    #
-D65L_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_HV5 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D80L_BVD                2   86          120         1  6
-# From Factory Summary BASELINE                                                #
-D80L_RDS                2   257         327         1  6
-# From Factory Summary BASELINE                                                #
-D80L_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_MV2 Parameters                                        #
-
-
-#     Starting NCH_LDMLS_MV3 Parameters                                        #
-# From Factory Summary BASELINE                                                #
-D30L_BVD                2   39          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-D30L_RDS                2   60          123.5       1  6
-# From Factory Summary BASELINE                                                #
-D30L_VTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_MV3B Parameters                                       #
-
-
-#     Starting NCH_LDMLS_NA_HV1 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D40LNBVD                2   52          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D40LNRDS                2   60          120         1  6
-# From Factory Summary NADJUST                                                 #
-D40LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_NA_HV2 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D50LNBVD                2   61          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D50LNRDS                2   80          140         1  6
-# From Factory Summary NADJUST                                                 #
-D50LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_NA_HV3 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D60LNBVD                2   73          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D60LNRDS                2   100         160         1  6
-# From Factory Summary NADJUST                                                 #
-D60LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_NA_MV2 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D22LNBVD                2   29          45          1  6
-# From Factory Summary NADJUST                                                 #
-D22LNRDS                2   30          83          1  6
-# From Factory Summary NADJUST                                                 #
-D22LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LDMLS_NA_MV3 Parameters                                     #
-# From Factory Summary NADJUST                                                 #
-D30LNBVD                2   38          9E+99       1  6
-# From Factory Summary NADJUST                                                 #
-D30LNRDS                2   40          97          1  6
-# From Factory Summary NADJUST                                                 #
-D30LNVTL                2   0.9         1.7         1  6
-
-
-#     Starting NCH_LV1 Parameters                                              #
-# From Factory Summary THINTOX                                                 #
-S3N_BVDS                2   9           11          1  6
-# From Factory Summary THINTOX                                                 #
-S3N_IOFW                2   -17         -11         1  6
-# From Factory Summary THINTOX                                                 #
-S3N_IONN                2   350         510         1  6
-# From Factory Summary THINTOX                                                 #
-S3N_IONS                2   445         570         1  6
-# From Factory Summary THINTOX                                                 #
-S3N_VTLL                2   0.53        0.67        1  6
-
-
-#     Starting NCH_LV2 Parameters                                              #
-# From Factory Summary BASELINE                                                #
-S5NII12S                2   417         480         1  6
-# From Factory Summary BASELINE                                                #
-S5NIIOFS                2   -9E+99      -11.5       1  6
-# From Factory Summary BASELINE                                                #
-S5NIVTLS                2   0.57        0.83        1  6
-# From Factory Summary BASELINE                                                #
-S5N_I12S                2   417         480         1  6
-# From Factory Summary BASELINE                                                #
-S5N_IOFS                2   -9E+99      -11.5       1  6
-# From Factory Summary BASELINE                                                #
-S5N_VTLS                2   0.57        0.83        1  6
-
-
-#     Starting NCH_NAT_LV1 Parameters                                          #
-# From Factory Summary THINTOX                                                 #
-L3N_IONS                2   230         300         1  6
-# From Factory Summary THINTOX                                                 #
-L3N_VTLS                2   -0.05       0.15        1  6
-
-
-#     Starting NCH_SCR_HV1 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-E_M40BVD                2   43          57          1  6
-# From Factory Summary BASELINE                                                #
-E_M40RDS                2   -9E+99      167         1  6
-# From Factory Summary BASELINE                                                #
-E_M40VTL                2   2.4         2.8         1  6
-
-
-#     Starting NCH_SCR_HV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-E_M60BVD                2   64          85          1  6
-# From Factory Summary BASELINE                                                #
-E_M60RDS                2   -9E+99      226         1  6
-# From Factory Summary BASELINE                                                #
-E_M60VTL                2   2.4         2.9         1  6
-
-
-#     Starting NCH_SCR_MV2 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-E_M22BVD                2   27          39          1  6
-# From Factory Summary BASELINE                                                #
-E_M22RDS                2   -9E+99      133         1  6
-# From Factory Summary BASELINE                                                #
-E_M22VTL                2   2.4         2.8         1  6
-# From Factory Summary BASELINE                                                #
-E_M22VTL_EXT            2   2.4         2.8         1  6
-# From Factory Summary BASELINE                                                #
-E_M22VTL_EXT_FLAG       2   -9E+99      9E+99       1  6
-# From Factory Summary BASELINE                                                #
-E_M22VTL_FLAG           2   -9E+99      9E+99       1  6
-
-
-#     Starting NPN_ESD_1 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-E_NP1ECS                2   7           8.2         1  6
-
-
-#     Starting NPN_ESD_4 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-E_NP4CES                2   15          19          1  6
-
-
-#     Starting NPN_ESD_5A Parameters                                           #
-# From Factory Summary BASELINE                                                #
-E_NPACES                2   20          24          1  6
-
-
-#     Starting NPN_ESD_5B Parameters                                           #
-# From Factory Summary BASELINE                                                #
-E_NPBCES                2   21          32          1  6
-
-
-#     Starting NPN_ESD_5B_ISO Parameters                                       #
-# From Factory Summary BASELINE                                                #
-E_NPICES                2   21          29          1  6
-
-
-#     Starting NPN_V_DN_MV1 Parameters                                         #
-# From Factory Summary BASELINE                                                #
-NV1BVCEO                2   25          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-NV1HFE_M                2   10          40          1  6
-# From Factory Summary BASELINE                                                #
-NV1VBE_M                2   0.695       0.725       1  6
-
-
-#     Starting NPN_V_DN_MV4 Parameters                                         #
-# From Factory Summary BASELINE                                                #
-NV2BVCEO                2   44          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-NV2HFE_M                2   7           35          1  6
-# From Factory Summary BASELINE                                                #
-NV2VBE_M                2   0.705       0.735       1  6
-
-
-#     Starting PCH_DEA_DEP_LV3 Parameters                                      #
-# From Factory Summary NPOLYBLK                                                #
-Y12P_BVD                2   -25         -16         1  6
-# From Factory Summary NPOLYBLK                                                #
-Y12P_R12                2   870         1120        1  6
-# From Factory Summary NPOLYBLK                                                #
-Y12P_VTL                2   -0.3        0           1  6
-
-
-#     Starting PCH_DEA_HV1 Parameters                                          #
-# From Factory Summary !SLM                                                    #
-X45P_BVD                2   -67         -52         1  6
-# From Factory Summary !SLM                                                    #
-X45P_RDS                2   1700        2500        1  6
-# From Factory Summary !SLM                                                    #
-X45P_VTL                2   -0.73       -0.5        1  6
-
-
-#     Starting PCH_DEA_HV2 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-X50P_BVD                2   -9E+99      -59         1  6
-# From Factory Summary BASELINE                                                #
-X50P_RDS                2   1600        3200        1  6
-# From Factory Summary BASELINE                                                #
-X50P_VTL                2   -0.73       -0.49       1  6
-
-
-#     Starting PCH_DEA_HV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-X6LP_BVD                2   -9E+99      -70         1  6
-# From Factory Summary BASELINE                                                #
-X6LP_RDS                2   4000        7000        1  6
-# From Factory Summary BASELINE                                                #
-X6LP_VTL                2   -0.72       -0.48       1  6
-
-
-#     Starting PCH_DEA_HV5 Parameters                                          #
-# From Factory Summary !SLM.PBL                                                #
-X80P_BVD                2   87          129         1  6
-# From Factory Summary !SLM.PBL                                                #
-X80P_RDS                2   1380        2080        1  6
-# From Factory Summary !SLM.PBL                                                #
-X80P_VTL                2   -0.73       -0.45       1  6
-
-
-#     Starting PCH_DEA_LV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-X12P_BVD                2   -9E+99      -16.5       1  6
-# From Factory Summary BASELINE                                                #
-X12P_R12                2   870         1120        1  6
-# From Factory Summary BASELINE                                                #
-X12P_VTL                2   -0.8        -0.56       1  6
-
-
-#     Starting PCH_DEA_MV2 Parameters                                          #
-# From Factory Summary !SLM                                                    #
-X20P_BVD                2   -32.5       -22.5       1  6
-# From Factory Summary !SLM                                                    #
-X20P_RDS                2   1000        1450        1  6
-# From Factory Summary !SLM                                                    #
-X20P_VTL                2   -0.77       -0.53       1  6
-
-
-#     Starting PCH_DEA_MV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-X30P_BVD                2   -50         -36         1  6
-# From Factory Summary BASELINE                                                #
-X30P_RDS                2   -9E+99      960         1  6
-# From Factory Summary BASELINE                                                #
-X30P_VTL                2   -0.74       -0.5        1  6
-
-
-#     Starting PCH_DEA_SNW_HV3 Parameters                                      #
-# From Factory Summary NPOLYBLK                                                #
-X6HP_BVD                2   -9E+99      -69         1  6
-# From Factory Summary NPOLYBLK                                                #
-X6HP_RDS                2   2500        4900        1  6
-# From Factory Summary NPOLYBLK                                                #
-X6HP_VTL                2   -4.1        -3.4        1  6
-
-
-#     Starting PCH_LV1 Parameters                                              #
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-S3P_BVDS                2   -11         -8          1  6
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-S3P_IOFW                2   -17         -12         1  6
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-S3P_IONN                2   -265        -135        1  6
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-S3P_IONS                2   -290        -190        1  6
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-S3P_VTLL                2   -0.75       -0.55       1  6
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-S3P_VTLS                2   -9E+99      9E+99       1  6
-
-
-#     Starting PCH_LV2 Parameters                                              #
-# From Factory Summary BASELINE                                                #
-S5P_I12S                2   -230        -195        1  6
-# From Factory Summary BASELINE                                                #
-S5P_IOFS                2   -17         -12         1  6
-# From Factory Summary BASELINE                                                #
-S5P_VTLS                2   -0.81       -0.53       1  6
-
-
-#     Starting PCH_NAT_LV1 Parameters                                          #
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-L3PDIONS                2   -124        -100        1  6
-# From Factory Summary THINTOX.NPOLYBLK                                        #
-L3PDVTLS                2   0.06        0.26        1  6
-
-
-#     Starting PNP_L_MV1 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-PLMBVCEO                2   -9E+99      -27         1  6
-# From Factory Summary BASELINE                                                #
-PLMHFE_M                2   130         386         1  6
-# From Factory Summary BASELINE                                                #
-PLMVBE_M                2   -0.685      -0.655      1  6
-
-
-#     Starting PNP_S_MV1 Parameters                                            #
-# From Factory Summary BASELINE                                                #
-PS_BVCEO                2   -9E+99      -35         1  6
-# From Factory Summary BASELINE                                                #
-PS_HFE_M                2   40          120         1  6
-# From Factory Summary BASELINE                                                #
-PS_VBE_M                2   -0.695      -0.665      1  6
-
-
-#     Starting RES_DNW Parameters                                              #
-# From Factory Summary BASELINE                                                #
-RS_DNWL                 2   2050        2850        1  6
-# From Factory Summary BASELINE                                                #
-RS_DWEL                 2   292         332         1  6
-
-
-#     Starting RES_FUSE Parameters                                             #
-
-
-#     Starting RES_M1 Parameters                                               #
-
-
-#     Starting RES_M2 Parameters                                               #
-
-
-#     Starting RES_M3 Parameters                                               #
-
-
-#     Starting RES_NMT Parameters                                              #
-# From Factory Summary BASELINE                                                #
-RS_NMOAT                2   2.9         4.3         1  6
-# From Factory Summary BASELINE                                                #
-RS_NM_SB                2   57          73          1  6
-
-
-#     Starting RES_NMT_HV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-RS_HNMSB                2   47          58          1  6
-
-
-#     Starting RES_P1H Parameters                                              #
-# From Factory Summary NPOLYBLK                                                #
-RS_P1HSR                2   275         375         1  6
-
-
-#     Starting RES_P1L Parameters                                              #
-# From Factory Summary BASELINE                                                #
-RS_P1LSR                2   3.1         4.7         1  6
-
-
-#     Starting RES_P1M Parameters                                              #
-# From Factory Summary BASELINE                                                #
-RS_P1MSR                2   45          63          1  6
-
-
-#     Starting RES_SNW Parameters                                              #
-# From Factory Summary BASELINE                                                #
-RS_SNWL                 2   376         440         1  6
-
-
-#     Starting RES_SNW_HV3 Parameters                                          #
-# From Factory Summary BASELINE                                                #
-RS_SNWDN                2   335         385         1  6
-
-
-#     Starting RES_SPW Parameters                                              #
-# From Factory Summary BASELINE                                                #
-RS_SPWDN                2   1550        1765        1  6
-
-
-#     Starting NO COMPONENT Parameters                                         #
-# From Factory Summary BASELINE                                                #
-CC_NMOAT                2   0           16          1  6
-# From Factory Summary BASELINE                                                #
-CC_NPOLY                2   0           16          1  6
-# From Factory Summary BASELINE                                                #
-CC_PMOAT                2   0           16          1  6
-# From Factory Summary BASELINE                                                #
-CK_NMOAT                1   0           4.5         1  2
-# From Factory Summary BASELINE                                                #
-CK_NM_DP                1   0           5.5         1  2
-# From Factory Summary BASELINE                                                #
-CK_POLY1                1   0           5           1  2
-# From Factory Summary THINTOX                                                 #
-F3NMV_MM                2   40          9E+99       1  6
-# From Factory Summary THINTOX                                                 #
-F3N_L_MM                2   -17         -14         1  6
-# From Factory Summary THINTOX                                                 #
-F3PMV_MM                2   -9E+99      -70         1  6
-# From Factory Summary THINTOX                                                 #
-F3P_L_MM                2   -17         -14         1  6
-# From Factory Summary BASELINE                                                #
-FHNMV_MM                2   38          9E+99       1  6
-# From Factory Summary BASELINE                                                #
-FHN_L_MT                2   -20         -13         1  6
-# From Factory Summary BASELINE                                                #
-FHN_V_MM                2   18          30          1  6
-# From Factory Summary BASELINE                                                #
-FHPMV_MM                2   -9E+99      -70         1  6
-# From Factory Summary NPOLYBLK                                                #
-FHP_L_MM                2   -17         -13.5       1  6
-# From Factory Summary THINTOX                                                 #
-GOI_3PT                 1   -9E+99      -7.5        1  2
-# From Factory Summary BASELINE                                                #
-GOI_HEP                 1   -9E+99      -26         1  2
-# From Factory Summary THINTOX                                                 #
-J_NM_BV                 2   12          15          1  6
-# From Factory Summary THINTOX                                                 #
-J_PM_BV                 2   -11.2       -8.2        1  6
-# From Factory Summary BASELINE                                                #
-RS_DEEPN                2   2.3         5.3         1  6
-# From Factory Summary BASELINE                                                #
-RS_NBL                  2   14          18          1  6
-# From Factory Summary BASELINE                                                #
-RS_PMOAT                2   3           4.4         1  6
-# From Factory Summary BASELINE                                                #
-RS_PM_SB                2   78          102         1  6
-# From Factory Summary BASELINE                                                #
-SHFT_NBL                2   -1          1           1  6
-# From Factory Summary !SLM                                                    #
-V1C_NOM                 2   0           4.5         1  6
-# From Factory Summary !SLM                                                    #
-V1K_NOM                 1   0           4.5         1  2
-# From Factory Summary TLM                                                     #
-V2C_NOM                 2   0           4.5         1  6
-# From Factory Summary TLM                                                     #
-V2K_NOM                 1   0           4.5         1  2
-
+The following recipes were successful:
+
+LBC5XM__A72AE1BL__M06BL6C598LB0
+LBC5XM__A72AE1BL__M06BL6C598LB1
+LBC5XM__A72AE1BL__M06BLC5912LB0
+LBC5XM__A72AE1BL__M06BLC5912LB0
+LBC5XM__A72AE2BE__M06BE7312C0
+LBC5XM__A72AE2BE__M06BE7312C0
+LBC5XM__A72AE2BQ__M06BQOS4REB0A
+LBC5XM__A72AE2CD__M06CD16006XB0
+LBC5XM__A72AE2CI__M06CI14003XA0
+LBC5XM__A72AE2CI__M06CIC65320
+LBC5XM__A72AE2CI__M06CIC65320A0
+LBC5XM__A72AE2CI__M06CIS65321A0
+LBC5XM__A72AE2CI__M06CIS65321A0
+LBC5XM__A72AE2CI__M06CIS65321A0
+LBC5XM__A72AE3BF__M06BFC65300A0
+LBC5XM__A72AE3BF__M06BFC65300A0
+LBC5XM__A72AE3CD__M06CDC65310C0
+LBC5XM__A72AE3CD__M06CDC65310C0
+LBC5XM__A72AE3CD__M06CDC65310C0
+LBC5XM__A72AE3CD__M06CDC65310C0
+LBC5XM__A72AE3CG__M06CGC65381C0
+LBC5XM__A72AE3CG__M06CGC65381C0
+LBC5XM__A72AE3CL__M06CLC92602B0
+LBC5XM__A72AE3CL__M06CLC92602B0
+LBC5XM__M72AE2CD__M06CD16006XB0
+LBC5XM__M72AE2CD__M06CD16006XB0
+LBC5XM__M72AE2CE__M06CEDRV8301
+LBC5XM__M72AE2CI__M06CI14003XA0
+LBC5X__A72AE1ABS__M06AB6C076A
+LBC5X__A72AE1ABS__M06AB6C076A
+LBC5X__A72AE2AA__M06AA63073D
+LBC5X__A72AE2AW__M06AWHVD1785A
+LBC5X__A72AE2ApML__M06AX0503085C
+LBC5X__A72AE2BB__M06BBVDA100C0
+LBC5X__A72AE3AAL__M06AAHSPDB0
+LBC5X__A72AE3AA__M06AAMSWTCHA
+LBC5X__A72AE3AA__M06AAMSWTCHA
+LBC5X__A72AE3AA__M06AAMSWTCHA
+LBC5X__A72AE3AA__M06AAMSWTCHA
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AD__M06ADCA6050B0
+LBC5X__A72AE3AO__M06AOAS5414D0
+LBC5X__A72AE3AO__M06AOAS5414E0
+LBC5X__A72AE3AO__M06AOAS5414E0
+LBC5X__A72AE3AV__M06AV004005A0
+LBC5X__A72AE3AV__M06AV811018A
+LBC5X__A72AE3ApML__M06AX502045B
+LBC5X__A72AE3ApSL__M06AX0604010B
+LBC5X__A72AE3Ap__M06AX608067C
+LBC5X__A72AE3Ap__M06AX709072C0
+LBC5X__A72AE3BCS8__M06BCPS40170A
+LBC5X__A72AE3BS__M06BST54260AA
+LBC5X__A72AE3BS__M06BST54561A0
+LBC5X__A72AF2ApZ__M06AX508068A
+LBC5X__A72AF2Ap__M06AX0508066B
+LBC5X__A72AF2Ap__M06AX508068A
+LBC5X__A72AF2CF__M06CF140XXA0
+LBC5X__A72AF2CF__M06CF140XXA0
+LBC5X__A72AF3AAC__M06AAC2PSB0
+LBC5X__A72AF3AAC__M06AAC2PSB0
+LBC5X__A72AF3AAC__M06AAC2PSB0
+LBC5X__A72AF3AAC__M06AAC2PSB0
+LBC5X__A72AF3AAC__M06AAC2PSB0
+LBC5X__A72AF3AAMJ__M06AAT54260AA
+LBC5X__A72AF3ApI__M06AXPIC7218A
+LBC5X__A72AF3Ap__M06AX71801A0P
+LBC5X__A72AF3Ap__M06AX90604A0
+LBC5X__A72AF3Ap__M06AX90604A0
+LBC5X__A72AF3Ap__M06AX90604A0M1
+LBC5X__A72AF3Ap__M06AX90604A0M1
+LBC5X__A72AF3Ap__M06AXN1102011
+LBC5X__A72AF3Ap__M06AXPIC7218A
+LBC5X__A72AF3BRZ__M06BR809054C1
+LBC5X__A72AF3BR__M06BR809054C1
+LBC5X__A72AF3BR__M06BR809054C1
+LBC5X__A72AF3BSI__M06BST54260AA
+LBC5X__A72AF3BSI__M06BST54260AA
+LBC5X__A72AF3BS__M06BST54260AA
+LBC5X__A72AF3BS__M06BST54260AA
+LBC5X__A72AF3BS__M06BST54260AA
+LBC5X__A72AF3BS__M06BST54260AA
+LBC5X__A72AF3BS__M06BST54260AA
+LBC5X__A72AF3BT__M06BTPS54331A
+LBC5X__A72AF3BWM8__M06BWC43330B0
+LBC5X__A72AF3BWM8__M06BWC43330B0
+LBC5X__A72AF3BWM8__M06BWC43330B0
+LBC5X__A72AF3BWM8__M06BWC43330B0
+LBC5X__A72AF3BWM8__M06BWC43330B0
+LBC5X__A72AF3BWM8__M06BWC43330B0
+LBC5X__A72AF3BWM8__M06BWC43337A0
+LBC5X__A72AF3BWM8__M06BWC43337A0
+LBC5X__A72AF3BWM8__M06BWC43337A0
+LBC5X__A72AF3BW__M06BWC43340B0
+LBC5X__A72AF4AO__M06AO07075SB
+LBC5X__A7e2F3AAMI__M06AAT54260AA
+LBC5X__M72AE1ABS__M06AB6C076A
+LBC5X__M72AE1AB__M06AB6C076A
+LBC5X__M72AE2AA__M06AA8812A0
+LBC5X__M72AE2AA__M06AA8812A0
+LBC5X__M72AE2AA__M06AATAS5162A
+LBC5X__M72AE2AA__M06AATAS5162A
+LBC5X__M72AE2ABML__M06ABTAS5342L
+LBC5X__M72AE2AB__M06AB79078A0
+LBC5X__M72AE2AB__M06AB88099A0
+LBC5X__M72AE2AL__M06AL8813B0
+LBC5X__M72AE2AL__M06ALRV8894A0
+LBC5X__M72AE2AW__M06AWHVD1785A
+LBC5X__M72AE2AW__M06AWHVD1785A
+LBC5X__M72AE2AW__M06AWHVD1785A
+LBC5X__M72AE2AW__M06AWHVD1785A
+LBC5X__M72AE2AZS8__M06AZTPS65149
+LBC5X__M72AE2AZ__M06AZ65175P5A
+LBC5X__M72AE2Ap__M06AX9A040B0
+LBC5X__M72AE2BA__M06BAAS5630D0
+LBC5X__M72AE2BG__M06BG8803A0
+LBC5X__M72AE2BM__M06BMS5614LA0
+LBC5X__M72AE2BV__M06BV8844A0
+LBC5X__M72AE2CF__M06CF140XXA0
+LBC5X__M72AE3AAMJ__M06AAT54260AA
+LBC5X__M72AE3AAMJ__M06AATPS54160
+LBC5X__M72AE3BA8__M06XBQ29500E
+LBC5X__M72AE3BCS8__M06BCPS40170A
+LBC5X__M72AE3BCS8__M06BCPS40170A
+LBC5X__M72AE3BS__M06BST54260AA
+LBC5X__M72AE3BS__M06BSTPS92510
+LBC5X__M72AE3BT__M06BTPS5405B0
+LBC5X__M72AE3BT__M06BTSN6046A0
+LBC5X__M72AE3BT__M06BTSN6046A0
+LBC5X__M72AE3CJ__M06CJ54061AA0
+LBC5X__M72AE4AMS__M06AMPL910ADB
+LBC5X__M72AF3AAMJ__M06AAT54260AA
+LBC5X__M72AF3AAMJ__M06AAT54260AA
+LBC5X__M72AF3BU__M06BULM5175A
+LBC5__A70AI3NMPL__M05Q0105262B
+LBC5__A70AI3NP__M05N0509066A
+LBC5__A70AI3NS__M05NPS28225A
+LBC5__M70AI1M__M05MN306020C
+LBC5__M70AI2MP__M05MCXD9845B
+LBC5__M70AI3NM__M05QN301043C
+LBC5__M70AI3NS__M05NPS28225A
+LBC5__M70AI3NS__M05NPS28225A
+
+The following recipes failed:
+
+LBC5X__A72AE3AO__M06AOAS5414D0M1
+LBC5X__A72AE3AO__M06AOCDBCAB0
+LBC5X__A72AF3AAMI__M06AAT54260AA
+LBC5X__A72AF3ABS__M06ABSPHDPA0
+LBC5X__A72AF3AB__M06ABPHDPC0
+LBC5X__A72AF3AB__M06ABPHDPC0
+LBC5X__A72AF3AB__M06XN105070E
+LBC5X__M72AE2AB__M06ABAS5132A
+LBC5X__M72AE3ABMJ__M06ABPS54331A
+LBC5X__M72AE3ABMJ__M06ABT54531A0
+LBC5__M70AI2NM__M05HTTAS5111B
 

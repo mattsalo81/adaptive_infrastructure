@@ -13,7 +13,7 @@ our $number_format = '[-+]?[0-9]*(\.)?[0-9]+([eE][-+]?[0-9]+)?';
 # configuration variables
 my @required_fields = qw(rule_number technology family dev_class prod_grp);
 push @required_fields, qw(routing effective_routing program device process_option);
-push @required_fields, qw(coordref test_lpt test_opn lpt functionality);
+push @required_fields, qw(coordref test_lpt test_opn lpt functionality cot);
 @required_fields = map {tr/a-z/A-Z/; $_} @required_fields;
 
 # fields that are allowed but are not used for filtering

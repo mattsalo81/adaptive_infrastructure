@@ -31,7 +31,7 @@ sub get_text{
         command_line,
         <EOR>
     };
-    $text =~ join("\n", map {s/^\s*//; $_} grep {m/\S/} split(/\n/, $text));
+    $text = join("\n", map {s/^\s*//; $_} grep {m/\S/} split(/\n/, $text));
     return $text;
 }
 

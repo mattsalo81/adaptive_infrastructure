@@ -18,6 +18,7 @@ my %filetype_lookup = (
     krf         => "recipe",
     klf         => "klf",
     wpf         => "wpf",
+    wdf         => "wdf",
     ktm         => "ktm",
     gdf         => "gdf",
 );
@@ -82,6 +83,10 @@ sub queue_archival{
     my ($file, $text) = @_;
     Logging::debug("Queuing <$file> for archival");
     configure_tmp();
+    my $file_ext = $file;
+    $file_ext =~ s/.*\.//;
+    confess "Unexpected file type <$file_ext>" unless defined $filetype_lookup{$file_ext};
+    $file_types_to_install{$file_ext} = 1;
     my $tmp_file = "$tmp_dir/$file";
     open my $fh, "> $tmp_file" or confess "Could not save copy of file (to archive) in <$tmp_file>";
     print $fh $text;
