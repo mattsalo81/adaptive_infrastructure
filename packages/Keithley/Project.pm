@@ -12,6 +12,7 @@ my %filetype_lookup = (
     cpf         => "KI_KTXE_CPF",
     krf         => "KI_KTXE_KRF",
     klf         => "KI_KTXE_KLF",
+    wdf         => "KI_KTXE_WDF",
     wpf         => "KI_KTXE_WPF",
     ktm         => "KI_KTXE_KTM",
     gdf         => "KI_KTXE_GDF",

@@ -5,6 +5,7 @@ use lib '/dm5/ki/adaptive_infrastructure/packages';
 use Carp;
 use Data::Dumper;
 use Logging;
+use Components::DeviceString;
 use Keithley::AutoZ;
 use Keithley::CPFSel;
 use Keithley::File;
@@ -16,7 +17,7 @@ use Keithley::Parse::KTM;
 use Keithley::Parse::WDF;
 use Keithley::Parse::WPF;
 use Keithley::Parse::KRF;
-use Components::DeviceString;
+use SpecFiles::Deploy;
 use SpecFiles::GenerateSpec;
 
 
@@ -35,7 +36,9 @@ sub generate_recipes{
     foreach my $sms_rec (sort {$a->get("RECIPE") cmp $b->get("RECIPE")} @{$sms_records}){
         eval{
             generate_recipe($sms_rec, $recipe_type, $use_archive);
-            push @successful_recipes, $sms_rec->get("RECIPE") . "$recipe_type";
+            my $recipe = $sms_rec->get("RECIPE") . "$recipe_type";
+            push @successful_recipes, $recipe;
+            print "generated <$recipe>\n";
             1;
         }or do{
             my $e = $@;
@@ -46,6 +49,8 @@ sub generate_recipes{
     }
     print "The following recipes were successful:\n\n" . join("\n", @successful_recipes) . "\n\n";
     print "The following recipes failed:\n\n" . join("\n", @failed_recipes) . "\n\n";
+    Keithley::File::commit();
+    SpecFiles::Deploy::commit();
 }
 
 sub generate_recipe{
@@ -157,7 +162,8 @@ sub generate_recipe{
     Keithley::File::save_text($klf_name, $klf_text, $use_archive);
     Keithley::File::save_text($wdf_name, $new_wdf_text, $use_archive);
     
-    # handle specfile?
+    # deploy specfile
+    SpecFiles::Deploy::save($sms_rec->get("PROGRAM"), $spec_name, $spec_text);
     
 }
 
