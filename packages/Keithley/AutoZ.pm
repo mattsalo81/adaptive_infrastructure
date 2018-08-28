@@ -8,6 +8,7 @@ use Logging;
 use Database::Connect;
 
 my $autoz_sth;
+my %autoz_mod;
 
 sub is_autoz_module_sms_rec{
     my ($sms_rec, $test_module) = @_;
@@ -17,6 +18,15 @@ sub is_autoz_module_sms_rec{
 }
 
 sub is_autoz_module{
+    my ($technology, $test_area, $test_module) = @_;
+    my $key = "$technology  $test_area  $test_module";
+    unless(defined $autoz_mod{$key}){
+        $autoz_mod{$key} = _is_autoz_module($technology, $test_area, $test_module);
+    }
+    return $autoz_mod{$key};
+}
+
+sub _is_autoz_module{
     my ($technology, $test_area, $test_module) = @_;
     my $sth = get_autoz_sth();
     $sth->execute($technology, $test_area, $test_module);
