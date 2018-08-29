@@ -106,8 +106,10 @@ sub install_all{
         Logging::event("Installing <$file_type> type files...");
         system("krm_mass_coci.pl '$tmp_dir' '$file_type' 'Automated Recipe Generator' -auto > /dev/null");
         delete $file_types_to_install{$file_type};
+        Logging::event("Released <$file_type> files");
         unlink(glob("$tmp_dir/*.$file_type"));
     }
+    print("Archived Files ready for `krm install`\n");
 }
 
 1;

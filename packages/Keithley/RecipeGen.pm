@@ -51,7 +51,7 @@ sub generate_recipes{
     }
     print "The following recipes were successful:\n\n" . join("\n", @successful_recipes) . "\n\n";
     print "The following recipes failed:\n\n" . join("\n", @failed_recipes) . "\n\n";
-    Keithley::File::commit();
+    Keithley::File::commit($use_archive);
     SpecFiles::Deploy::commit();
 }
 
@@ -129,7 +129,7 @@ sub generate_recipe{
     my $klf_name = $sms_rec->get("PROGRAM") . ".klf";
 
     # generate specfile
-    my $spec_text = GenerateSpec::get_spec_sms($sms_rec, $use_comp);
+    my $spec_text = GenerateSpec::get_spec_sms($sms_rec, $use_comp)->get_text();
     my $spec_name = "DMOS5_" . $sms_rec->get("TECHNOLOGY") . "_" . $sms_rec->get("PROGRAM") . ".spec";
 
     # generate device string

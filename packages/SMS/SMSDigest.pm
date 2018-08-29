@@ -53,6 +53,32 @@ sub get_recipe_gen_info_for_tech{
     return \@records;
 }
 
+sub get_recipe_gen_info_for_recipes{
+    my (@recipes) = @_;
+    my $in = join ', ', map {"?"} @recipes;
+    my $sql = qq{
+        select distinct
+            e.program,
+            e.prober_file,
+            e.recipe,
+            e.technology,
+            e.effective_routing,
+            e.area
+        from    
+            daily_sms_extract e 
+        where 
+            e.recipe in ($in)
+    };
+    my $conn = Connect::read_only_connection("etest");
+    my $sth = $conn->prepare($sql);
+    $sth->execute(@recipes) or confess "Could not get the daily_sms_extract";
+    my @records;
+    while (my $rec = $sth->fetchrow_hashref("NAME_uc")){
+        push @records, SMSSpec->new($rec);
+    }
+    return \@records;
+}
+
 sub get_all_active_records{
     my $sql = q{select e.* from daily_sms_extract e where e.device in 
                (select distinct w.device from daily_wip_extract w)};

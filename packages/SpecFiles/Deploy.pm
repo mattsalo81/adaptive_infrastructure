@@ -70,14 +70,14 @@ sub create_migration_info{
 
             # manage previous specfile
             cd '$program'
-            if [ -f '$program.spec' ] ; then
+            if [ -f '$program.spec' -a ! -L '$program.spec' ] ; then
                 mv '$program.spec' '$program.spec-$stamp'
             fi
     
             # manage previous link
             if [ -L '$program.spec' ] ; then
-                LINK_DEST="\$(readlink '$program.spec')"
-                if [ "\$LINK_DEST" -ne '$program_dir_from_parm5tst/specfiles/$spec' ] ; then
+                LINK_DEST="\$(ls -ltr '$program.spec' | sed 's/.*->[ \t]*//')"
+                if [ "\$LINK_DEST" != '$program_dir_from_parm5tst/specfiles/$spec' ] ; then
                     mv '$program.spec' '$program.spec-$stamp'
                 fi
             fi
@@ -100,13 +100,14 @@ sub create_migration_info{
     foreach my $program (keys %prog2spec){
         my $spec = $prog2spec{$program};
         $script .= qq{
-            CUR_CKSUM="\$(cksum '$program/$program.spec' | sed 's/[ \\t].*//')"
-            COR_CKSUM="\$(cksum '$cmp_dir/$spec' | sed 's/[ \\t].*//')"
+            CUR_CKSUM="\$(cksum '$program/$program.spec' | sed 's/[ \t].*//')"
+            COR_CKSUM="\$(cksum '$cmp_dir/$spec' | sed 's/[ \t].*//')"
             if [ "\$CUR_CKSUM" != "\$COR_CKSUM" ] ; then
                 echo "<$program> failed to deploy <$spec>.  Checksum is <\$CUR_CKSUM> but should be <\$COR_CKSUM>"
             fi
         };
     }
+    $script .= "echo 'Deployment complete... Errors will be printed above'";
     my $q3030_shell = "$common_dir_from_q3030/$shell_file_name";
     my $parm5tst_shell = "$common_dir_from_parm5tst/$shell_file_name";
     open my $fh, "> $q3030_shell" or confess "Could not write to <$q3030_shell>";
