@@ -30,22 +30,24 @@ my %recipe_to_wdf_type = (
 );
 
 sub generate_recipes{
-    my ($sms_records, $recipe_type, $use_archive) = @_;
+    my ($sms_records, $recipe_types, $use_archive) = @_;
     my @successful_recipes;
     my @failed_recipes;
     foreach my $sms_rec (sort {$a->get("RECIPE") cmp $b->get("RECIPE")} @{$sms_records}){
-        eval{
-            generate_recipe($sms_rec, $recipe_type, $use_archive);
-            my $recipe = $sms_rec->get("RECIPE") . "$recipe_type";
-            push @successful_recipes, $recipe;
-            print "generated <$recipe>\n";
-            1;
-        }or do{
-            my $e = $@;
-            my $failed = $sms_rec->get("RECIPE") . "$recipe_type";
-            warn "\n\n\nCould not generate recipe <$failed> because $e\n\n\n";
-            push @failed_recipes, $failed;
-        };
+        foreach my $recipe_type (@{$recipe_types}){
+            eval{
+                generate_recipe($sms_rec, $recipe_type, $use_archive);
+                my $recipe = $sms_rec->get("RECIPE") . "$recipe_type";
+                push @successful_recipes, $recipe;
+                print "generated <$recipe>\n";
+                1;
+            }or do{
+                my $e = $@;
+                my $failed = $sms_rec->get("RECIPE") . "$recipe_type";
+                warn "\n\n\nCould not generate recipe <$failed> because $e\n\n\n";
+                push @failed_recipes, $failed;
+            };
+        }
     }
     print "The following recipes were successful:\n\n" . join("\n", @successful_recipes) . "\n\n";
     print "The following recipes failed:\n\n" . join("\n", @failed_recipes) . "\n\n";

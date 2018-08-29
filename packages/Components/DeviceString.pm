@@ -43,7 +43,7 @@ sub convert_bits_to_device_string{
 
     my @bitstring = (0) x $max_bits;
     foreach my $bit (@{$bits}){
-        $bitstring[$bit] = 1;
+        $bitstring[$bit-1] = 1;
     }
 
     Logging::diag("Bitstring is " . join("", @bitstring));
