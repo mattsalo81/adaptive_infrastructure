@@ -125,6 +125,12 @@ my @tests =(
     ['SET',     'SAMPLING_RATE',   "5 SITE",  1,   "SAMPLING_RATE", "5 SITE"],
     ['FORBID_5_SITE','SAMPLING_RATE', undef,  1,   "SAMPLING_RATE", "9 SITE"],
     ['FORBID_5_SITE','SAMPLING_RATE', undef,  0,   "SAMPLING_RATE", "9 SITE"],
+    # FORBID_9_SITE
+    ['SET',     'SAMPLING_RATE',   "RANDOM",  1,   "SAMPLING_RATE", "RANDOM"],
+    ['FORBID_9_SITE','SAMPLING_RATE', undef,  0,   "SAMPLING_RATE", "RANDOM"],
+    ['SET',     'SAMPLING_RATE',   "9 SITE",  1,   "SAMPLING_RATE", "9 SITE"],
+    ['FORBID_9_SITE','SAMPLING_RATE', undef,  1,   "SAMPLING_RATE", "5 SITE"],
+    ['FORBID_9_SITE','SAMPLING_RATE', undef,  0,   "SAMPLING_RATE", "5 SITE"],
     # DISPO_RULE
     ['SET',     'DISPO_RULE',      "OPAP",    1,   "DISPO_RULE",    "OPAP"],
     ['SET',     'DISPO_RULE',      "OPAP",    0,   "DISPO_RULE",    "OPAP"],

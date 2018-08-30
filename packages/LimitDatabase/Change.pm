@@ -42,6 +42,7 @@ my %known_things = (
                                         RELAX           => \&RELAX_SAMPLING_RATE,
                                         TIGHTEN         => \&TIGHTEN_SAMPLING_RATE,
                                         FORBID_5_SITE   => \&FORBID_5_SITE,
+                                        FORBID_9_SITE   => \&FORBID_9_SITE,
                                         SET             => sub {return set_value($_[1], "SAMPLING_RATE", $_[0]->{"VALUE"})},
                                     },
     SPEC                        => {
@@ -291,6 +292,14 @@ sub FORBID_5_SITE{
     my ($self, $limit) = @_;
     if ($limit->get("SAMPLING_RATE") eq "5 SITE"){
         return set_value($limit, "SAMPLING_RATE", "9 SITE");
+    }
+    return 0;
+}
+
+sub FORBID_9_SITE{
+    my ($self, $limit) = @_;
+    if ($limit->get("SAMPLING_RATE") eq "9 SITE"){
+        return set_value($limit, "SAMPLING_RATE", "5 SITE");
     }
     return 0;
 }
