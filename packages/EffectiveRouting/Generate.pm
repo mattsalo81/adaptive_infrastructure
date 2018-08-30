@@ -51,6 +51,7 @@ sub LBC5{
 # code 0 -> Test Area
 # code 1 -> # of ML
 # code 2 -> 2 char options
+# code 3 -> scribe width?
 sub LBC7{
     my ($record) = @_;
     my ($main_code, $num_ml);
@@ -77,7 +78,18 @@ sub LBC7{
     }else{
         confess "Unexpected LBC7 routing format <$routing>";
     }
-    return make_routing_from_array($num_ml, $main_code);
+    # get card_type from card
+    my $card = get($record, "CARD_FAMILY");
+    my $card_type;;
+    if($card eq "MPRYXX"){
+        $card_type = 'Y';
+    }elsif($card eq "MPRZXX"){
+        $card_type = 'Z';
+    }else{
+        confess "unexpected card type <$card>";
+    }
+
+    return make_routing_from_array($num_ml, $main_code, $card_type);
 }
 
 # code 0 -> Test Area

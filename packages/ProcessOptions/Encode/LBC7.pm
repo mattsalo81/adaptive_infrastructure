@@ -15,7 +15,8 @@ sub get_codes{
     my $area = Encode::Global::get_area_codes();
     my $ml	= Encode::Global::get_num_ml_codes();
     my $main = Encode::Global::parse_old_txt_format($options);	
-    return [$area, $ml, $main];
+    mY $card = Encode::Global::parse_old_txt_format($card_options);
+    return [$area, $ml, $main, $card];
 }
 
 $options = q{
@@ -375,4 +376,10 @@ OK PBL DEEPN NLDD PLDD PORPLUG PO_CMP SiON_PO POLY2 HPCAP 435C_Sinter PORDCU MET
 OL LVT NLDD PLDD SiON_PO MET3THK 435C_Sinter THICK
 OM DWELL DEEPN LVT NLDD PLDD PORPLUG PO_CMP SiON_PO 435C_Sinter PORDCU METDCU LVGX
 };
+
+my $card_options = q{
+Z Z_CARD 80UM_SCRIBE
+Y Y_CARD 52UM_SCRIBE
+};
+
 1;
