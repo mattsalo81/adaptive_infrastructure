@@ -1,7 +1,7 @@
+This repository contains a perl-based infrastructure for generating test plans/recipes for Keithley S600 Parametric Testers.
+
+
 The adaptive test infrastructure uses the GIT revision control system.
-Files are being uploaded to TI's official, IT supported Bitbucket. You could
-also configure your windows system to pull/push from the repo, so could
-conceivably work from that at all times.
 
 Basic Tutorials :
 	https://git-scm.com/docs/gittutorial
